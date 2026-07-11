@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-segueme}
+      POSTGRES_USER: ${DB_USERNAME:-segueme}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-segueme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-segueme}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # KC_HOSTNAME fixo em "keycloak" faz o Keycloak emitir sempre o mesmo `iss` no
+  # token, seja acessado pela rede interna do compose (app) ou do host (browser/Swagger).
+  # Para acessar pelo host, adicione "127.0.0.1 keycloak" ao /etc/hosts local.
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_HOSTNAME: keycloak
+      KC_HOSTNAME_PORT: "8081"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./src/main/resources/keycloak/segueme-realm.json:/opt/keycloak/data/import/segueme-realm.json:ro
+
+  app:
+    build: .
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-segueme}
+      DB_USERNAME: ${DB_USERNAME:-segueme}
+      DB_PASSWORD: ${DB_PASSWORD:-segueme}
+      KEYCLOAK_ISSUER_URI: http://keycloak:8081/realms/segueme
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+
+volumes:
+  postgres-data:

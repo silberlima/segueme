@@ -1,0 +1,32 @@
+{
+  "realm": "segueme",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "roles": {
+    "realm": [
+      { "name": "NACIONAL" },
+      { "name": "DIOCESE" },
+      { "name": "SETORIAL" },
+      { "name": "PAROQUIA" },
+      { "name": "EQUIPE_FICHAS" },
+      { "name": "EQUIPE_MONTAGEM" },
+      { "name": "EQUIPE_COMANDO" },
+      { "name": "EQUIPE_FINANCAS" },
+      { "name": "POS_ENCONTRO" },
+      { "name": "SEGUIDOR" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "segueme-frontend",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:5173"]
+    }
+  ]
+}
