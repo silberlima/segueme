@@ -4,7 +4,6 @@ import com.silberlima.segueme.acesso.application.dto.MeResult;
 import com.silberlima.segueme.acesso.application.dto.UsuarioAutenticadoClaims;
 import com.silberlima.segueme.acesso.domain.Perfil;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,11 +17,7 @@ import org.springframework.stereotype.Service;
 public class GetMeUseCase {
 
     public MeResult execute(UsuarioAutenticadoClaims claims) {
-        List<Perfil> perfis = claims.authorities().stream()
-                .map(Perfil::fromAuthority)
-                .flatMap(Optional::stream)
-                .distinct()
-                .toList();
+        List<Perfil> perfis = Perfil.fromAuthorities(claims.authorities());
         return new MeResult(claims.id(), claims.email(), claims.nome(), perfis);
     }
 }

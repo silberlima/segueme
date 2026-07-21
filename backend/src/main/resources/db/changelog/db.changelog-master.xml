@@ -9,5 +9,6 @@
          <include file="db/changelog/pessoas/db.changelog-pessoas.xml" relativeToChangelogFile="false"/> -->
 
     <include file="db/changelog/notificacao/db.changelog-notificacao.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/hierarquia/db.changelog-hierarquia.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

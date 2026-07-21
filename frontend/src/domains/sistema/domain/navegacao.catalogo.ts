@@ -22,8 +22,20 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
   { titulo: 'Painel Pós-Encontro', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['POS_ENCONTRO'] },
   { titulo: 'Meu Perfil', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['SEGUIDOR'] },
 
-  { titulo: 'Dioceses e Setores', modulo: 'Território', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Paróquias', modulo: 'Território', status: 'previsto', path: null, perfis: 'todos' },
+  {
+    titulo: 'Dioceses e Setores',
+    modulo: 'Território',
+    status: 'pronto',
+    path: '/hierarquia/dioceses',
+    perfis: ['NACIONAL', 'DIOCESE'],
+  },
+  {
+    titulo: 'Paróquias',
+    modulo: 'Território',
+    status: 'pronto',
+    path: '/hierarquia/paroquias',
+    perfis: ['NACIONAL', 'DIOCESE', 'SETORIAL'],
+  },
 
   { titulo: 'Lista de Pessoas', modulo: 'Pessoas', status: 'previsto', path: null, perfis: 'todos' },
   { titulo: 'Cadastrar Pessoa', modulo: 'Pessoas', status: 'previsto', path: null, perfis: 'todos' },

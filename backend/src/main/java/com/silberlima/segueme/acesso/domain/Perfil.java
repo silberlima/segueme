@@ -1,6 +1,8 @@
 package com.silberlima.segueme.acesso.domain;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -36,5 +38,14 @@ public enum Perfil {
         return Arrays.stream(values())
                 .filter(perfil -> perfil.name().equals(name))
                 .findFirst();
+    }
+
+    /** Converte um conjunto de authorities do Spring Security nos perfis correspondentes (RN-ACESSO-02). */
+    public static List<Perfil> fromAuthorities(Collection<String> authorities) {
+        return authorities.stream()
+                .map(Perfil::fromAuthority)
+                .flatMap(Optional::stream)
+                .distinct()
+                .toList();
     }
 }

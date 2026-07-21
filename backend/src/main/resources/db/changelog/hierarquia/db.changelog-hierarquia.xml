@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="hierarquia-0001-create-tables" author="segueme">
+        <createTable tableName="diocese">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nome" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="setor">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nome" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="diocese_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_setor_diocese" references="diocese(id)"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="setor" indexName="idx_setor_diocese">
+            <column name="diocese_id"/>
+        </createIndex>
+
+        <createTable tableName="paroquia">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nome" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="setor_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_paroquia_setor" references="setor(id)"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="paroquia" indexName="idx_paroquia_setor">
+            <column name="setor_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Dados de demonstração (pendência #25 de pendencias-gerais.md: não há tela de
+         cadastro/edição no protótipo, apenas consulta). Nomes genéricos, não representam
+         uma estrutura eclesiástica real. -->
+    <changeSet id="hierarquia-0002-seed-demo-data" author="segueme">
+        <insert tableName="diocese">
+            <column name="id" value="00000000-0000-4000-8000-000000000001"/>
+            <column name="nome" value="Diocese Central"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="diocese">
+            <column name="id" value="00000000-0000-4000-8000-000000000002"/>
+            <column name="nome" value="Diocese Norte"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="setor">
+            <column name="id" value="00000000-0000-4000-8000-000000000011"/>
+            <column name="nome" value="Setor 1"/>
+            <column name="diocese_id" value="00000000-0000-4000-8000-000000000001"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="setor">
+            <column name="id" value="00000000-0000-4000-8000-000000000012"/>
+            <column name="nome" value="Setor 2"/>
+            <column name="diocese_id" value="00000000-0000-4000-8000-000000000001"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="setor">
+            <column name="id" value="00000000-0000-4000-8000-000000000021"/>
+            <column name="nome" value="Setor 1"/>
+            <column name="diocese_id" value="00000000-0000-4000-8000-000000000002"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="setor">
+            <column name="id" value="00000000-0000-4000-8000-000000000022"/>
+            <column name="nome" value="Setor 2"/>
+            <column name="diocese_id" value="00000000-0000-4000-8000-000000000002"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="paroquia">
+            <column name="id" value="00000000-0000-4000-8000-000000000111"/>
+            <column name="nome" value="Paróquia São José"/>
+            <column name="setor_id" value="00000000-0000-4000-8000-000000000011"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="paroquia">
+            <column name="id" value="00000000-0000-4000-8000-000000000112"/>
+            <column name="nome" value="Paróquia Santa Rita"/>
+            <column name="setor_id" value="00000000-0000-4000-8000-000000000011"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="paroquia">
+            <column name="id" value="00000000-0000-4000-8000-000000000121"/>
+            <column name="nome" value="Paróquia São Pedro"/>
+            <column name="setor_id" value="00000000-0000-4000-8000-000000000012"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="paroquia">
+            <column name="id" value="00000000-0000-4000-8000-000000000122"/>
+            <column name="nome" value="Paróquia Nossa Senhora Aparecida"/>
+            <column name="setor_id" value="00000000-0000-4000-8000-000000000012"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="paroquia">
+            <column name="id" value="00000000-0000-4000-8000-000000000211"/>
+            <column name="nome" value="Paróquia Santo Antônio"/>
+            <column name="setor_id" value="00000000-0000-4000-8000-000000000021"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="paroquia">
+            <column name="id" value="00000000-0000-4000-8000-000000000212"/>
+            <column name="nome" value="Paróquia São Francisco"/>
+            <column name="setor_id" value="00000000-0000-4000-8000-000000000021"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="paroquia">
+            <column name="id" value="00000000-0000-4000-8000-000000000221"/>
+            <column name="nome" value="Paróquia São João Batista"/>
+            <column name="setor_id" value="00000000-0000-4000-8000-000000000022"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
