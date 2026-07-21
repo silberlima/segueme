@@ -3,6 +3,7 @@ package com.silberlima.segueme.api.exception;
 import com.silberlima.segueme.domain.exception.BusinessRuleViolationException;
 import com.silberlima.segueme.domain.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,6 +39,15 @@ public class GlobalExceptionHandler {
         Map<String, String> fieldErrors = new LinkedHashMap<>();
         exception.getBindingResult().getFieldErrors()
                 .forEach(fieldError -> fieldErrors.put(fieldError.getField(), fieldError.getDefaultMessage()));
+        return build(HttpStatus.BAD_REQUEST, "Dados inválidos", request, fieldErrors);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiError> handleConstraintViolation(ConstraintViolationException exception,
+            HttpServletRequest request) {
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        exception.getConstraintViolations().forEach(violation -> fieldErrors.put(
+                violation.getPropertyPath().toString(), violation.getMessage()));
         return build(HttpStatus.BAD_REQUEST, "Dados inválidos", request, fieldErrors);
     }
 

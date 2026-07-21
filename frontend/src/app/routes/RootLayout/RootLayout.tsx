@@ -1,12 +1,20 @@
-import { useAuth } from '../../providers/AuthProvider'
+import { Outlet } from 'react-router-dom'
+import { ProfileProvider } from '../../providers/ProfileProvider'
+import { Sidebar } from '../../../domains/sistema/components/Sidebar'
+import { Header } from '../../../domains/sistema/components/Header'
 
 export function RootLayout() {
-  const { user } = useAuth()
-
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-2">
-      <h1 className="text-2xl font-semibold text-slate-900">Segue-me</h1>
-      <p className="text-sm text-slate-500">{user?.name ?? user?.email ?? 'Bem-vindo(a).'}</p>
-    </div>
+    <ProfileProvider>
+      <div className="flex h-screen bg-slate-50">
+        <Sidebar />
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <Header />
+          <main className="flex-1 overflow-y-auto bg-slate-50">
+            <Outlet />
+          </main>
+        </div>
+      </div>
+    </ProfileProvider>
   )
 }

@@ -17,6 +17,6 @@ export interface AuthContextValue {
   isConfigured: boolean
   user: AuthUser | null
   roles: string[]
-  login: () => void
+  login: (email: string, password: string) => Promise<void>
   logout: () => void
 }

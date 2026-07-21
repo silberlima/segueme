@@ -8,4 +8,6 @@
     <!-- Cada domínio inclui seu próprio changelog aqui, ex.:
          <include file="db/changelog/pessoas/db.changelog-pessoas.xml" relativeToChangelogFile="false"/> -->
 
+    <include file="db/changelog/notificacao/db.changelog-notificacao.xml" relativeToChangelogFile="false"/>
+
 </databaseChangeLog>
