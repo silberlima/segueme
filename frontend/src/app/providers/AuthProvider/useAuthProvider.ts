@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { setAccessTokenProvider } from '../../../shared/utils/httpClient'
+import { queryClient } from '../QueryProvider'
 import type { AuthContextValue, AuthUser } from './AuthProvider.types'
 
 const SESSION_STORAGE_KEY = 'segueme.session'
@@ -211,6 +212,9 @@ export function useAuthProvider(): AuthContextValue {
       if (!response.ok) {
         throw new Error('Credenciais inválidas. Verifique seu e-mail e senha.')
       }
+      // Novo login pode trocar de usuário: descarta caches (ex.: `me`, `perfilAtivo`)
+      // do usuário anterior para não vazar seu perfil/escopo para a nova sessão.
+      queryClient.clear()
       applyTokenResponse((await response.json()) as TokenResponse)
     },
     [applyTokenResponse, clientId],
@@ -220,6 +224,7 @@ export function useAuthProvider(): AuthContextValue {
     const authority = buildAuthority()
     const refreshToken = session?.refreshToken
     clearSession()
+    queryClient.clear()
     if (authority && clientId && refreshToken) {
       void fetch(`${authority}/protocol/openid-connect/logout`, {
         method: 'POST',
