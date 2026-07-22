@@ -147,6 +147,33 @@ class HierarquiaControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.content[0].nome").value("Paróquia do Setor A"));
     }
 
+    @Test
+    void shouldListOwnParoquiaWhenParoquia() throws Exception {
+        Diocese diocese = dioceseRepository.save(new Diocese("Diocese Escopo Paróquia Perfil"));
+        Setor setor = setorRepository.save(new Setor("Setor Escopo Paróquia Perfil", diocese));
+        Paroquia paroquia = paroquiaRepository.save(new Paroquia("Paróquia do Perfil Paróquia", setor));
+
+        mockMvc.perform(get("/api/v1/paroquias")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
+                                .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("Paróquia do Perfil Paróquia"));
+    }
+
+    @Test
+    void shouldReturn200WhenEquipeFichasListsParoquias() throws Exception {
+        Diocese diocese = dioceseRepository.save(new Diocese("Diocese Escopo Fichas"));
+        Setor setor = setorRepository.save(new Setor("Setor Escopo Fichas", diocese));
+        Paroquia paroquia = paroquiaRepository.save(new Paroquia("Paróquia do Perfil Fichas", setor));
+
+        mockMvc.perform(get("/api/v1/paroquias")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))
+                                .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1));
+    }
+
     private void criarSetorComParoquia(Diocese diocese, String nomeSetor, String nomeParoquia) {
         Setor setor = setorRepository.save(new Setor(nomeSetor, diocese));
         paroquiaRepository.save(new Paroquia(nomeParoquia, setor));

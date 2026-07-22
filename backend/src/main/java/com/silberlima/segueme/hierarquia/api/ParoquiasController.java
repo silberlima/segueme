@@ -40,8 +40,12 @@ public class ParoquiasController {
         this.paroquiaResponseMapper = paroquiaResponseMapper;
     }
 
+    // PAROQUIA e EQUIPE_FICHAS incluídos a partir da Fase 3 (Pessoas): o formulário de
+    // Cadastro de Pessoa usa este endpoint para o seletor de paróquia, e são exatamente os
+    // perfis autorizados a criar pessoa (PessoasController). O escopo de cada um já era
+    // resolvido corretamente pelo EscopoTerritorialResolver — só a role estava faltando aqui.
     @GetMapping
-    @PreAuthorize("hasAnyRole('NACIONAL','DIOCESE','SETORIAL')")
+    @PreAuthorize("hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA','EQUIPE_FICHAS')")
     @Operation(summary = "Lista as paróquias do escopo territorial do usuário autenticado")
     public ResponseEntity<PageResponse<ParoquiaResponse>> listar(
             @AuthenticationPrincipal Jwt jwt,
