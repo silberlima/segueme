@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="pessoas-0001-create-tables" author="segueme">
+        <createTable tableName="pessoa">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nome_completo" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_nascimento" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="telefone" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="estado_civil" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="paroquia_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_pessoa_paroquia" references="paroquia(id)"/>
+            </column>
+            <column name="situacao" type="varchar(20)" defaultValue="PRE_INSCRITO">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alergias" type="varchar(255)"/>
+            <column name="restricao_alimentar" type="varchar(255)"/>
+            <column name="medicacao_uso_continuo" type="varchar(255)"/>
+            <column name="contato_emergencia_nome" type="varchar(255)"/>
+            <column name="contato_emergencia_telefone" type="varchar(30)"/>
+            <column name="contato_emergencia_parentesco" type="varchar(100)"/>
+            <column name="indicado_por_id" type="uuid">
+                <constraints foreignKeyName="fk_pessoa_indicado_por" references="pessoa(id)"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="pessoa" indexName="idx_pessoa_paroquia">
+            <column name="paroquia_id"/>
+        </createIndex>
+        <createIndex tableName="pessoa" indexName="idx_pessoa_nome_completo">
+            <column name="nome_completo"/>
+        </createIndex>
+
+        <createTable tableName="competencia">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nome" type="varchar(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="pessoa_competencia">
+            <column name="pessoa_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_pessoa_competencia_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="competencia_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_pessoa_competencia_competencia"
+                             references="competencia(id)"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="pessoa_competencia" columnNames="pessoa_id, competencia_id"
+                        constraintName="pk_pessoa_competencia"/>
+
+        <createTable tableName="casal">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pessoa1_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_casal_pessoa1" references="pessoa(id)"/>
+            </column>
+            <column name="pessoa2_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_casal_pessoa2" references="pessoa(id)"/>
+            </column>
+            <column name="data_vinculo" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="casal" indexName="idx_casal_pessoa1">
+            <column name="pessoa1_id"/>
+        </createIndex>
+        <createIndex tableName="casal" indexName="idx_casal_pessoa2">
+            <column name="pessoa2_id"/>
+        </createIndex>
+
+        <createTable tableName="historico_evento">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_historico_evento_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="tipo" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_evento" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="descricao" type="varchar(500)"/>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="historico_evento" indexName="idx_historico_evento_pessoa">
+            <column name="pessoa_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Catálogo nacional de competências (RF-013). Lista observada no protótipo, conjunto exato
+         a confirmar com o PO (pendência #16 de pendencias-gerais.md) — seed placeholder documentado. -->
+    <changeSet id="pessoas-0002-seed-competencias" author="segueme">
+        <insert tableName="competencia">
+            <column name="id" value="00000000-0000-4000-8000-000000000401"/>
+            <column name="nome" value="Canta"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="competencia">
+            <column name="id" value="00000000-0000-4000-8000-000000000402"/>
+            <column name="nome" value="Cozinha"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="competencia">
+            <column name="id" value="00000000-0000-4000-8000-000000000403"/>
+            <column name="nome" value="Violão"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="competencia">
+            <column name="id" value="00000000-0000-4000-8000-000000000404"/>
+            <column name="nome" value="Fotografia"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="competencia">
+            <column name="id" value="00000000-0000-4000-8000-000000000405"/>
+            <column name="nome" value="Decoração"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="competencia">
+            <column name="id" value="00000000-0000-4000-8000-000000000406"/>
+            <column name="nome" value="Som/Teclado"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="competencia">
+            <column name="id" value="00000000-0000-4000-8000-000000000407"/>
+            <column name="nome" value="Motorista"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="competencia">
+            <column name="id" value="00000000-0000-4000-8000-000000000408"/>
+            <column name="nome" value="Informática"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="competencia">
+            <column name="id" value="00000000-0000-4000-8000-000000000409"/>
+            <column name="nome" value="Liturgia"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+    <!-- Dados de demonstração ligados às paróquias semeadas na Fase 2 (hierarquia), para
+         exercitar a Lista de Pessoas/Casais/Competências em dev — mesmo padrão do seed de
+         hierarquia. Não representam pessoas reais. -->
+    <changeSet id="pessoas-0003-seed-demo-data" author="segueme">
+        <insert tableName="pessoa">
+            <column name="id" value="00000000-0000-4000-8000-000000000301"/>
+            <column name="nome_completo" value="Ana Beatriz Souza"/>
+            <column name="data_nascimento" valueDate="2003-04-12"/>
+            <column name="telefone" value="(11) 91234-5678"/>
+            <column name="estado_civil" value="SOLTEIRO"/>
+            <column name="paroquia_id" value="00000000-0000-4000-8000-000000000111"/>
+            <column name="situacao" value="SEGUIDOR"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="pessoa">
+            <column name="id" value="00000000-0000-4000-8000-000000000302"/>
+            <column name="nome_completo" value="Carlos Eduardo Lima"/>
+            <column name="data_nascimento" valueDate="2001-09-30"/>
+            <column name="telefone" value="(11) 99876-5432"/>
+            <column name="estado_civil" value="SOLTEIRO"/>
+            <column name="paroquia_id" value="00000000-0000-4000-8000-000000000111"/>
+            <column name="situacao" value="SEGUIMISTA"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="pessoa">
+            <column name="id" value="00000000-0000-4000-8000-000000000303"/>
+            <column name="nome_completo" value="Fernanda Alves Costa"/>
+            <column name="data_nascimento" valueDate="1998-01-22"/>
+            <column name="telefone" value="(11) 98765-4321"/>
+            <column name="estado_civil" value="CASADO"/>
+            <column name="paroquia_id" value="00000000-0000-4000-8000-000000000112"/>
+            <column name="situacao" value="SEGUIDOR"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="pessoa">
+            <column name="id" value="00000000-0000-4000-8000-000000000304"/>
+            <column name="nome_completo" value="Rodrigo Martins Costa"/>
+            <column name="data_nascimento" valueDate="1997-06-15"/>
+            <column name="telefone" value="(11) 97654-3210"/>
+            <column name="estado_civil" value="CASADO"/>
+            <column name="paroquia_id" value="00000000-0000-4000-8000-000000000112"/>
+            <column name="situacao" value="SEGUIDOR"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="pessoa">
+            <column name="id" value="00000000-0000-4000-8000-000000000305"/>
+            <column name="nome_completo" value="Juliana Pereira"/>
+            <column name="data_nascimento" valueDate="2005-11-02"/>
+            <column name="telefone" value="(21) 96543-2109"/>
+            <column name="estado_civil" value="SOLTEIRO"/>
+            <column name="paroquia_id" value="00000000-0000-4000-8000-000000000211"/>
+            <column name="situacao" value="PRE_INSCRITO"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="pessoa">
+            <column name="id" value="00000000-0000-4000-8000-000000000306"/>
+            <column name="nome_completo" value="Bruno Henrique Santos"/>
+            <column name="data_nascimento" valueDate="2000-03-08"/>
+            <column name="telefone" value="(21) 95432-1098"/>
+            <column name="estado_civil" value="SOLTEIRO"/>
+            <column name="paroquia_id" value="00000000-0000-4000-8000-000000000221"/>
+            <column name="situacao" value="SEGUIMISTA"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="pessoa_competencia">
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000301"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000401"/>
+        </insert>
+        <insert tableName="pessoa_competencia">
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000301"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000409"/>
+        </insert>
+        <insert tableName="pessoa_competencia">
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000302"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000403"/>
+        </insert>
+        <insert tableName="pessoa_competencia">
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000303"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000402"/>
+        </insert>
+        <insert tableName="pessoa_competencia">
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000304"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000407"/>
+        </insert>
+        <insert tableName="pessoa_competencia">
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000304"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000406"/>
+        </insert>
+        <insert tableName="pessoa_competencia">
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000306"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000404"/>
+        </insert>
+
+        <insert tableName="casal">
+            <column name="id" value="00000000-0000-4000-8000-000000000501"/>
+            <column name="pessoa1_id" value="00000000-0000-4000-8000-000000000303"/>
+            <column name="pessoa2_id" value="00000000-0000-4000-8000-000000000304"/>
+            <column name="data_vinculo" valueDate="2020-05-10"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="historico_evento">
+            <column name="id" value="00000000-0000-4000-8000-000000000601"/>
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000301"/>
+            <column name="tipo" value="INSCRICAO_CADASTRO_NACIONAL"/>
+            <column name="data_evento" valueDate="current_timestamp"/>
+            <column name="descricao" value="Pessoa cadastrada no cadastro nacional único."/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="historico_evento">
+            <column name="id" value="00000000-0000-4000-8000-000000000602"/>
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000302"/>
+            <column name="tipo" value="INSCRICAO_CADASTRO_NACIONAL"/>
+            <column name="data_evento" valueDate="current_timestamp"/>
+            <column name="descricao" value="Pessoa cadastrada no cadastro nacional único."/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="historico_evento">
+            <column name="id" value="00000000-0000-4000-8000-000000000603"/>
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000303"/>
+            <column name="tipo" value="INSCRICAO_CADASTRO_NACIONAL"/>
+            <column name="data_evento" valueDate="current_timestamp"/>
+            <column name="descricao" value="Pessoa cadastrada no cadastro nacional único."/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="historico_evento">
+            <column name="id" value="00000000-0000-4000-8000-000000000604"/>
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000304"/>
+            <column name="tipo" value="INSCRICAO_CADASTRO_NACIONAL"/>
+            <column name="data_evento" valueDate="current_timestamp"/>
+            <column name="descricao" value="Pessoa cadastrada no cadastro nacional único."/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="historico_evento">
+            <column name="id" value="00000000-0000-4000-8000-000000000605"/>
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000305"/>
+            <column name="tipo" value="INSCRICAO_CADASTRO_NACIONAL"/>
+            <column name="data_evento" valueDate="current_timestamp"/>
+            <column name="descricao" value="Pessoa cadastrada no cadastro nacional único."/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="historico_evento">
+            <column name="id" value="00000000-0000-4000-8000-000000000606"/>
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000306"/>
+            <column name="tipo" value="INSCRICAO_CADASTRO_NACIONAL"/>
+            <column name="data_evento" valueDate="current_timestamp"/>
+            <column name="descricao" value="Pessoa cadastrada no cadastro nacional único."/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="historico_evento">
+            <column name="id" value="00000000-0000-4000-8000-000000000607"/>
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000303"/>
+            <column name="tipo" value="VINCULO_CASAL_REGISTRADO"/>
+            <column name="data_evento" valueDate="2020-05-10T00:00:00"/>
+            <column name="descricao" value="Vínculo de casal registrado com Rodrigo Martins Costa."/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="historico_evento">
+            <column name="id" value="00000000-0000-4000-8000-000000000608"/>
+            <column name="pessoa_id" value="00000000-0000-4000-8000-000000000304"/>
+            <column name="tipo" value="VINCULO_CASAL_REGISTRADO"/>
+            <column name="data_evento" valueDate="2020-05-10T00:00:00"/>
+            <column name="descricao" value="Vínculo de casal registrado com Fernanda Alves Costa."/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -37,12 +37,12 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
     perfis: ['NACIONAL', 'DIOCESE', 'SETORIAL'],
   },
 
-  { titulo: 'Lista de Pessoas', modulo: 'Pessoas', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Cadastrar Pessoa', modulo: 'Pessoas', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Perfil da Pessoa', modulo: 'Pessoas', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Histórico da Pessoa', modulo: 'Pessoas', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Casais', modulo: 'Pessoas', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Competências', modulo: 'Pessoas', status: 'previsto', path: null, perfis: 'todos' },
+  { titulo: 'Lista de Pessoas', modulo: 'Pessoas', status: 'pronto', path: '/pessoas', perfis: 'todos' },
+  { titulo: 'Cadastrar Pessoa', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/novo', perfis: 'todos' },
+  { titulo: 'Perfil da Pessoa', modulo: 'Pessoas', status: 'pronto', path: null, perfis: 'todos' },
+  { titulo: 'Histórico da Pessoa', modulo: 'Pessoas', status: 'pronto', path: null, perfis: 'todos' },
+  { titulo: 'Casais', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/casais', perfis: 'todos' },
+  { titulo: 'Competências', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/competencias', perfis: 'todos' },
 
   { titulo: 'Lista de Encontros', modulo: 'Encontros', status: 'previsto', path: null, perfis: 'todos' },
   { titulo: 'Criar Encontro', modulo: 'Encontros', status: 'previsto', path: null, perfis: ['PAROQUIA'] },

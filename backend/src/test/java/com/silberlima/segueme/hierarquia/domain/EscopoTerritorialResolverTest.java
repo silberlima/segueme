@@ -54,9 +54,33 @@ class EscopoTerritorialResolverTest {
     }
 
     @Test
-    void shouldThrowWhenNoRelevantPerfilPresent() {
+    void shouldThrowWhenNoPerfilPresent() {
+        assertThatThrownBy(() -> resolver.resolve(List.of(), null, null, null))
+                .isInstanceOf(BusinessRuleViolationException.class);
+    }
+
+    @Test
+    void shouldThrowWhenEquipePerfilHasNoParoquiaClaim() {
         assertThatThrownBy(() -> resolver.resolve(List.of(Perfil.EQUIPE_FICHAS), null, null, null))
                 .isInstanceOf(BusinessRuleViolationException.class);
+    }
+
+    @Test
+    void shouldResolveDeParoquiaForEquipePerfilFromClaim() {
+        UUID paroquiaId = UUID.randomUUID();
+
+        EscopoTerritorial escopo = resolver.resolve(List.of(Perfil.EQUIPE_MONTAGEM), null, null, paroquiaId.toString());
+
+        assertThat(escopo).isEqualTo(new EscopoTerritorial.DeParoquia(paroquiaId));
+    }
+
+    @Test
+    void shouldResolveDeParoquiaForSeguidorFromClaim() {
+        UUID paroquiaId = UUID.randomUUID();
+
+        EscopoTerritorial escopo = resolver.resolve(List.of(Perfil.SEGUIDOR), null, null, paroquiaId.toString());
+
+        assertThat(escopo).isEqualTo(new EscopoTerritorial.DeParoquia(paroquiaId));
     }
 
     @Test

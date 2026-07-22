@@ -12,6 +12,12 @@ import org.springframework.stereotype.Service;
  * ({@code diocese_id}/{@code setor_id}/{@code paroquia_id} — atributos de usuário no Keycloak,
  * análogos ao mapeamento de roles já usado para {@link Perfil}). Prioriza o perfil de maior
  * alcance territorial quando o usuário possui mais de um.
+ *
+ * <p>Todo perfil que não seja {@code NACIONAL}/{@code DIOCESE}/{@code SETORIAL} opera no nível
+ * "Paróquia" da hierarquia (RN-04): além de {@code PAROQUIA}, isso inclui as 5 equipes,
+ * {@code POS_ENCONTRO} e {@code SEGUIDOR} — todos escopados pela mesma claim {@code paroquia_id}.
+ * Generalizado a partir da Fase 3 (Pessoas), cujo RF-007 exige que os 10 perfis, não só os 4
+ * originais da Fase 2, consigam listar dados escopados territorialmente.
  */
 @Service
 public class EscopoTerritorialResolver {
@@ -27,7 +33,7 @@ public class EscopoTerritorialResolver {
         if (perfis.contains(Perfil.SETORIAL)) {
             return new EscopoTerritorial.DeSetor(exigirClaim(setorIdClaim, "setor_id"));
         }
-        if (perfis.contains(Perfil.PAROQUIA)) {
+        if (!perfis.isEmpty()) {
             return new EscopoTerritorial.DeParoquia(exigirClaim(paroquiaIdClaim, "paroquia_id"));
         }
         throw new BusinessRuleViolationException(

@@ -12,7 +12,9 @@ export function Sidebar({ className = '' }: SidebarProps) {
   const { perfis, perfilAtivo, setPerfilAtivo } = useProfile()
   const location = useLocation()
 
-  const menu = getMenuParaPerfil(perfilAtivo).filter((item) => item.path !== '/mapa')
+  // Itens 'pronto' sem path (ex.: telas de detalhe só alcançáveis via id, como Perfil/Histórico
+  // da Pessoa) não viram link estático no menu — só aparecem no Mapa de Navegação.
+  const menu = getMenuParaPerfil(perfilAtivo).filter((item) => item.path !== null && item.path !== '/mapa')
 
   return (
     <aside className={`flex h-full w-64 flex-col border-r border-slate-200 bg-white ${className}`}>
