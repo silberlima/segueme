@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="encontros-0001-create-tables" author="segueme">
+        <createTable tableName="encontro">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="numero" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="padroeiro" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="diretor_espiritual_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_encontro_diretor_espiritual" references="pessoa(id)"/>
+            </column>
+            <column name="local" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_inicio" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_termino" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vagas" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="paroquia_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_encontro_paroquia" references="paroquia(id)"/>
+            </column>
+            <column name="status" type="varchar(20)" defaultValue="ATIVO">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="encontro" indexName="idx_encontro_paroquia">
+            <column name="paroquia_id"/>
+        </createIndex>
+        <createIndex tableName="encontro" indexName="idx_encontro_diretor_espiritual">
+            <column name="diretor_espiritual_id"/>
+        </createIndex>
+        <addUniqueConstraint tableName="encontro" columnNames="paroquia_id, numero"
+                              constraintName="uq_encontro_paroquia_numero"/>
+
+        <createTable tableName="equipe_dirigente">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" unique="true" foreignKeyName="fk_equipe_dirigente_encontro"
+                             references="encontro(id)"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="membro_equipe_dirigente">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="equipe_dirigente_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_membro_dirigente_equipe"
+                             references="equipe_dirigente(id)"/>
+            </column>
+            <column name="pasta" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tipo_membro" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints foreignKeyName="fk_membro_dirigente_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="casal_id" type="uuid">
+                <constraints foreignKeyName="fk_membro_dirigente_casal" references="casal(id)"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="membro_equipe_dirigente" indexName="idx_membro_dirigente_equipe">
+            <column name="equipe_dirigente_id"/>
+        </createIndex>
+        <createIndex tableName="membro_equipe_dirigente" indexName="idx_membro_dirigente_pessoa">
+            <column name="pessoa_id"/>
+        </createIndex>
+        <createIndex tableName="membro_equipe_dirigente" indexName="idx_membro_dirigente_casal">
+            <column name="casal_id"/>
+        </createIndex>
+
+        <createTable tableName="equipe_comando">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" unique="true" foreignKeyName="fk_equipe_comando_encontro"
+                             references="encontro(id)"/>
+            </column>
+            <column name="coordenador_geral_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_equipe_comando_coordenador_geral"
+                             references="pessoa(id)"/>
+            </column>
+            <column name="casal_coordenador_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_equipe_comando_casal_coordenador"
+                             references="casal(id)"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="equipe_comando" indexName="idx_equipe_comando_coordenador_geral">
+            <column name="coordenador_geral_id"/>
+        </createIndex>
+        <createIndex tableName="equipe_comando" indexName="idx_equipe_comando_casal_coordenador">
+            <column name="casal_coordenador_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

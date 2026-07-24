@@ -9,6 +9,7 @@ export interface AuthUser {
   email?: string
   name?: string
   accessToken?: string
+  paroquiaId?: string
 }
 
 export interface AuthContextValue {

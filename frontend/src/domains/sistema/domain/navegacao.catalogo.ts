@@ -44,11 +44,35 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
   { titulo: 'Casais', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/casais', perfis: 'todos' },
   { titulo: 'Competências', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/competencias', perfis: 'todos' },
 
-  { titulo: 'Lista de Encontros', modulo: 'Encontros', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Criar Encontro', modulo: 'Encontros', status: 'previsto', path: null, perfis: ['PAROQUIA'] },
-  { titulo: 'Detalhe do Encontro', modulo: 'Encontros', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Equipe Dirigente', modulo: 'Encontros', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Equipe Comando', modulo: 'Encontros', status: 'previsto', path: null, perfis: 'todos' },
+  {
+    titulo: 'Lista de Encontros',
+    modulo: 'Encontros',
+    status: 'pronto',
+    path: '/encontros',
+    perfis: ['NACIONAL', 'DIOCESE', 'SETORIAL', 'PAROQUIA'],
+  },
+  { titulo: 'Criar Encontro', modulo: 'Encontros', status: 'pronto', path: '/encontros/novo', perfis: ['PAROQUIA'] },
+  {
+    titulo: 'Detalhe do Encontro',
+    modulo: 'Encontros',
+    status: 'pronto',
+    path: null,
+    perfis: ['NACIONAL', 'DIOCESE', 'SETORIAL', 'PAROQUIA'],
+  },
+  {
+    titulo: 'Equipe Dirigente',
+    modulo: 'Encontros',
+    status: 'pronto',
+    path: null,
+    perfis: ['NACIONAL', 'DIOCESE', 'SETORIAL', 'PAROQUIA'],
+  },
+  {
+    titulo: 'Equipe Comando',
+    modulo: 'Encontros',
+    status: 'pronto',
+    path: null,
+    perfis: ['NACIONAL', 'DIOCESE', 'SETORIAL', 'PAROQUIA'],
+  },
 
   { titulo: 'Equipes do Encontro', modulo: 'Equipes & Convites', status: 'previsto', path: null, perfis: 'todos' },
   {

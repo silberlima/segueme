@@ -24,6 +24,7 @@ interface JwtClaims {
   name?: string
   preferred_username?: string
   realm_access?: { roles?: string[] }
+  paroquia_id?: string
 }
 
 function decodeJwt<T>(token: string): T | null {
@@ -76,6 +77,7 @@ function toAuthUser(accessToken: string): AuthUser {
     email: claims.email,
     name: claims.name ?? claims.preferred_username,
     accessToken,
+    paroquiaId: claims.paroquia_id,
   }
 }
 

@@ -12,6 +12,11 @@ import { PersonProfileScreen } from '../../domains/pessoas/screens/PersonProfile
 import { PersonHistoryScreen } from '../../domains/pessoas/screens/PersonHistoryScreen'
 import { CouplesScreen } from '../../domains/pessoas/screens/CouplesScreen'
 import { CompetenciesScreen } from '../../domains/pessoas/screens/CompetenciesScreen'
+import { EncounterListScreen } from '../../domains/encontros/screens/EncounterListScreen'
+import { CreateEncounterScreen } from '../../domains/encontros/screens/CreateEncounterScreen'
+import { EncounterDetailScreen } from '../../domains/encontros/screens/EncounterDetailScreen'
+import { DirigenteScreen } from '../../domains/encontros/screens/DirigenteScreen'
+import { ComandoTeamScreen } from '../../domains/encontros/screens/ComandoTeamScreen'
 
 export function AppRouter() {
   return (
@@ -37,6 +42,11 @@ export function AppRouter() {
           <Route path="pessoas/competencias" element={<CompetenciesScreen />} />
           <Route path="pessoas/:id" element={<PersonProfileScreen />} />
           <Route path="pessoas/:id/historico" element={<PersonHistoryScreen />} />
+          <Route path="encontros" element={<EncounterListScreen />} />
+          <Route path="encontros/novo" element={<CreateEncounterScreen />} />
+          <Route path="encontros/:id" element={<EncounterDetailScreen />} />
+          <Route path="encontros/:id/dirigente" element={<DirigenteScreen />} />
+          <Route path="encontros/:id/comando" element={<ComandoTeamScreen />} />
         </Route>
       </Routes>
     </BrowserRouter>
