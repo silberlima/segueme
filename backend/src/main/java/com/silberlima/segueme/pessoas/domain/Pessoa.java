@@ -1,5 +1,6 @@
 package com.silberlima.segueme.pessoas.domain;
 
+import com.silberlima.segueme.domain.exception.BusinessRuleViolationException;
 import com.silberlima.segueme.domain.model.AbstractAuditableEntity;
 import com.silberlima.segueme.hierarquia.domain.Paroquia;
 import jakarta.persistence.Column;
@@ -108,6 +109,21 @@ public class Pessoa extends AbstractAuditableEntity {
 
     public void adicionarCompetencias(Set<Competencia> novasCompetencias) {
         this.competencias.addAll(novasCompetencias);
+    }
+
+    /**
+     * Confirma a Ficha de Inscrição da pessoa, promovendo-a de Pré-inscrito a Seguimista
+     * (RN-INSCRICAO-02). {@code SituacaoPessoa.INSCRITO} não é usado nesta transição: o RN é
+     * literal (Pré-inscrito → Seguimista), sem estado intermediário definido pelas regras/casos
+     * de uso da Fase 5.
+     */
+    public void confirmarComoSeguimista() {
+        if (situacao != SituacaoPessoa.PRE_INSCRITO) {
+            throw new BusinessRuleViolationException(
+                    "Só é possível confirmar como Seguimista uma pessoa Pré-inscrita (situação atual: "
+                            + situacao + ").");
+        }
+        this.situacao = SituacaoPessoa.SEGUIMISTA;
     }
 
     public String getNomeCompleto() {

@@ -73,6 +73,30 @@ export function EncounterDetailScreen() {
               </Link>
             </div>
           </div>
+
+          <div className="mt-6">
+            <p className="mb-2 text-xs font-medium text-slate-500">Inscrições</p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                to={`/encontros/${encontro.id}/inscricoes`}
+                className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 hover:border-violet-300 hover:text-violet-700"
+              >
+                Pré-inscrições →
+              </Link>
+              <Link
+                to={`/encontros/${encontro.id}/reserva`}
+                className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 hover:border-violet-300 hover:text-violet-700"
+              >
+                Lista de Espera →
+              </Link>
+              <Link
+                to={`/encontros/${encontro.id}/participantes`}
+                className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 hover:border-violet-300 hover:text-violet-700"
+              >
+                Participantes →
+              </Link>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -17,6 +17,10 @@ import { CreateEncounterScreen } from '../../domains/encontros/screens/CreateEnc
 import { EncounterDetailScreen } from '../../domains/encontros/screens/EncounterDetailScreen'
 import { DirigenteScreen } from '../../domains/encontros/screens/DirigenteScreen'
 import { ComandoTeamScreen } from '../../domains/encontros/screens/ComandoTeamScreen'
+import { PreEnrollmentScreen } from '../../domains/inscricoes/screens/PreEnrollmentScreen'
+import { EnrollmentFormScreen } from '../../domains/inscricoes/screens/EnrollmentFormScreen'
+import { WaitlistScreen } from '../../domains/inscricoes/screens/WaitlistScreen'
+import { ParticipantsScreen } from '../../domains/inscricoes/screens/ParticipantsScreen'
 
 export function AppRouter() {
   return (
@@ -47,6 +51,10 @@ export function AppRouter() {
           <Route path="encontros/:id" element={<EncounterDetailScreen />} />
           <Route path="encontros/:id/dirigente" element={<DirigenteScreen />} />
           <Route path="encontros/:id/comando" element={<ComandoTeamScreen />} />
+          <Route path="encontros/:id/inscricoes" element={<PreEnrollmentScreen />} />
+          <Route path="encontros/:id/inscricoes/:preInscricaoId/ficha" element={<EnrollmentFormScreen />} />
+          <Route path="encontros/:id/reserva" element={<WaitlistScreen />} />
+          <Route path="encontros/:id/participantes" element={<ParticipantsScreen />} />
         </Route>
       </Routes>
     </BrowserRouter>

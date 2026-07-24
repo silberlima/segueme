@@ -12,5 +12,6 @@
     <include file="db/changelog/hierarquia/db.changelog-hierarquia.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/pessoas/db.changelog-pessoas.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/encontros/db.changelog-encontros.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/inscricoes/db.changelog-inscricoes.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="inscricoes-0001-create-tables" author="segueme">
+        <createTable tableName="pre_inscricao">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_pre_inscricao_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_pre_inscricao_encontro" references="encontro(id)"/>
+            </column>
+            <column name="status" type="varchar(20)" defaultValue="AGUARDANDO_FICHA">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="pre_inscricao" indexName="idx_pre_inscricao_pessoa">
+            <column name="pessoa_id"/>
+        </createIndex>
+        <createIndex tableName="pre_inscricao" indexName="idx_pre_inscricao_encontro">
+            <column name="encontro_id"/>
+        </createIndex>
+        <addUniqueConstraint tableName="pre_inscricao" columnNames="pessoa_id, encontro_id"
+                              constraintName="uq_pre_inscricao_pessoa_encontro"/>
+
+        <createTable tableName="ficha_inscricao">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pre_inscricao_id" type="uuid">
+                <constraints nullable="false" unique="true" foreignKeyName="fk_ficha_inscricao_pre_inscricao"
+                             references="pre_inscricao(id)"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_ficha_inscricao_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_ficha_inscricao_encontro" references="encontro(id)"/>
+            </column>
+            <column name="status_pagamento" type="varchar(20)" defaultValue="PENDENTE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="ficha_inscricao" indexName="idx_ficha_inscricao_pessoa">
+            <column name="pessoa_id"/>
+        </createIndex>
+        <createIndex tableName="ficha_inscricao" indexName="idx_ficha_inscricao_encontro">
+            <column name="encontro_id"/>
+        </createIndex>
+
+        <createTable tableName="cadastro_reserva">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_cadastro_reserva_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_cadastro_reserva_encontro" references="encontro(id)"/>
+            </column>
+            <column name="status" type="varchar(20)" defaultValue="AGUARDANDO">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="cadastro_reserva" indexName="idx_cadastro_reserva_pessoa">
+            <column name="pessoa_id"/>
+        </createIndex>
+        <createIndex tableName="cadastro_reserva" indexName="idx_cadastro_reserva_encontro">
+            <column name="encontro_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

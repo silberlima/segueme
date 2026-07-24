@@ -109,10 +109,10 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
     perfis: ['SETORIAL'],
   },
 
-  { titulo: 'Pré-inscrições', modulo: 'Inscrições', status: 'previsto', path: null, perfis: ['EQUIPE_FICHAS'] },
-  { titulo: 'Ficha de Inscrição', modulo: 'Inscrições', status: 'previsto', path: null, perfis: ['EQUIPE_FICHAS'] },
-  { titulo: 'Lista de Espera', modulo: 'Inscrições', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Participantes', modulo: 'Inscrições', status: 'previsto', path: null, perfis: 'todos' },
+  { titulo: 'Pré-inscrições', modulo: 'Inscrições', status: 'pronto', path: null, perfis: ['EQUIPE_FICHAS'] },
+  { titulo: 'Ficha de Inscrição', modulo: 'Inscrições', status: 'pronto', path: null, perfis: ['EQUIPE_FICHAS'] },
+  { titulo: 'Lista de Espera', modulo: 'Inscrições', status: 'pronto', path: null, perfis: 'todos' },
+  { titulo: 'Participantes', modulo: 'Inscrições', status: 'pronto', path: null, perfis: 'todos' },
 
   { titulo: 'Palestras', modulo: 'Conteúdo', status: 'previsto', path: null, perfis: 'todos' },
   { titulo: 'Palestrantes', modulo: 'Conteúdo', status: 'previsto', path: null, perfis: 'todos' },
