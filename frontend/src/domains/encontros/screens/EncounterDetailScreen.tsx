@@ -77,6 +77,24 @@ export function EncounterDetailScreen() {
               >
                 Equipes de Serviço →
               </Link>
+              <Link
+                to={`/encontros/${encontro.id}/convites`}
+                className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 hover:border-violet-300 hover:text-violet-700"
+              >
+                Convites →
+              </Link>
+              <Link
+                to={`/encontros/${encontro.id}/aceites`}
+                className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 hover:border-violet-300 hover:text-violet-700"
+              >
+                Aceites →
+              </Link>
+              <Link
+                to={`/encontros/${encontro.id}/recusas`}
+                className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 hover:border-violet-300 hover:text-violet-700"
+              >
+                Recusas →
+              </Link>
             </div>
           </div>
 

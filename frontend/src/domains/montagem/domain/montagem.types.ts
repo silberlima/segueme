@@ -82,3 +82,29 @@ export interface NovaSubstituicaoPayload {
   pessoaEntraId: string
   justificativa: string
 }
+
+/**
+ * Um convite (RF-034 a RF-039) — no backend é o próprio `IntegranteEquipe` (Fase 7 reaproveita a
+ * entidade da Fase 6), aqui exposto com os campos do ciclo de convite/aceite/recusa.
+ */
+export interface Convite {
+  id: string
+  encontroId: string
+  equipeId: string
+  equipeNome: string
+  pessoaId: string
+  pessoaNome: string
+  papel: PapelIntegrante
+  status: StatusIntegrante
+  dataEnvioConvite: string
+  dataResposta: string | null
+  justificativaRecusa: string | null
+  reenvios: number
+}
+
+export interface EmitirConvitePayload {
+  encontroId: string
+  equipeId: string
+  pessoaId: string
+  papel: PapelIntegrante
+}

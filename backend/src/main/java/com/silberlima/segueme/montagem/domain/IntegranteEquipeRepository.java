@@ -15,6 +15,13 @@ public interface IntegranteEquipeRepository extends JpaRepository<IntegranteEqui
     @EntityGraph(attributePaths = {"pessoa", "equipe"})
     List<IntegranteEquipe> findByEncontro_Id(UUID encontroId);
 
+    @EntityGraph(attributePaths = {"pessoa", "equipe"})
+    List<IntegranteEquipe> findByEncontro_IdAndStatus(UUID encontroId, StatusIntegrante status);
+
+    /** RN-CONVITE-01: convite de integrante só pode ser emitido após o coordenador aceitar o dele. */
+    boolean existsByEncontro_IdAndEquipe_IdAndPapelAndStatus(
+            UUID encontroId, UUID equipeId, PapelIntegrante papel, StatusIntegrante status);
+
     Optional<IntegranteEquipe> findByEncontro_IdAndEquipe_IdAndPessoa_IdAndStatusNot(
             UUID encontroId, UUID equipeId, UUID pessoaId, StatusIntegrante status);
 

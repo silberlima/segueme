@@ -105,6 +105,12 @@ export function TeamsWorkspaceScreen() {
                         Competências desejadas: {detalhe.competenciasRequeridas.join(', ')}
                       </p>
                     )}
+                    <Link
+                      to={`/encontros/${encontroId}/equipes/${detalhe.id}/coordenador`}
+                      className="mt-1 inline-block text-xs font-medium text-violet-600 hover:underline"
+                    >
+                      Painel do Coordenador →
+                    </Link>
                   </div>
                   <Badge tone={detalhe.completa ? 'success' : 'warning'}>
                     {detalhe.completa ? 'Completa' : 'Incompleta'}

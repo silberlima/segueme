@@ -45,6 +45,7 @@ Consolidação de tudo que não pôde ser determinado apenas pelo protótipo. Ca
 32. Quem pode editar a composição da Equipe Dirigente e da Equipe Comando após a criação do encontro.
 33. Se "Coordenador de equipe" é um perfil de acesso à parte ou um papel dentro de outro perfil existente (não consta na lista de 10 perfis trocáveis do protótipo).
 34. Quem pode alterar preferências de Notificações de outros usuários (individual vs. administração global).
+39. **Vínculo entre usuário autenticado (Keycloak) e Pessoa não existe.** Nenhuma entidade do backend liga o `sub` do JWT a um registro de `Pessoa`. Isso impede, na Fase 7, restringir de verdade o Painel do Coordenador (`screen_coordenador`) a quem aceitou o convite — hoje as ações de emitir/aceitar/recusar/reenviar convite são executadas por staff com role `EQUIPE_COMANDO` em nome da pessoa convidada (mesmo padrão já usado pela Equipe Montagem desde a Fase 6 em `AdicionarIntegranteUseCase`), nunca pelo próprio convidado logado. Pelo mesmo motivo, a notificação de recusa (RF-038/RN-12) não consegue alcançar "a Equipe Montagem" como um grupo — ela é endereçada a quem emitiu o convite (`IntegranteEquipe.createdBy`), resolvido via `ConviteRecusadoEvent`. Revisitar quando existir vínculo Pessoa↔Usuário ou um diretório de usuários por role.
 
 ## Integrações externas não detalhadas
 35. Envio de e-mail de recuperação de senha (mecanismo externo não modelado).

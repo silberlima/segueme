@@ -24,6 +24,10 @@ import { ParticipantsScreen } from '../../domains/inscricoes/screens/Participant
 import { TeamsWorkspaceScreen } from '../../domains/montagem/screens/TeamsWorkspaceScreen'
 import { SuggestionsScreen } from '../../domains/montagem/screens/SuggestionsScreen'
 import { SubstitutionsScreen } from '../../domains/montagem/screens/SubstitutionsScreen'
+import { InvitesScreen } from '../../domains/montagem/screens/InvitesScreen'
+import { AcceptancesScreen } from '../../domains/montagem/screens/AcceptancesScreen'
+import { RefusalsScreen } from '../../domains/montagem/screens/RefusalsScreen'
+import { CoordinatorPanelScreen } from '../../domains/montagem/screens/CoordinatorPanelScreen'
 
 export function AppRouter() {
   return (
@@ -61,6 +65,10 @@ export function AppRouter() {
           <Route path="encontros/:id/equipes" element={<TeamsWorkspaceScreen />} />
           <Route path="encontros/:id/equipes/:equipeId/sugestoes" element={<SuggestionsScreen />} />
           <Route path="encontros/:id/substituicoes" element={<SubstitutionsScreen />} />
+          <Route path="encontros/:id/convites" element={<InvitesScreen />} />
+          <Route path="encontros/:id/aceites" element={<AcceptancesScreen />} />
+          <Route path="encontros/:id/recusas" element={<RefusalsScreen />} />
+          <Route path="encontros/:id/equipes/:equipeId/coordenador" element={<CoordinatorPanelScreen />} />
         </Route>
       </Routes>
     </BrowserRouter>

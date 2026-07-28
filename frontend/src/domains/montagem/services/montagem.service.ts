@@ -2,10 +2,13 @@ import { httpClient } from '../../../shared/utils/httpClient'
 import type { Pagination } from '../../../shared/types/pagination.types'
 import type {
   CandidatoSugerido,
+  Convite,
+  EmitirConvitePayload,
   EquipeDetalhe,
   EquipeResumo,
   NovaSubstituicaoPayload,
   PapelIntegrante,
+  StatusIntegrante,
   Substituicao,
 } from '../domain/montagem.types'
 
@@ -62,4 +65,33 @@ export async function searchPessoas(nome: string): Promise<PessoaOption[]> {
   }
   const { data } = await httpClient.get<Pagination<PessoaOption>>('/pessoas', { params: { nome, size: 10 } })
   return data.content
+}
+
+export async function fetchConvites(
+  encontroId: string,
+  filtros?: { status?: StatusIntegrante; equipeId?: string; papel?: PapelIntegrante },
+): Promise<Convite[]> {
+  const { data } = await httpClient.get<Convite[]>('/convites', { params: { encontroId, ...filtros } })
+  return data
+}
+
+export async function emitirConvite(payload: EmitirConvitePayload): Promise<Convite> {
+  const { encontroId, ...body } = payload
+  const { data } = await httpClient.post<Convite>('/convites', body, { params: { encontroId } })
+  return data
+}
+
+export async function aceitarConvite(conviteId: string): Promise<Convite> {
+  const { data } = await httpClient.patch<Convite>(`/convites/${conviteId}/aceitar`)
+  return data
+}
+
+export async function recusarConvite(conviteId: string, justificativa: string): Promise<Convite> {
+  const { data } = await httpClient.patch<Convite>(`/convites/${conviteId}/recusar`, { justificativa })
+  return data
+}
+
+export async function reenviarConvite(conviteId: string): Promise<Convite> {
+  const { data } = await httpClient.patch<Convite>(`/convites/${conviteId}/reenviar`)
+  return data
 }
