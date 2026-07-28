@@ -71,6 +71,12 @@ export function EncounterDetailScreen() {
               >
                 Equipe Comando ({encontro.equipeComando.coordenadorGeralNome}) →
               </Link>
+              <Link
+                to={`/encontros/${encontro.id}/equipes`}
+                className="rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-900 hover:border-violet-300 hover:text-violet-700"
+              >
+                Equipes de Serviço →
+              </Link>
             </div>
           </div>
 

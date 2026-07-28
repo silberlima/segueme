@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="montagem-0001-create-tables" author="segueme">
+        <createTable tableName="equipe">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nome" type="varchar(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="minimo" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="maximo" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pre_requisito_min_encontros" type="int"/>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="equipe_competencia">
+            <column name="equipe_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_equipe_competencia_equipe" references="equipe(id)"/>
+            </column>
+            <column name="competencia_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_equipe_competencia_competencia"
+                             references="competencia(id)"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="equipe_competencia" columnNames="equipe_id, competencia_id"
+                        constraintName="pk_equipe_competencia"/>
+
+        <createTable tableName="integrante_equipe">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_integrante_equipe_encontro" references="encontro(id)"/>
+            </column>
+            <column name="equipe_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_integrante_equipe_equipe" references="equipe(id)"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_integrante_equipe_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="papel" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(20)" defaultValue="PENDENTE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="integrante_equipe" indexName="idx_integrante_equipe_encontro">
+            <column name="encontro_id"/>
+        </createIndex>
+        <createIndex tableName="integrante_equipe" indexName="idx_integrante_equipe_equipe">
+            <column name="equipe_id"/>
+        </createIndex>
+        <createIndex tableName="integrante_equipe" indexName="idx_integrante_equipe_pessoa">
+            <column name="pessoa_id"/>
+        </createIndex>
+
+        <createTable tableName="substituicao">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_substituicao_encontro" references="encontro(id)"/>
+            </column>
+            <column name="equipe_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_substituicao_equipe" references="equipe(id)"/>
+            </column>
+            <column name="pessoa_sai_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_substituicao_pessoa_sai" references="pessoa(id)"/>
+            </column>
+            <column name="motivo_saida" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pessoa_entra_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_substituicao_pessoa_entra" references="pessoa(id)"/>
+            </column>
+            <column name="justificativa" type="varchar(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_substituicao" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="substituicao" indexName="idx_substituicao_encontro">
+            <column name="encontro_id"/>
+        </createIndex>
+        <createIndex tableName="substituicao" indexName="idx_substituicao_equipe">
+            <column name="equipe_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Catálogo nacional de tipos de equipe (RN-06/RN-MONTAGEM-07). Lista e faixas min/max são
+         placeholder observado no protótipo (`montagem-de-equipes.md`: "Exemplos observados: Sala,
+         Som, Liturgia, Cozinha, Acolhida, Secretaria") — conjunto exato, faixas e competências
+         exigidas de cada tipo a confirmar com o PO, mesmo racional do seed de Competências
+         (pendência #16 de pendencias-gerais.md). Nenhum pré-requisito de encontros é atribuído
+         aqui por ausência de dado de origem — permanece null até confirmação. -->
+    <changeSet id="montagem-0002-seed-equipes" author="segueme">
+        <insert tableName="equipe">
+            <column name="id" value="00000000-0000-4000-8000-000000000701"/>
+            <column name="nome" value="Sala"/>
+            <column name="minimo" valueNumeric="4"/>
+            <column name="maximo" valueNumeric="10"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="equipe">
+            <column name="id" value="00000000-0000-4000-8000-000000000702"/>
+            <column name="nome" value="Som"/>
+            <column name="minimo" valueNumeric="2"/>
+            <column name="maximo" valueNumeric="4"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="equipe">
+            <column name="id" value="00000000-0000-4000-8000-000000000703"/>
+            <column name="nome" value="Liturgia"/>
+            <column name="minimo" valueNumeric="2"/>
+            <column name="maximo" valueNumeric="6"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="equipe">
+            <column name="id" value="00000000-0000-4000-8000-000000000704"/>
+            <column name="nome" value="Cozinha"/>
+            <column name="minimo" valueNumeric="4"/>
+            <column name="maximo" valueNumeric="12"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="equipe">
+            <column name="id" value="00000000-0000-4000-8000-000000000705"/>
+            <column name="nome" value="Acolhida"/>
+            <column name="minimo" valueNumeric="2"/>
+            <column name="maximo" valueNumeric="6"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="equipe">
+            <column name="id" value="00000000-0000-4000-8000-000000000706"/>
+            <column name="nome" value="Secretaria"/>
+            <column name="minimo" valueNumeric="2"/>
+            <column name="maximo" valueNumeric="4"/>
+            <column name="pre_requisito_min_encontros" valueNumeric="1"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="equipe_competencia">
+            <column name="equipe_id" value="00000000-0000-4000-8000-000000000702"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000406"/>
+        </insert>
+        <insert tableName="equipe_competencia">
+            <column name="equipe_id" value="00000000-0000-4000-8000-000000000703"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000409"/>
+        </insert>
+        <insert tableName="equipe_competencia">
+            <column name="equipe_id" value="00000000-0000-4000-8000-000000000704"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000402"/>
+        </insert>
+        <insert tableName="equipe_competencia">
+            <column name="equipe_id" value="00000000-0000-4000-8000-000000000706"/>
+            <column name="competencia_id" value="00000000-0000-4000-8000-000000000408"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

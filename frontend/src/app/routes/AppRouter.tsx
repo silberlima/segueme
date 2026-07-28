@@ -21,6 +21,9 @@ import { PreEnrollmentScreen } from '../../domains/inscricoes/screens/PreEnrollm
 import { EnrollmentFormScreen } from '../../domains/inscricoes/screens/EnrollmentFormScreen'
 import { WaitlistScreen } from '../../domains/inscricoes/screens/WaitlistScreen'
 import { ParticipantsScreen } from '../../domains/inscricoes/screens/ParticipantsScreen'
+import { TeamsWorkspaceScreen } from '../../domains/montagem/screens/TeamsWorkspaceScreen'
+import { SuggestionsScreen } from '../../domains/montagem/screens/SuggestionsScreen'
+import { SubstitutionsScreen } from '../../domains/montagem/screens/SubstitutionsScreen'
 
 export function AppRouter() {
   return (
@@ -55,6 +58,9 @@ export function AppRouter() {
           <Route path="encontros/:id/inscricoes/:preInscricaoId/ficha" element={<EnrollmentFormScreen />} />
           <Route path="encontros/:id/reserva" element={<WaitlistScreen />} />
           <Route path="encontros/:id/participantes" element={<ParticipantsScreen />} />
+          <Route path="encontros/:id/equipes" element={<TeamsWorkspaceScreen />} />
+          <Route path="encontros/:id/equipes/:equipeId/sugestoes" element={<SuggestionsScreen />} />
+          <Route path="encontros/:id/substituicoes" element={<SubstitutionsScreen />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -74,15 +74,15 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
     perfis: ['NACIONAL', 'DIOCESE', 'SETORIAL', 'PAROQUIA'],
   },
 
-  { titulo: 'Equipes do Encontro', modulo: 'Equipes & Convites', status: 'previsto', path: null, perfis: 'todos' },
+  { titulo: 'Equipes do Encontro', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: 'todos' },
   {
     titulo: 'Sugestões Inteligentes',
     modulo: 'Equipes & Convites',
-    status: 'previsto',
+    status: 'pronto',
     path: null,
     perfis: ['EQUIPE_MONTAGEM'],
   },
-  { titulo: 'Substituições', modulo: 'Equipes & Convites', status: 'previsto', path: null, perfis: ['EQUIPE_MONTAGEM'] },
+  { titulo: 'Substituições', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: ['EQUIPE_MONTAGEM'] },
   { titulo: 'Convites', modulo: 'Equipes & Convites', status: 'previsto', path: null, perfis: 'todos' },
   { titulo: 'Aceites', modulo: 'Equipes & Convites', status: 'previsto', path: null, perfis: 'todos' },
   { titulo: 'Recusas', modulo: 'Equipes & Convites', status: 'previsto', path: null, perfis: 'todos' },

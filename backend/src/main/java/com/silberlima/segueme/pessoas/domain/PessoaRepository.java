@@ -16,6 +16,14 @@ public interface PessoaRepository extends JpaRepository<Pessoa, UUID>, JpaSpecif
 
     boolean existsByIdAndDeletedFalse(UUID id);
 
+    /**
+     * Pool de candidatos a integrante de equipe (`montagem-de-equipes.md`, Fase 6): só quem já
+     * concluiu um Encontro como participante ({@link SituacaoPessoa#SEGUIDOR}) serve em equipes de
+     * serviço — modelagem adotada na ausência de um RN explícito sobre o critério de elegibilidade.
+     */
+    @EntityGraph(attributePaths = {"paroquia", "competencias"})
+    List<Pessoa> findBySituacaoAndDeletedFalse(SituacaoPessoa situacao);
+
     @Query("select comp.id as competenciaId, count(p) as total "
             + "from Pessoa p join p.competencias comp where p.deleted = false group by comp.id")
     List<ContagemPorCompetencia> contarPorCompetencia();
