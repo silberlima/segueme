@@ -36,6 +36,13 @@ public final class PessoaSpecification {
         return (root, query, cb) -> cb.equal(root.get("paroquia").get("id"), paroquiaId);
     }
 
+    public static Specification<Pessoa> comSituacao(SituacaoPessoa situacao) {
+        if (situacao == null) {
+            return Specification.unrestricted();
+        }
+        return (root, query, cb) -> cb.equal(root.get("situacao"), situacao);
+    }
+
     public static Specification<Pessoa> comCompetencia(UUID competenciaId) {
         if (competenciaId == null) {
             return Specification.unrestricted();

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="movimentacao-0001-create-tables" author="segueme">
+        <createTable tableName="transferencia">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_transferencia_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="paroquia_origem_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_transferencia_paroquia_origem"
+                             references="paroquia(id)"/>
+            </column>
+            <column name="paroquia_destino_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_transferencia_paroquia_destino"
+                             references="paroquia(id)"/>
+            </column>
+            <column name="status" type="varchar(20)" defaultValue="PENDENTE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="motivo" type="varchar(500)"/>
+            <column name="justificativa_recusa" type="varchar(1000)"/>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="transferencia" indexName="idx_transferencia_pessoa">
+            <column name="pessoa_id"/>
+        </createIndex>
+        <createIndex tableName="transferencia" indexName="idx_transferencia_paroquia_origem">
+            <column name="paroquia_origem_id"/>
+        </createIndex>
+        <createIndex tableName="transferencia" indexName="idx_transferencia_paroquia_destino">
+            <column name="paroquia_destino_id"/>
+        </createIndex>
+
+        <createTable tableName="emprestimo">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_emprestimo_encontro" references="encontro(id)"/>
+            </column>
+            <column name="equipe_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_emprestimo_equipe" references="equipe(id)"/>
+            </column>
+            <column name="competencia_requerida_id" type="uuid">
+                <constraints foreignKeyName="fk_emprestimo_competencia_requerida" references="competencia(id)"/>
+            </column>
+            <column name="status" type="varchar(20)" defaultValue="SOLICITADO">
+                <constraints nullable="false"/>
+            </column>
+            <column name="justificativa_recusa" type="varchar(1000)"/>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="emprestimo" indexName="idx_emprestimo_encontro">
+            <column name="encontro_id"/>
+        </createIndex>
+        <createIndex tableName="emprestimo" indexName="idx_emprestimo_equipe">
+            <column name="equipe_id"/>
+        </createIndex>
+        <createIndex tableName="emprestimo" indexName="idx_emprestimo_competencia_requerida">
+            <column name="competencia_requerida_id"/>
+        </createIndex>
+
+        <createTable tableName="emprestimo_candidato">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="emprestimo_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_emprestimo_candidato_emprestimo"
+                             references="emprestimo(id)"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_emprestimo_candidato_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="status" type="varchar(20)" defaultValue="SUGERIDO">
+                <constraints nullable="false"/>
+            </column>
+            <column name="integrante_equipe_id" type="uuid">
+                <constraints foreignKeyName="fk_emprestimo_candidato_integrante_equipe"
+                             references="integrante_equipe(id)"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="emprestimo_candidato" indexName="idx_emprestimo_candidato_emprestimo">
+            <column name="emprestimo_id"/>
+        </createIndex>
+        <createIndex tableName="emprestimo_candidato" indexName="idx_emprestimo_candidato_pessoa">
+            <column name="pessoa_id"/>
+        </createIndex>
+        <createIndex tableName="emprestimo_candidato" indexName="idx_emprestimo_candidato_integrante_equipe">
+            <column name="integrante_equipe_id"/>
+        </createIndex>
+        <addUniqueConstraint tableName="emprestimo_candidato" columnNames="emprestimo_id, pessoa_id"
+                              constraintName="uk_emprestimo_candidato_emprestimo_pessoa"/>
+    </changeSet>
+
+</databaseChangeLog>

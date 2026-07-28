@@ -90,22 +90,25 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
   {
     titulo: 'Transferências',
     modulo: 'Equipes & Convites',
-    status: 'previsto',
-    path: null,
-    perfis: ['SETORIAL', 'EQUIPE_MONTAGEM'],
+    status: 'pronto',
+    path: '/setorial/transferencias',
+    // Corrigido do seed original ['SETORIAL','EQUIPE_MONTAGEM'] (cópia do item Empréstimos):
+    // `transferencias-e-emprestimos.md` 2.1 diz "perfis de Pessoas/Paróquia (solicitação) e
+    // Setorial (decisão)" — Montagem não solicita Transferência, só Empréstimo.
+    perfis: ['SETORIAL', 'NACIONAL', 'DIOCESE', 'PAROQUIA', 'EQUIPE_FICHAS'],
   },
   {
     titulo: 'Empréstimos',
     modulo: 'Equipes & Convites',
-    status: 'previsto',
-    path: null,
+    status: 'pronto',
+    path: '/setorial/emprestimos',
     perfis: ['SETORIAL', 'EQUIPE_MONTAGEM'],
   },
   {
     titulo: 'Solicitações (inbox)',
     modulo: 'Equipes & Convites',
-    status: 'previsto',
-    path: null,
+    status: 'pronto',
+    path: '/setorial/solicitacoes',
     perfis: ['SETORIAL'],
   },
 

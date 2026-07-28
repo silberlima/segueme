@@ -3,6 +3,7 @@ package com.silberlima.segueme.montagem.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.silberlima.segueme.domain.exception.BusinessRuleViolationException;
@@ -19,14 +20,17 @@ import com.silberlima.segueme.montagem.domain.IntegranteEquipeRepository;
 import com.silberlima.segueme.montagem.domain.PapelIntegrante;
 import com.silberlima.segueme.montagem.domain.StatusIntegrante;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
+import com.silberlima.segueme.pessoas.domain.HistoricoEvento;
 import com.silberlima.segueme.pessoas.domain.HistoricoEventoRepository;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
+import com.silberlima.segueme.pessoas.domain.TipoEventoHistorico;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -142,6 +146,50 @@ class AdicionarIntegranteUseCaseTest {
                         encontroRepository, equipeRepository, integranteEquipeRepository, pessoaRepository, historicoEventoRepository)
                 .execute(encontroId, UUID.randomUUID(), UUID.randomUUID(), PapelIntegrante.INTEGRANTE))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void shouldAllowCandidateFromAnotherParoquiaWhenViaEmprestimoAprovado() {
+        UUID encontroId = UUID.randomUUID();
+        UUID equipeId = UUID.randomUUID();
+        UUID pessoaId = UUID.randomUUID();
+        Pessoa pessoaDeOutraParoquia = umaPessoa("Emprestado", umaParoquia("Outra Paróquia"));
+        when(encontroRepository.findByIdAndDeletedFalse(encontroId)).thenReturn(Optional.of(encontro));
+        when(equipeRepository.findByIdAndDeletedFalse(equipeId)).thenReturn(Optional.of(equipe));
+        when(pessoaRepository.findByIdAndDeletedFalse(pessoaId)).thenReturn(Optional.of(pessoaDeOutraParoquia));
+        when(integranteEquipeRepository.findByEncontro_IdAndEquipe_IdAndPessoa_IdAndStatusNot(
+                        encontroId, equipeId, pessoaId, StatusIntegrante.RECUSADO))
+                .thenReturn(Optional.empty());
+        when(integranteEquipeRepository.countByEncontro_IdAndEquipe_IdAndStatusNot(
+                        encontroId, equipeId, StatusIntegrante.RECUSADO))
+                .thenReturn(0L);
+        when(integranteEquipeRepository.save(any(IntegranteEquipe.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        IntegranteEquipe integrante = new AdicionarIntegranteUseCase(
+                        encontroRepository, equipeRepository, integranteEquipeRepository, pessoaRepository, historicoEventoRepository)
+                .execute(encontroId, equipeId, pessoaId, PapelIntegrante.INTEGRANTE, true);
+
+        assertThat(integrante.getStatus()).isEqualTo(StatusIntegrante.PENDENTE);
+        assertThat(integrante.getPessoa()).isEqualTo(pessoaDeOutraParoquia);
+        ArgumentCaptor<HistoricoEvento> captor = ArgumentCaptor.forClass(HistoricoEvento.class);
+        verify(historicoEventoRepository).save(captor.capture());
+        assertThat(captor.getValue().getTipo()).isEqualTo(TipoEventoHistorico.EMPRESTIMO_OUTRA_PAROQUIA);
+    }
+
+    @Test
+    void shouldStillThrowWhenAnotherParoquiaAndNotViaEmprestimoAprovado() {
+        UUID encontroId = UUID.randomUUID();
+        UUID equipeId = UUID.randomUUID();
+        UUID pessoaId = UUID.randomUUID();
+        Pessoa pessoaDeOutraParoquia = umaPessoa("Forasteiro", umaParoquia("Outra Paróquia"));
+        when(encontroRepository.findByIdAndDeletedFalse(encontroId)).thenReturn(Optional.of(encontro));
+        when(equipeRepository.findByIdAndDeletedFalse(equipeId)).thenReturn(Optional.of(equipe));
+        when(pessoaRepository.findByIdAndDeletedFalse(pessoaId)).thenReturn(Optional.of(pessoaDeOutraParoquia));
+
+        assertThatThrownBy(() -> new AdicionarIntegranteUseCase(
+                        encontroRepository, equipeRepository, integranteEquipeRepository, pessoaRepository, historicoEventoRepository)
+                .execute(encontroId, equipeId, pessoaId, PapelIntegrante.INTEGRANTE, false))
+                .isInstanceOf(BusinessRuleViolationException.class);
     }
 
     private Paroquia umaParoquia(String nome) {

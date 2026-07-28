@@ -25,7 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
  * Adiciona um candidato (sugerido ou não) a uma equipe de serviço do Encontro (RF-031), ação
  * restrita à Equipe Montagem via {@code @PreAuthorize} no controller (RN-07/RN-MONTAGEM-01).
  * Bloqueia diretamente candidatos de outra paróquia: RN-MOVIMENTO-04 exige que esse vínculo passe
- * pelo Setorial (Fase 8, ainda não implementada) — aqui só sinalizamos a restrição.
+ * pelo Setorial. A partir da Fase 8, esse caminho é o overload
+ * {@link #execute(UUID, UUID, UUID, PapelIntegrante, boolean)} com {@code viaEmprestimoAprovado=true},
+ * usado exclusivamente por {@code EfetivarEmprestimoUseCase} após a aprovação do Setorial.
  */
 @Service
 public class AdicionarIntegranteUseCase {
@@ -51,6 +53,18 @@ public class AdicionarIntegranteUseCase {
 
     @Transactional
     public IntegranteEquipe execute(UUID encontroId, UUID equipeId, UUID pessoaId, PapelIntegrante papel) {
+        return execute(encontroId, equipeId, pessoaId, papel, false);
+    }
+
+    /**
+     * @param viaEmprestimoAprovado {@code true} quando o vínculo vem de um {@code Emprestimo} já
+     *     aprovado pelo Setorial (Fase 8) — dispensa a checagem de mesma-paróquia (RN-MOVIMENTO-04)
+     *     e registra o histórico como {@link TipoEventoHistorico#EMPRESTIMO_OUTRA_PAROQUIA} em vez
+     *     de {@link TipoEventoHistorico#PARTICIPACAO_EQUIPE}.
+     */
+    @Transactional
+    public IntegranteEquipe execute(
+            UUID encontroId, UUID equipeId, UUID pessoaId, PapelIntegrante papel, boolean viaEmprestimoAprovado) {
         Encontro encontro = encontroRepository
                 .findByIdAndDeletedFalse(encontroId)
                 .orElseThrow(() -> new ResourceNotFoundException("Encontro não encontrado: " + encontroId));
@@ -61,9 +75,10 @@ public class AdicionarIntegranteUseCase {
                 .findByIdAndDeletedFalse(pessoaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada: " + pessoaId));
 
-        if (!Objects.equals(pessoa.getParoquia().getId(), encontro.getParoquia().getId())) {
+        if (!viaEmprestimoAprovado
+                && !Objects.equals(pessoa.getParoquia().getId(), encontro.getParoquia().getId())) {
             throw new BusinessRuleViolationException(
-                    "Candidato de outra paróquia requer empréstimo aprovado pelo Setorial (RN-MOVIMENTO-04, Fase 8).");
+                    "Candidato de outra paróquia requer empréstimo aprovado pelo Setorial (RN-MOVIMENTO-04).");
         }
 
         integranteEquipeRepository
@@ -84,10 +99,13 @@ public class AdicionarIntegranteUseCase {
 
         historicoEventoRepository.save(new HistoricoEvento(
                 pessoa,
-                TipoEventoHistorico.PARTICIPACAO_EQUIPE,
+                viaEmprestimoAprovado ? TipoEventoHistorico.EMPRESTIMO_OUTRA_PAROQUIA : TipoEventoHistorico.PARTICIPACAO_EQUIPE,
                 Instant.now(),
-                "Adicionado(a) à equipe " + equipe.getNome() + " do encontro #" + encontro.getNumero()
-                        + " pela Equipe Montagem."));
+                viaEmprestimoAprovado
+                        ? "Emprestado(a) à equipe " + equipe.getNome() + " do encontro #" + encontro.getNumero()
+                                + " via autorização do Setorial."
+                        : "Adicionado(a) à equipe " + equipe.getNome() + " do encontro #" + encontro.getNumero()
+                                + " pela Equipe Montagem."));
         if (papel == PapelIntegrante.COORDENADOR) {
             historicoEventoRepository.save(new HistoricoEvento(
                     pessoa,

@@ -112,6 +112,15 @@ public class Pessoa extends AbstractAuditableEntity {
     }
 
     /**
+     * Efetiva uma Transferência aprovada pelo Setorial (RF-041, RN-MOVIMENTO-01): muda o vínculo
+     * definitivo da pessoa para a nova paróquia. O histórico da pessoa (Fichas, Encontros,
+     * Equipes anteriores) é preservado por não referenciar a paróquia diretamente (RN-MOVIMENTO-03).
+     */
+    public void transferirParaParoquia(Paroquia novaParoquia) {
+        this.paroquia = novaParoquia;
+    }
+
+    /**
      * Confirma a Ficha de Inscrição da pessoa, promovendo-a de Pré-inscrito a Seguimista
      * (RN-INSCRICAO-02). {@code SituacaoPessoa.INSCRITO} não é usado nesta transição: o RN é
      * literal (Pré-inscrito → Seguimista), sem estado intermediário definido pelas regras/casos

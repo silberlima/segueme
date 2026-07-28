@@ -28,6 +28,9 @@ import { InvitesScreen } from '../../domains/montagem/screens/InvitesScreen'
 import { AcceptancesScreen } from '../../domains/montagem/screens/AcceptancesScreen'
 import { RefusalsScreen } from '../../domains/montagem/screens/RefusalsScreen'
 import { CoordinatorPanelScreen } from '../../domains/montagem/screens/CoordinatorPanelScreen'
+import { TransfersScreen } from '../../domains/setorial/screens/TransfersScreen'
+import { LoansScreen } from '../../domains/setorial/screens/LoansScreen'
+import { RequestsInboxScreen } from '../../domains/setorial/screens/RequestsInboxScreen'
 
 export function AppRouter() {
   return (
@@ -69,6 +72,9 @@ export function AppRouter() {
           <Route path="encontros/:id/aceites" element={<AcceptancesScreen />} />
           <Route path="encontros/:id/recusas" element={<RefusalsScreen />} />
           <Route path="encontros/:id/equipes/:equipeId/coordenador" element={<CoordinatorPanelScreen />} />
+          <Route path="setorial/transferencias" element={<TransfersScreen />} />
+          <Route path="setorial/emprestimos" element={<LoansScreen />} />
+          <Route path="setorial/solicitacoes" element={<RequestsInboxScreen />} />
         </Route>
       </Routes>
     </BrowserRouter>

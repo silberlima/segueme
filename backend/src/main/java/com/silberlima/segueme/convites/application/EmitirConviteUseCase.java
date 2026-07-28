@@ -57,7 +57,7 @@ public class EmitirConviteUseCase {
 
         if (!Objects.equals(pessoa.getParoquia().getId(), encontro.getParoquia().getId())) {
             throw new BusinessRuleViolationException(
-                    "Candidato de outra paróquia requer empréstimo aprovado pelo Setorial (RN-MOVIMENTO-04, Fase 8).");
+                    "Candidato de outra paróquia requer empréstimo aprovado pelo Setorial (RN-MOVIMENTO-04).");
         }
 
         if (papel == PapelIntegrante.INTEGRANTE
