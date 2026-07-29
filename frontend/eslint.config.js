@@ -27,4 +27,14 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
+  // Os testes E2E (Playwright) rodam em Node, fora do React. As regras de hooks não se aplicam e
+  // dão falso positivo no `use()` das fixtures do Playwright, que não é o hook `use` do React.
+  {
+    files: ['e2e/**/*.ts', 'playwright.config.ts'],
+    languageOptions: { globals: globals.node },
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 )

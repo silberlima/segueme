@@ -1,0 +1,19 @@
+# Override de infraestrutura para os testes E2E do frontend (Playwright).
+#
+# No compose padrão o Keycloak sobe com KC_HOSTNAME=keycloak para que o `iss` do token seja o mesmo
+# visto de dentro da rede do compose e do host — o que exige "127.0.0.1 keycloak" no /etc/hosts.
+# No E2E o browser, o backend e o Keycloak rodam todos no host, então fixar o hostname em
+# "localhost" faz os três concordarem sobre o issuer sem tocar no /etc/hosts.
+#
+# Uso (só a infraestrutura; o backend roda no host via ./mvnw spring-boot:run):
+#   docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d postgres keycloak
+services:
+  keycloak:
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: "8081"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_PORT: "8081"

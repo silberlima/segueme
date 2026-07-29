@@ -174,6 +174,21 @@ class HierarquiaControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.content.length()").value(1));
     }
 
+    /** Fase 11: o seletor de paróquia das telas do Pós-Encontro consome este endpoint. */
+    @Test
+    void shouldReturn200WhenPosEncontroListsParoquias() throws Exception {
+        Diocese diocese = dioceseRepository.save(new Diocese("Diocese Escopo Pós-Encontro"));
+        Setor setor = setorRepository.save(new Setor("Setor Escopo Pós-Encontro", diocese));
+        Paroquia paroquia = paroquiaRepository.save(new Paroquia("Paróquia do Perfil Pós-Encontro", setor));
+
+        mockMvc.perform(get("/api/v1/paroquias")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))
+                                .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("Paróquia do Perfil Pós-Encontro"));
+    }
+
     private void criarSetorComParoquia(Diocese diocese, String nomeSetor, String nomeParoquia) {
         Setor setor = setorRepository.save(new Setor(nomeSetor, diocese));
         paroquiaRepository.save(new Paroquia(nomeParoquia, setor));

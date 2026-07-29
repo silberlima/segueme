@@ -164,6 +164,12 @@ export function AttendanceScreen() {
             </label>
           </div>
 
+          {agendar.isError && (
+            <p className="mt-3 text-xs text-rose-600">
+              Não foi possível agendar. Verifique se já existe um encontro pós nesta paróquia nesta data.
+            </p>
+          )}
+
           <div className="mt-4 flex justify-end">
             <Button disabled={!data || agendar.isPending} onClick={agendarEncontroPos}>
               Agendar
@@ -202,7 +208,15 @@ export function AttendanceScreen() {
           </div>
 
           {podeRegistrar && (
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex items-center justify-end gap-4">
+              {registrar.isError && (
+                <p className="text-xs text-rose-600">Não foi possível salvar a chamada. Tente novamente.</p>
+              )}
+              {/* Sem esta confirmação a tela fica idêntica antes e depois de salvar — a marcação já
+                  aparece só por ter sido clicada, e a equipe não tem como saber se a chamada foi. */}
+              {registrar.isSuccess && !registrar.isPending && (
+                <p className="text-xs text-emerald-600">Chamada salva.</p>
+              )}
               <Button disabled={registrar.isPending} onClick={salvarChamada}>
                 Salvar chamada
               </Button>

@@ -44,8 +44,11 @@ public class ParoquiasController {
     // Cadastro de Pessoa usa este endpoint para o seletor de paróquia, e são exatamente os
     // perfis autorizados a criar pessoa (PessoasController). O escopo de cada um já era
     // resolvido corretamente pelo EscopoTerritorialResolver — só a role estava faltando aqui.
+    // POS_ENCONTRO e EQUIPE_MONTAGEM incluídos a partir da Fase 11 (Pós-Encontro), pelo mesmo
+    // motivo: as telas Presenças/Frequência/Prioridades recortam o acompanhamento por paróquia e
+    // usam este endpoint no seletor — sem a role, o perfil dono do módulo não carregava a própria tela.
     @GetMapping
-    @PreAuthorize("hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA','EQUIPE_FICHAS')")
+    @PreAuthorize("hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA','EQUIPE_FICHAS','POS_ENCONTRO','EQUIPE_MONTAGEM')")
     @Operation(summary = "Lista as paróquias do escopo territorial do usuário autenticado")
     public ResponseEntity<PageResponse<ParoquiaResponse>> listar(
             @AuthenticationPrincipal Jwt jwt,
