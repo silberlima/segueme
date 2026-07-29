@@ -35,6 +35,8 @@ import { FinanceOverviewScreen } from '../../domains/financeiro/screens/FinanceO
 import { RevenuesScreen } from '../../domains/financeiro/screens/RevenuesScreen'
 import { ExpensesScreen } from '../../domains/financeiro/screens/ExpensesScreen'
 import { CampaignsScreen } from '../../domains/financeiro/screens/CampaignsScreen'
+import { LecturesScreen } from '../../domains/conteudo/screens/LecturesScreen'
+import { SpeakersScreen } from '../../domains/conteudo/screens/SpeakersScreen'
 
 export function AppRouter() {
   return (
@@ -83,6 +85,8 @@ export function AppRouter() {
           <Route path="encontros/:id/financeiro/receitas" element={<RevenuesScreen />} />
           <Route path="encontros/:id/financeiro/despesas" element={<ExpensesScreen />} />
           <Route path="encontros/:id/financeiro/campanhas" element={<CampaignsScreen />} />
+          <Route path="encontros/:id/palestras" element={<LecturesScreen />} />
+          <Route path="encontros/:id/palestrantes" element={<SpeakersScreen />} />
         </Route>
       </Routes>
     </BrowserRouter>

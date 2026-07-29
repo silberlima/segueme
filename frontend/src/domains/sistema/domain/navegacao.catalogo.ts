@@ -117,8 +117,8 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
   { titulo: 'Lista de Espera', modulo: 'Inscrições', status: 'pronto', path: null, perfis: 'todos' },
   { titulo: 'Participantes', modulo: 'Inscrições', status: 'pronto', path: null, perfis: 'todos' },
 
-  { titulo: 'Palestras', modulo: 'Conteúdo', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Palestrantes', modulo: 'Conteúdo', status: 'previsto', path: null, perfis: 'todos' },
+  { titulo: 'Palestras', modulo: 'Conteúdo', status: 'pronto', path: null, perfis: 'todos' },
+  { titulo: 'Palestrantes', modulo: 'Conteúdo', status: 'pronto', path: null, perfis: 'todos' },
 
   {
     titulo: 'Visão Geral Financeira',
