@@ -31,6 +31,10 @@ import { CoordinatorPanelScreen } from '../../domains/montagem/screens/Coordinat
 import { TransfersScreen } from '../../domains/setorial/screens/TransfersScreen'
 import { LoansScreen } from '../../domains/setorial/screens/LoansScreen'
 import { RequestsInboxScreen } from '../../domains/setorial/screens/RequestsInboxScreen'
+import { FinanceOverviewScreen } from '../../domains/financeiro/screens/FinanceOverviewScreen'
+import { RevenuesScreen } from '../../domains/financeiro/screens/RevenuesScreen'
+import { ExpensesScreen } from '../../domains/financeiro/screens/ExpensesScreen'
+import { CampaignsScreen } from '../../domains/financeiro/screens/CampaignsScreen'
 
 export function AppRouter() {
   return (
@@ -75,6 +79,10 @@ export function AppRouter() {
           <Route path="setorial/transferencias" element={<TransfersScreen />} />
           <Route path="setorial/emprestimos" element={<LoansScreen />} />
           <Route path="setorial/solicitacoes" element={<RequestsInboxScreen />} />
+          <Route path="encontros/:id/financeiro" element={<FinanceOverviewScreen />} />
+          <Route path="encontros/:id/financeiro/receitas" element={<RevenuesScreen />} />
+          <Route path="encontros/:id/financeiro/despesas" element={<ExpensesScreen />} />
+          <Route path="encontros/:id/financeiro/campanhas" element={<CampaignsScreen />} />
         </Route>
       </Routes>
     </BrowserRouter>
