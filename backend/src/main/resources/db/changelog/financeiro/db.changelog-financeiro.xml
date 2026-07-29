@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="financeiro-0001-create-tables" author="segueme">
+        <createTable tableName="lancamento_financeiro">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_lancamento_financeiro_encontro"
+                             references="encontro(id)"/>
+            </column>
+            <column name="tipo" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="categoria" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valor" type="numeric(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="situacao" type="varchar(20)"/>
+            <column name="aprovado_por" type="varchar(255)"/>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="lancamento_financeiro" indexName="idx_lancamento_financeiro_encontro">
+            <column name="encontro_id"/>
+        </createIndex>
+
+        <createTable tableName="campanha">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_campanha_encontro" references="encontro(id)"/>
+            </column>
+            <column name="nome" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="meta" type="numeric(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valor_arrecadado" type="numeric(12,2)" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(20)" defaultValue="ATIVA">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="campanha" indexName="idx_campanha_encontro">
+            <column name="encontro_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
