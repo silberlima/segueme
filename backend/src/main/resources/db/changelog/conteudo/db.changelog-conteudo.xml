@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="conteudo-0001-create-tables" author="segueme">
+        <createTable tableName="palestra">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="numero" type="int">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="tema" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="palestrante">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nome" type="varchar(150)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tipo" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints foreignKeyName="fk_palestrante_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="designacao_palestra">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encontro_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_designacao_palestra_encontro" references="encontro(id)"/>
+            </column>
+            <column name="palestra_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_designacao_palestra_palestra" references="palestra(id)"/>
+            </column>
+            <column name="palestrante_id" type="uuid">
+                <constraints foreignKeyName="fk_designacao_palestra_palestrante" references="palestrante(id)"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="designacao_palestra" columnNames="encontro_id, palestra_id"
+                              constraintName="uk_designacao_palestra_encontro_palestra"/>
+        <createIndex tableName="designacao_palestra" indexName="idx_designacao_palestra_encontro">
+            <column name="encontro_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Catálogo nacional dos 7 temas oficiais (RN-22/RN-CONTEUDO-01). Títulos placeholder: o
+         protótipo só menciona os temas como "numerados e fixos", sem detalhar a lista nem a
+         ementa — conjunto exato a confirmar com o PO (pendência #15 de pendencias-gerais.md),
+         mesmo racional do seed de Competências e do seed de tipos de Equipe. -->
+    <changeSet id="conteudo-0002-seed-palestras" author="segueme">
+        <insert tableName="palestra">
+            <column name="id" value="00000000-0000-4000-8000-000000001001"/>
+            <column name="numero" valueNumeric="1"/>
+            <column name="tema" value="Tema 1 (placeholder)"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="palestra">
+            <column name="id" value="00000000-0000-4000-8000-000000001002"/>
+            <column name="numero" valueNumeric="2"/>
+            <column name="tema" value="Tema 2 (placeholder)"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="palestra">
+            <column name="id" value="00000000-0000-4000-8000-000000001003"/>
+            <column name="numero" valueNumeric="3"/>
+            <column name="tema" value="Tema 3 (placeholder)"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="palestra">
+            <column name="id" value="00000000-0000-4000-8000-000000001004"/>
+            <column name="numero" valueNumeric="4"/>
+            <column name="tema" value="Tema 4 (placeholder)"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="palestra">
+            <column name="id" value="00000000-0000-4000-8000-000000001005"/>
+            <column name="numero" valueNumeric="5"/>
+            <column name="tema" value="Tema 5 (placeholder)"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="palestra">
+            <column name="id" value="00000000-0000-4000-8000-000000001006"/>
+            <column name="numero" valueNumeric="6"/>
+            <column name="tema" value="Tema 6 (placeholder)"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+        <insert tableName="palestra">
+            <column name="id" value="00000000-0000-4000-8000-000000001007"/>
+            <column name="numero" valueNumeric="7"/>
+            <column name="tema" value="Tema 7 (placeholder)"/>
+            <column name="created_at" valueDate="current_timestamp"/>
+            <column name="updated_at" valueDate="current_timestamp"/>
+            <column name="deleted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
