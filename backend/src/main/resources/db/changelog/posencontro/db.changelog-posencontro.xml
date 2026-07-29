@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="posencontro-0001-create-tables" author="segueme">
+        <createTable tableName="encontro_pos">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="paroquia_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_encontro_pos_paroquia" references="paroquia(id)"/>
+            </column>
+            <column name="data" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tema" type="varchar(200)"/>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="encontro_pos" columnNames="paroquia_id, data"
+                             constraintName="uk_encontro_pos_paroquia_data"/>
+        <createIndex tableName="encontro_pos" indexName="idx_encontro_pos_paroquia_data">
+            <column name="paroquia_id"/>
+            <column name="data"/>
+        </createIndex>
+
+        <createTable tableName="frequencia_pos_encontro">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encontro_pos_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_frequencia_pos_encontro_encontro_pos"
+                             references="encontro_pos(id)"/>
+            </column>
+            <column name="pessoa_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_frequencia_pos_encontro_pessoa" references="pessoa(id)"/>
+            </column>
+            <column name="presente" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="frequencia_pos_encontro" columnNames="encontro_pos_id, pessoa_id"
+                             constraintName="uk_frequencia_pos_encontro_encontro_pessoa"/>
+        <!-- Apuração da frequência e do ranking de prioridade sempre filtra por pessoa (RN-POS-03). -->
+        <createIndex tableName="frequencia_pos_encontro" indexName="idx_frequencia_pos_encontro_pessoa">
+            <column name="pessoa_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

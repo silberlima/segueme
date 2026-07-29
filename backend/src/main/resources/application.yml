@@ -9,6 +9,14 @@ spring:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  pos-encontro:
+    # Régua de corte das faixas de prioridade (RN-POS-03). Percentual de presenças nos encontros
+    # pós realizados no período. A régua exata é pendência #14 de docs/pendencias-gerais.md — estes
+    # valores são o default documentado, coerente com os exemplos do doc (12/12 = Alta, 3/12 = Baixa),
+    # e devem ser reajustados por configuração quando o PO validar a régua.
+    regua:
+      percentual-minimo-alta: ${POS_ENCONTRO_PERCENTUAL_MINIMO_ALTA:75}
+      percentual-minimo-media: ${POS_ENCONTRO_PERCENTUAL_MINIMO_MEDIA:40}
 
 springdoc:
   swagger-ui:

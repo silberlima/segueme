@@ -18,8 +18,10 @@ import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.pessoas.domain.SituacaoPessoa;
+import com.silberlima.segueme.posencontro.application.ConsultarPercentualFrequenciaUseCase;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -44,6 +46,9 @@ class GerarSugestoesUseCaseTest {
     @Mock
     private PessoaRepository pessoaRepository;
 
+    @Mock
+    private ConsultarPercentualFrequenciaUseCase consultarPercentualFrequenciaUseCase;
+
     private final Paroquia paroquiaDoEncontro = umaParoquia("Paróquia do Encontro");
     private final Encontro encontro = umEncontro(paroquiaDoEncontro);
     private final Equipe equipe = new Equipe("Cozinha", 2, 4, null);
@@ -64,9 +69,7 @@ class GerarSugestoesUseCaseTest {
         when(pessoaRepository.findBySituacaoAndDeletedFalse(SituacaoPessoa.SEGUIDOR))
                 .thenReturn(List.of(jaVinculado, candidato));
 
-        List<CandidatoSugerido> sugestoes = new GerarSugestoesUseCase(
-                        encontroRepository, equipeRepository, integranteEquipeRepository, pessoaRepository)
-                .execute(encontroId, equipeId);
+        List<CandidatoSugerido> sugestoes = umUseCase().execute(encontroId, equipeId);
 
         assertThat(sugestoes).extracting(CandidatoSugerido::pessoa).containsExactly(candidato);
     }
@@ -84,13 +87,41 @@ class GerarSugestoesUseCaseTest {
         when(pessoaRepository.findBySituacaoAndDeletedFalse(SituacaoPessoa.SEGUIDOR))
                 .thenReturn(List.of(deOutraParoquia));
 
-        List<CandidatoSugerido> sugestoes = new GerarSugestoesUseCase(
-                        encontroRepository, equipeRepository, integranteEquipeRepository, pessoaRepository)
-                .execute(encontroId, equipeId);
+        List<CandidatoSugerido> sugestoes = umUseCase().execute(encontroId, equipeId);
 
         assertThat(sugestoes).hasSize(1);
         assertThat(sugestoes.get(0).mesmaParoquia()).isFalse();
         assertThat(sugestoes.get(0).justificativas()).contains("Requer empréstimo do setor");
+    }
+
+    /**
+     * O fator de frequência (20% do score, RN-09/RN-MONTAGEM-03) nasceu zerado na Fase 6 e passou a
+     * usar a apuração real do pós-encontro na Fase 11: quem tem dado pontua, quem não tem fica em 0
+     * sem ser confundido com quem tem 0% de presença.
+     */
+    @Test
+    void shouldScoreFrequenciaPosEncontroFromApuracaoReal() {
+        UUID encontroId = UUID.randomUUID();
+        UUID equipeId = UUID.randomUUID();
+        Pessoa frequente = umaPessoa("Frequente", paroquiaDoEncontro);
+        ReflectionTestUtils.setField(frequente, "id", UUID.randomUUID());
+        Pessoa semDado = umaPessoa("Sem Dado", paroquiaDoEncontro);
+        ReflectionTestUtils.setField(semDado, "id", UUID.randomUUID());
+
+        when(encontroRepository.findByIdAndDeletedFalse(encontroId)).thenReturn(Optional.of(encontro));
+        when(equipeRepository.findByIdAndDeletedFalse(equipeId)).thenReturn(Optional.of(equipe));
+        when(integranteEquipeRepository.idsPessoaVinculadaNaEquipe(encontroId, equipeId)).thenReturn(Set.of());
+        when(pessoaRepository.findBySituacaoAndDeletedFalse(SituacaoPessoa.SEGUIDOR))
+                .thenReturn(List.of(frequente, semDado));
+        when(consultarPercentualFrequenciaUseCase.execute()).thenReturn(Map.of(frequente.getId(), 80));
+
+        List<CandidatoSugerido> sugestoes = umUseCase().execute(encontroId, equipeId);
+
+        assertThat(sugestoes).extracting(CandidatoSugerido::pessoa).containsExactly(frequente, semDado);
+        assertThat(sugestoes.get(0).score().frequenciaPosEncontro()).isEqualTo(80);
+        assertThat(sugestoes.get(0).justificativas()).contains("80% de frequência no pós-encontro");
+        assertThat(sugestoes.get(1).score().frequenciaPosEncontro()).isZero();
+        assertThat(sugestoes.get(1).justificativas()).noneMatch(justificativa -> justificativa.contains("frequência"));
     }
 
     @Test
@@ -100,10 +131,17 @@ class GerarSugestoesUseCaseTest {
         when(encontroRepository.findByIdAndDeletedFalse(encontroId)).thenReturn(Optional.of(encontro));
         when(equipeRepository.findByIdAndDeletedFalse(equipeId)).thenReturn(Optional.empty());
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(() -> new GerarSugestoesUseCase(
-                        encontroRepository, equipeRepository, integranteEquipeRepository, pessoaRepository)
-                .execute(encontroId, equipeId))
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> umUseCase().execute(encontroId, equipeId))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    private GerarSugestoesUseCase umUseCase() {
+        return new GerarSugestoesUseCase(
+                encontroRepository,
+                equipeRepository,
+                integranteEquipeRepository,
+                pessoaRepository,
+                consultarPercentualFrequenciaUseCase);
     }
 
     private Paroquia umaParoquia(String nome) {

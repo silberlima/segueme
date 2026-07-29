@@ -15,10 +15,12 @@ import com.silberlima.segueme.pessoas.domain.Competencia;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.pessoas.domain.SituacaoPessoa;
+import com.silberlima.segueme.posencontro.application.ConsultarPercentualFrequenciaUseCase;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -40,17 +42,20 @@ public class GerarSugestoesUseCase {
     private final EquipeRepository equipeRepository;
     private final IntegranteEquipeRepository integranteEquipeRepository;
     private final PessoaRepository pessoaRepository;
+    private final ConsultarPercentualFrequenciaUseCase consultarPercentualFrequenciaUseCase;
     private final SuggestionEngine suggestionEngine = new SuggestionEngine();
 
     public GerarSugestoesUseCase(
             EncontroRepository encontroRepository,
             EquipeRepository equipeRepository,
             IntegranteEquipeRepository integranteEquipeRepository,
-            PessoaRepository pessoaRepository) {
+            PessoaRepository pessoaRepository,
+            ConsultarPercentualFrequenciaUseCase consultarPercentualFrequenciaUseCase) {
         this.encontroRepository = encontroRepository;
         this.equipeRepository = equipeRepository;
         this.integranteEquipeRepository = integranteEquipeRepository;
         this.pessoaRepository = pessoaRepository;
+        this.consultarPercentualFrequenciaUseCase = consultarPercentualFrequenciaUseCase;
     }
 
     @Transactional(readOnly = true)
@@ -63,13 +68,14 @@ public class GerarSugestoesUseCase {
                 .orElseThrow(() -> new ResourceNotFoundException("Equipe não encontrada: " + equipeId));
 
         Set<UUID> jaVinculados = integranteEquipeRepository.idsPessoaVinculadaNaEquipe(encontroId, equipeId);
+        Map<UUID, Integer> frequenciaPosEncontro = consultarPercentualFrequenciaUseCase.execute();
 
         List<CandidatoSugerido> candidatos = new ArrayList<>();
         for (Pessoa candidato : pessoaRepository.findBySituacaoAndDeletedFalse(SituacaoPessoa.SEGUIDOR)) {
             if (jaVinculados.contains(candidato.getId())) {
                 continue;
             }
-            candidatos.add(avaliar(candidato, equipe, encontro));
+            candidatos.add(avaliar(candidato, equipe, encontro, frequenciaPosEncontro.get(candidato.getId())));
         }
 
         return candidatos.stream()
@@ -78,7 +84,8 @@ public class GerarSugestoesUseCase {
                 .toList();
     }
 
-    private CandidatoSugerido avaliar(Pessoa candidato, Equipe equipe, Encontro encontro) {
+    private CandidatoSugerido avaliar(
+            Pessoa candidato, Equipe equipe, Encontro encontro, Integer percentualFrequenciaPosEncontro) {
         int participacoesSemelhantes = (int) integranteEquipeRepository
                 .countByPessoa_IdAndEquipe_IdAndEncontro_IdNotAndStatusNot(
                         candidato.getId(), equipe.getId(), encontro.getId(), StatusIntegrante.RECUSADO);
@@ -93,7 +100,12 @@ public class GerarSugestoesUseCase {
                         >= equipe.getPreRequisitoMinEncontros();
 
         MatchScore score = suggestionEngine.calcular(new CandidatoScoreInput(
-                participacoesSemelhantes, requeridas.size(), atendidas.size(), false, 0, cumprePreRequisito));
+                participacoesSemelhantes,
+                requeridas.size(),
+                atendidas.size(),
+                percentualFrequenciaPosEncontro != null,
+                percentualFrequenciaPosEncontro == null ? 0 : percentualFrequenciaPosEncontro,
+                cumprePreRequisito));
 
         boolean mesmaParoquia = Objects.equals(candidato.getParoquia().getId(), encontro.getParoquia().getId());
 
@@ -103,6 +115,9 @@ public class GerarSugestoesUseCase {
         }
         if (participacoesSemelhantes > 0) {
             justificativas.add(participacoesSemelhantes + " encontro(s) nesta equipe");
+        }
+        if (percentualFrequenciaPosEncontro != null) {
+            justificativas.add(percentualFrequenciaPosEncontro + "% de frequência no pós-encontro");
         }
         if (!mesmaParoquia) {
             justificativas.add("Requer empréstimo do setor");

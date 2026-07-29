@@ -6,13 +6,18 @@ package com.silberlima.segueme.montagem.domain;
  * pesos 35/30/20/15% são fixos por regra de negócio; a fórmula interna de cada fator é melhor
  * esforço documentado (pendência #6 de {@code pendencias-gerais.md}), versionada em
  * {@link #VERSAO} para permitir recalibração sem quebrar o contrato do endpoint que expõe o
- * score — ver {@code plano-implementacao.md} seção 19 sobre o fator de frequência pós-encontro
- * nascer zerado até a Fase 11.
+ * score.
+ *
+ * <p>O fator de frequência no pós-encontro nasceu zerado na Fase 6 por não haver dado
+ * ({@code plano-implementacao.md} seção 19) e passou a usar a apuração real com a entrega da
+ * Fase 11 — {@code frequenciaPosEncontroDisponivel} continua distinguindo "0% de presença" de
+ * "nenhum encontro pós registrado para esta pessoa", que não pode virar 0 pontos sob pena de
+ * penalizar candidatos de paróquias que ainda não fazem acompanhamento.
  */
 public class SuggestionEngine {
 
     /** Identificador da fórmula atual, exposto na resposta da API para permitir recalibração futura sem quebra de contrato. */
-    public static final String VERSAO = "v1-placeholder-frequencia-posencontro";
+    public static final String VERSAO = "v2-frequencia-posencontro";
 
     private static final double PESO_HISTORICO = 0.35;
     private static final double PESO_COMPETENCIAS = 0.30;
@@ -48,10 +53,7 @@ public class SuggestionEngine {
         return (int) Math.round((atendidas * 100.0) / totalRequeridas);
     }
 
-    /**
-     * Retorna 0 enquanto a Fase 11 (Pós-Encontro) não existir — {@code frequenciaPosEncontroDisponivel}
-     * é o placeholder documentado que sinaliza essa dependência circular leve entre as Fases 6 e 11.
-     */
+    /** Sem dado de pós-encontro para a pessoa, o fator não pontua — ver a nota de classe sobre a Fase 11. */
     private int calcularFrequenciaPosEncontro(CandidatoScoreInput entrada) {
         if (!entrada.frequenciaPosEncontroDisponivel()) {
             return 0;

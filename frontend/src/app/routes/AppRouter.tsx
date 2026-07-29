@@ -37,6 +37,9 @@ import { ExpensesScreen } from '../../domains/financeiro/screens/ExpensesScreen'
 import { CampaignsScreen } from '../../domains/financeiro/screens/CampaignsScreen'
 import { LecturesScreen } from '../../domains/conteudo/screens/LecturesScreen'
 import { SpeakersScreen } from '../../domains/conteudo/screens/SpeakersScreen'
+import { AttendanceScreen } from '../../domains/posencontro/screens/AttendanceScreen'
+import { FrequencyScreen } from '../../domains/posencontro/screens/FrequencyScreen'
+import { PriorityScreen } from '../../domains/posencontro/screens/PriorityScreen'
 
 export function AppRouter() {
   return (
@@ -87,6 +90,9 @@ export function AppRouter() {
           <Route path="encontros/:id/financeiro/campanhas" element={<CampaignsScreen />} />
           <Route path="encontros/:id/palestras" element={<LecturesScreen />} />
           <Route path="encontros/:id/palestrantes" element={<SpeakersScreen />} />
+          <Route path="pos-encontro/presencas" element={<AttendanceScreen />} />
+          <Route path="pos-encontro/frequencia" element={<FrequencyScreen />} />
+          <Route path="pos-encontro/prioridades" element={<PriorityScreen />} />
         </Route>
       </Routes>
     </BrowserRouter>

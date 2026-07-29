@@ -23,4 +23,6 @@ public interface ParoquiaRepository extends JpaRepository<Paroquia, UUID> {
     Optional<Paroquia> findByIdAndDeletedFalse(UUID id);
 
     List<Paroquia> findBySetor_IdInAndDeletedFalse(List<UUID> setorIds);
+
+    boolean existsByIdAndDeletedFalse(UUID id);
 }

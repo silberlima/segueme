@@ -131,7 +131,25 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
   { titulo: 'Despesas', modulo: 'Finanças', status: 'pronto', path: null, perfis: ['EQUIPE_FINANCAS'] },
   { titulo: 'Campanhas', modulo: 'Finanças', status: 'pronto', path: null, perfis: ['EQUIPE_FINANCAS'] },
 
-  { titulo: 'Presenças', modulo: 'Pós-Encontro', status: 'previsto', path: null, perfis: ['POS_ENCONTRO'] },
-  { titulo: 'Frequência', modulo: 'Pós-Encontro', status: 'previsto', path: null, perfis: ['POS_ENCONTRO'] },
-  { titulo: 'Prioridades', modulo: 'Pós-Encontro', status: 'previsto', path: null, perfis: ['POS_ENCONTRO'] },
+  {
+    titulo: 'Presenças',
+    modulo: 'Pós-Encontro',
+    status: 'pronto',
+    path: '/pos-encontro/presencas',
+    perfis: ['POS_ENCONTRO', 'PAROQUIA'],
+  },
+  {
+    titulo: 'Frequência',
+    modulo: 'Pós-Encontro',
+    status: 'pronto',
+    path: '/pos-encontro/frequencia',
+    perfis: ['POS_ENCONTRO', 'PAROQUIA'],
+  },
+  {
+    titulo: 'Prioridades',
+    modulo: 'Pós-Encontro',
+    status: 'pronto',
+    path: '/pos-encontro/prioridades',
+    perfis: ['POS_ENCONTRO', 'PAROQUIA', 'EQUIPE_MONTAGEM'],
+  },
 ]

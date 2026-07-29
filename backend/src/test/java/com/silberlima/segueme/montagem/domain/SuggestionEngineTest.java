@@ -55,7 +55,7 @@ class SuggestionEngineTest {
     }
 
     @Test
-    void shouldIgnoreFrequenciaPosEncontroWhenNotAvailableYet() {
+    void shouldIgnoreFrequenciaPosEncontroWhenThereIsNoData() {
         MatchScore comDadoAlto = suggestionEngine.calcular(new CandidatoScoreInput(0, 0, 0, false, 100, false));
 
         assertThat(comDadoAlto.frequenciaPosEncontro()).isZero();

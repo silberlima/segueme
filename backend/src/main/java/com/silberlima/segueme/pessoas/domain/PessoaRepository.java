@@ -1,5 +1,6 @@
 package com.silberlima.segueme.pessoas.domain;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,6 +24,15 @@ public interface PessoaRepository extends JpaRepository<Pessoa, UUID>, JpaSpecif
      */
     @EntityGraph(attributePaths = {"paroquia", "competencias"})
     List<Pessoa> findBySituacaoAndDeletedFalse(SituacaoPessoa situacao);
+
+    /**
+     * Pool de acompanhados do pós-encontro (Fase 11): quem já fez o Encontro na paróquia — tanto
+     * {@link SituacaoPessoa#SEGUIMISTA} quanto {@link SituacaoPessoa#SEGUIDOR}, para que quem já
+     * passou a servir em equipes continue no ranking de frequência que alimenta o motor de
+     * sugestões da Fase 6.
+     */
+    List<Pessoa> findByParoquia_IdAndSituacaoInAndDeletedFalseOrderByNomeCompletoAsc(
+            UUID paroquiaId, Collection<SituacaoPessoa> situacoes);
 
     @Query("select comp.id as competenciaId, count(p) as total "
             + "from Pessoa p join p.competencias comp where p.deleted = false group by comp.id")

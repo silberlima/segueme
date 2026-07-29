@@ -7,7 +7,7 @@ package com.silberlima.segueme.montagem.domain;
  * @param participacoesEquipeSemelhante quantas vezes a pessoa já serviu neste mesmo tipo de equipe, em outros Encontros
  * @param totalCompetenciasRequeridas quantas competências o tipo de equipe exige
  * @param competenciasAtendidas quantas dessas competências a pessoa possui
- * @param frequenciaPosEncontroDisponivel {@code false} até a Fase 11 entregar o dado real (placeholder documentado, ver seção 19 do plano de implementação)
+ * @param frequenciaPosEncontroDisponivel se há apuração de pós-encontro para a pessoa (Fase 11); {@code false} significa "sem dado", não 0% de presença
  * @param frequenciaPosEncontroPercentual 0–100, só usado quando {@code frequenciaPosEncontroDisponivel} for {@code true}
  * @param cumprePreRequisito se a pessoa atende o {@code preRequisitoMinEncontros} da equipe (sempre {@code true} quando a equipe não exige pré-requisito)
  */

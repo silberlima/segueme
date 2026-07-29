@@ -16,7 +16,7 @@ Consolidação de tudo que não pôde ser determinado apenas pelo protótipo. Ca
 11. Limite de quantos empréstimos uma paróquia pode conceder simultaneamente.
 12. Quem aprova uma Despesa financeira (perfil aprovador não identificado no protótipo).
 13. Campos e regras de validação do formulário de "Lançamento" financeiro (categorias, forma de pagamento).
-14. Régua numérica exata que separa as faixas de prioridade Alta/Média/Baixa no Pós-Encontro.
+14. Régua numérica exata que separa as faixas de prioridade Alta/Média/Baixa no Pós-Encontro. *(Fase 11: default parametrizável de 75%/40% em `app.pos-encontro.regua.*`, aguardando validação — ver `pos-encontro.md` 6.4.)*
 15. Lista definitiva e ementa dos 7 temas oficiais de palestra.
 16. Lista definitiva das 8 competências do catálogo nacional.
 
@@ -26,7 +26,7 @@ Consolidação de tudo que não pôde ser determinado apenas pelo protótipo. Ca
 19. Campos mínimos exigidos no primeiro contato de "Nova pré-inscrição" (o protótipo mostra apenas o botão, sem abrir o formulário correspondente).
 
 ## Fluxos incompletos
-20. Telas de detalhe do módulo Pós-Encontro (`screen_presencas`, `screen_frequencia`, `screen_prioridades`) não estão desenhadas no protótipo atual — apenas referenciadas no menu e no briefing original.
+20. Telas de detalhe do módulo Pós-Encontro (`screen_presencas`, `screen_frequencia`, `screen_prioridades`) não estão desenhadas no protótipo atual — apenas referenciadas no menu e no briefing original. *(Fase 11: desenho proposto e implementado, aguardando validação — ver `pos-encontro.md` 6.2 a 6.4.)*
 21. Telas de Sistema "Aprovações" (`screen_aprovacoes`) e "Pendências" (`screen_pendencias`) citadas no briefing original, mas fora do escopo já desenhado do protótipo.
 22. O wizard "Criar Encontro" é navegável, mas não persiste dados reais entre sessões — o comportamento de persistência definitivo depende da futura implementação.
 23. Fluxo de edição de uma pessoa já cadastrada (o protótipo modela apenas a criação).
