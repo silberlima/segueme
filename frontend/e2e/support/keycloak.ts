@@ -13,6 +13,19 @@ export async function provisionarUsuarioE2E(paroquiaId: string): Promise<void> {
   await atribuirRoles(adminToken, userId)
 }
 
+/**
+ * Id do usuário de E2E no Keycloak — o mesmo valor que chega ao backend como `sub` do token e que
+ * identifica o dono das notificações, preferências e relatórios. As specs da Fase 13 precisam dele
+ * para limpar só os próprios dados, sem varrer as tabelas inteiras do banco de desenvolvimento.
+ */
+export async function obterIdDoUsuarioE2E(): Promise<string> {
+  const id = await buscarUsuario(await obterTokenAdmin())
+  if (!id) {
+    throw new Error('Usuário de E2E não encontrado no Keycloak. O global setup rodou?')
+  }
+  return id
+}
+
 async function obterTokenAdmin(): Promise<string> {
   const resposta = await fetch(`${STACK.keycloakUrl}/realms/master/protocol/openid-connect/token`, {
     method: 'POST',

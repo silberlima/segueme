@@ -1,4 +1,4 @@
-# Testes E2E — Fase 11 (Pós-Encontro)
+# Testes E2E de browser
 
 Playwright dirigindo o stack real: browser → frontend (vite) → backend Spring → PostgreSQL, com
 login de verdade no Keycloak. Nenhuma requisição é mockada.
@@ -52,7 +52,9 @@ cd frontend && npm run test:e2e:ui
   `PAROQUIA` e o atributo `paroquia_id` da paróquia semeada (o realm compartilhado não é alterado).
 
 Cada teste limpa os encontros pós e as presenças da massa antes de rodar, então a suíte é repetível e
-os testes não dependem da ordem.
+os testes não dependem da ordem. As specs da Fase 13 também apagam relatórios, preferências e
+notificações do usuário de E2E — filtrando pelo `sub` dele, e não esvaziando as tabelas, para não
+levar junto dado de outro usuário do banco de desenvolvimento.
 
 ## Cobertura
 
@@ -61,3 +63,5 @@ os testes não dependem da ordem.
 | `presencas.spec.ts` | Agendar encontro pós, chamada em lote persistida (sobrevive a reload), recusa de duas datas iguais (RN-POS-01), pool restrito aos acompanhados |
 | `frequencia.spec.ts` | Apuração sobre todo o pool incluindo quem só faltou, recorte por período (RF-059) |
 | `prioridades.spec.ts` | Ranking por frequência, faixas Alta/Média/Baixa da régua default e a regra exibida (RN-POS-02/03) |
+| `paineis.spec.ts` | Entrada no painel do perfil ativo, menu restrito a esse painel (RN-DASH-01), KPIs reais dos painéis Pós-Encontro e Paróquia (RF-053) |
+| `sistema.spec.ts` | Relatório gerado e baixado de ponta a ponta (UC-22), falha registrada com motivo, notificação de conclusão e badge de não lida (RN-SISTEMA-01/02), toggle de preferência persistido barrando a notificação (RF-057) |

@@ -65,6 +65,21 @@ export function limparEncontrosPosDaMassa(): void {
   `)
 }
 
+/**
+ * Zera relatórios, preferências e notificações do usuário de E2E (Fase 13). Filtra pelo `sub` dele
+ * em vez de esvaziar as tabelas: o banco é o de desenvolvimento, e apagar dado de outro usuário
+ * seria efeito colateral do teste.
+ */
+export function limparDadosDeSistemaDoUsuarioE2E(usuarioId: string): void {
+  psql(`
+    begin;
+    delete from relatorio where solicitante_id = '${usuarioId}';
+    delete from preferencia_notificacao where usuario_id = '${usuarioId}';
+    delete from notificacao where destinatario_id = '${usuarioId}';
+    commit;
+  `)
+}
+
 function psql(sql: string): void {
   try {
     execFileSync(

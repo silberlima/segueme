@@ -19,5 +19,6 @@
     <include file="db/changelog/financeiro/db.changelog-financeiro.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/conteudo/db.changelog-conteudo.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/posencontro/db.changelog-posencontro.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/relatorios/db.changelog-relatorios.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

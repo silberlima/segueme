@@ -1,19 +1,17 @@
-import { Badge, Drawer } from '../../../../shared/ui'
-import type { BadgeTone } from '../../../../shared/ui'
+import { Link } from 'react-router-dom'
+import { Drawer } from '../../../../shared/ui'
 import { useDisclosure } from '../../../../shared/hooks/useDisclosure'
 import { useNotifications } from '../../hooks/useNotifications'
-import type { TipoNotificacao } from '../../domain/notificacao.types'
+import { NotificationList } from '../NotificationList'
 import type { NotificationBellProps } from './NotificationBell.types'
 
-const TONE_POR_TIPO: Record<TipoNotificacao, BadgeTone> = {
-  INFORMATIVA: 'info',
-  POSITIVA: 'success',
-  NEGATIVA: 'danger',
-}
-
+/**
+ * Sino do header (RN-SISTEMA-02): badge de não lidas e o drawer com a central. O drawer mostra o
+ * recorte recente e leva à tela cheia (`screen_notificacoes`) para o histórico completo.
+ */
 export function NotificationBell({ className = '' }: NotificationBellProps) {
   const { isOpen, open, close } = useDisclosure()
-  const { data, naoLidas, marcarComoLidas, isLoading } = useNotifications()
+  const { data, naoLidas, marcarComoLidas, isMarcandoLidas, isLoading } = useNotifications()
 
   return (
     <>
@@ -32,31 +30,31 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
       </button>
 
       <Drawer isOpen={isOpen} onClose={close} title="Notificações">
-        {naoLidas > 0 && (
-          <button
-            type="button"
-            onClick={() => marcarComoLidas()}
-            className="mb-4 text-sm font-medium text-violet-600 hover:underline"
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <Link
+            to="/notificacoes"
+            onClick={close}
+            className="text-sm font-medium text-violet-600 hover:underline"
           >
-            Marcar todas como lidas
-          </button>
-        )}
-        {isLoading && <p className="text-sm text-slate-400">Carregando...</p>}
-        {!isLoading && (data?.content.length ?? 0) === 0 && (
-          <p className="text-sm text-slate-400">Nenhuma notificação.</p>
-        )}
-        <ul className="flex flex-col gap-3">
-          {data?.content.map((notificacao) => (
-            <li key={notificacao.id} className="rounded-lg border border-slate-100 p-3">
-              <div className="mb-1 flex items-center justify-between">
-                <Badge tone={TONE_POR_TIPO[notificacao.tipo]}>{notificacao.tipo}</Badge>
-                {!notificacao.lida && <span className="h-2 w-2 rounded-full bg-violet-600" />}
-              </div>
-              <p className="text-sm font-medium text-slate-900">{notificacao.titulo}</p>
-              <p className="text-xs text-slate-500">{notificacao.mensagem}</p>
-            </li>
-          ))}
-        </ul>
+            Ver todas
+          </Link>
+          {naoLidas > 0 && (
+            <button
+              type="button"
+              disabled={isMarcandoLidas}
+              onClick={() => marcarComoLidas()}
+              className="text-sm font-medium text-violet-600 hover:underline disabled:opacity-50"
+            >
+              Marcar todas como lidas
+            </button>
+          )}
+        </div>
+
+        <NotificationList
+          notificacoes={data?.content ?? []}
+          isLoading={isLoading}
+          mensagemVazio="Nenhuma notificação."
+        />
       </Drawer>
     </>
   )

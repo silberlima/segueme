@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="relatorios-0001-create-table" author="segueme">
+        <createTable tableName="relatorio">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tipo" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="solicitante_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Escopo territorial do solicitante (RN-04), congelado no pedido: a geração roda
+                 depois do commit, num thread sem as claims do token. -->
+            <column name="escopo_nivel" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="escopo_id" type="uuid"/>
+            <column name="gerado_em" type="timestamp with time zone"/>
+            <column name="total_linhas" type="integer"/>
+            <column name="conteudo" type="text"/>
+            <column name="erro" type="varchar(255)"/>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <!-- "Gerados recentemente" sempre filtra pelo solicitante e ordena pela data do pedido. -->
+        <createIndex tableName="relatorio" indexName="idx_relatorio_solicitante_created_at">
+            <column name="solicitante_id"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

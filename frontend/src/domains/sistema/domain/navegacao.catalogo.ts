@@ -7,9 +7,28 @@ import type { ItemNavegacao } from './navegacao.types'
  */
 export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
   { titulo: 'Mapa de Navegação', modulo: 'Acesso', status: 'pronto', path: '/mapa', perfis: 'todos' },
-  { titulo: 'Notificações', modulo: 'Sistema', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Relatórios', modulo: 'Sistema', status: 'previsto', path: null, perfis: 'todos' },
-  { titulo: 'Configurações', modulo: 'Sistema', status: 'previsto', path: null, perfis: 'todos' },
+  { titulo: 'Notificações', modulo: 'Sistema', status: 'pronto', path: '/notificacoes', perfis: 'todos' },
+  {
+    titulo: 'Relatórios',
+    modulo: 'Sistema',
+    status: 'pronto',
+    path: '/relatorios',
+    // Todo perfil operacional gera algum relatório; quais tipos cada um vê é decidido pelo backend
+    // (`TipoRelatorio`). SEGUIDOR não gera nenhum, então não vê o item — ver
+    // `sistema-relatorios-config.md` 6.1.
+    perfis: [
+      'NACIONAL',
+      'DIOCESE',
+      'SETORIAL',
+      'PAROQUIA',
+      'EQUIPE_FICHAS',
+      'EQUIPE_MONTAGEM',
+      'EQUIPE_COMANDO',
+      'EQUIPE_FINANCAS',
+      'POS_ENCONTRO',
+    ],
+  },
+  { titulo: 'Configurações', modulo: 'Sistema', status: 'pronto', path: '/configuracoes', perfis: 'todos' },
 
   // Um painel por perfil operacional (RN-DASH-01): cada item é visível só ao seu perfil, e é o
   // destino da entrada no sistema (ver `PanelRedirect`).

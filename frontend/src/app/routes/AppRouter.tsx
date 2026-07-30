@@ -14,6 +14,9 @@ import { PostEncounterPanelScreen } from '../../domains/dashboards/screens/PostE
 import { LoginScreen } from '../../domains/sistema/screens/LoginScreen'
 import { RecuperarSenhaScreen } from '../../domains/sistema/screens/RecuperarSenhaScreen'
 import { NavigationMapScreen } from '../../domains/sistema/screens/NavigationMapScreen'
+import { ReportsScreen } from '../../domains/sistema/screens/ReportsScreen'
+import { NotificationsFullScreen } from '../../domains/sistema/screens/NotificationsFullScreen'
+import { SettingsScreen } from '../../domains/sistema/screens/SettingsScreen'
 import { DiocesesScreen } from '../../domains/hierarquia/screens/DiocesesScreen'
 import { ParoquiasScreen } from '../../domains/hierarquia/screens/ParoquiasScreen'
 import { PersonListScreen } from '../../domains/pessoas/screens/PersonListScreen'
@@ -67,6 +70,9 @@ export function AppRouter() {
         >
           <Route index element={<PanelRedirect />} />
           <Route path="mapa" element={<NavigationMapScreen />} />
+          <Route path="relatorios" element={<ReportsScreen />} />
+          <Route path="notificacoes" element={<NotificationsFullScreen />} />
+          <Route path="configuracoes" element={<SettingsScreen />} />
           <Route path="painel/nacional" element={<NationalPanelScreen />} />
           <Route path="painel/diocese" element={<DiocesePanelScreen />} />
           <Route path="painel/setor" element={<SectorPanelScreen />} />

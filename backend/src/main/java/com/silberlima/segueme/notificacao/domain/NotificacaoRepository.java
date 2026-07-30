@@ -11,4 +11,7 @@ public interface NotificacaoRepository extends JpaRepository<Notificacao, UUID> 
     Page<Notificacao> findByDestinatarioIdAndDeletedFalse(String destinatarioId, Pageable pageable);
 
     List<Notificacao> findByDestinatarioIdAndLidaFalseAndDeletedFalse(String destinatarioId);
+
+    /** Badge do sino (RN-SISTEMA-02) — contagem no banco, independente da página carregada pelo drawer. */
+    long countByDestinatarioIdAndLidaFalseAndDeletedFalse(String destinatarioId);
 }

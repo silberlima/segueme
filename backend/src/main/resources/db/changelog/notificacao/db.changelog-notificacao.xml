@@ -43,4 +43,36 @@
         </createIndex>
     </changeSet>
 
+    <!-- Fase 13: preferências de notificação por usuário (RF-057). Só a escolha explícita é
+         gravada — a ausência de linha significa "recebe", regra em PreferenciasDeNotificacao. -->
+    <changeSet id="notificacao-0002-create-preferencia" author="segueme">
+        <createTable tableName="preferencia_notificacao">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="usuario_id" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tipo" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ativo" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="updated_by" type="varchar(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="preferencia_notificacao" columnNames="usuario_id, tipo"
+                             constraintName="uk_preferencia_notificacao_usuario_tipo"/>
+    </changeSet>
+
 </databaseChangeLog>
