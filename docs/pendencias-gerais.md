@@ -7,7 +7,7 @@ Consolidação de tudo que não pôde ser determinado apenas pelo protótipo. Ca
 2. Fluxo completo de redefinição de senha (tela de nova senha, expiração do link de recuperação).
 3. Regra de atribuição de perfil(is) de acesso a um usuário real (hoje o protótipo permite trocar de perfil livremente para fins de demonstração).
 4. Regra de permitir ou não mais de um encontro ativo simultâneo por paróquia.
-5. Etapa de aprovação de criação de encontro em nível de Diocese/Setorial (mencionada indiretamente no Painel da Diocese — "3 aprovações de encontro aguardando a diocese" — mas não modelada no wizard).
+5. Etapa de aprovação de criação de encontro em nível de Diocese/Setorial (mencionada indiretamente no Painel da Diocese — "3 aprovações de encontro aguardando a diocese" — mas não modelada no wizard). *(Fase 12: o cartão "Solicitações ao setorial" conta apenas transferências pendentes e empréstimos em aberto, já que não existe fluxo de aprovação de Encontro — ver `dashboards-por-perfil.md` 6.2.)*
 6. Fórmula exata de cálculo de cada um dos 4 fatores do score de Sugestões Inteligentes (apenas os pesos — 35/30/20/15% — estão definidos).
 7. Regra de bloqueio (ou não) da ação "Confirmar montagem" quando há equipes incompletas.
 8. Prazo/expiração de convites pendentes sem resposta; regras de reenvio.

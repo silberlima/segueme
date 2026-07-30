@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../../../app/providers/AuthProvider'
+import { useBadges } from '../../../../app/providers/BadgeProvider'
 import { useProfile } from '../../../../app/providers/ProfileProvider'
-import { Select } from '../../../../shared/ui'
+import { Badge, Select } from '../../../../shared/ui'
 import { PERFIL_LABEL } from '../../domain/perfil.types'
 import type { Perfil } from '../../domain/perfil.types'
 import { getMenuParaPerfil } from '../../domain/navegacao.entity'
@@ -10,6 +11,7 @@ import type { SidebarProps } from './Sidebar.types'
 export function Sidebar({ className = '' }: SidebarProps) {
   const { user, logout } = useAuth()
   const { perfis, perfilAtivo, setPerfilAtivo } = useProfile()
+  const { badges } = useBadges()
   const location = useLocation()
 
   // Itens 'pronto' sem path (ex.: telas de detalhe só alcançáveis via id, como Perfil/Histórico
@@ -31,19 +33,25 @@ export function Sidebar({ className = '' }: SidebarProps) {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2">
-        {menu.map((item) => (
-          <Link
-            key={item.titulo}
-            to={item.path ?? '#'}
-            className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              location.pathname === item.path
-                ? 'bg-violet-50 text-violet-700'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            {item.titulo}
-          </Link>
-        ))}
+        {menu.map((item) => {
+          // Badge de pendência do painel do perfil ativo (RN-DASH-02).
+          const pendencias = item.path ? (badges[item.path] ?? 0) : 0
+
+          return (
+            <Link
+              key={item.titulo}
+              to={item.path ?? '#'}
+              className={`flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                location.pathname === item.path
+                  ? 'bg-violet-50 text-violet-700'
+                  : 'text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <span>{item.titulo}</span>
+              {pendencias > 0 && <Badge tone="warning">{pendencias}</Badge>}
+            </Link>
+          )
+        })}
       </nav>
 
       <div className="border-t border-slate-200 p-4">

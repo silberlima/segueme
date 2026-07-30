@@ -75,3 +75,33 @@ Fornecer, para cada um dos 9 perfis operacionais, uma visão consolidada (KPIs +
 ## 5. Pendências
 - Os valores numéricos dos KPIs são estáticos/ilustrativos no protótipo; regras de cálculo exatas (período de apuração, corte de data, etc.) precisam ser validadas com o Product Owner.
 - Botões "Exportar"/"Relatório"/"Extrato" não têm formato de saída definido (PDF, planilha, etc.) — ver `sistema-relatorios-config.md`.
+
+## 6. Decisões da implementação (Fase 12) — sujeitas a validação do PO
+
+Registro do que a Fase 12 adotou onde o protótipo não determina a regra. Tudo aqui é melhor esforço documentado, não decisão fechada.
+
+### 6.1 Período de apuração dos KPIs
+Concentrado num único lugar (`PeriodoApuracao`, módulo `dashboards`) para que a revisão com o PO troque a regra em um ponto, não em nove painéis:
+
+- **"no ano"** = ano civil corrente (1º de janeiro a 31 de dezembro), pela data de início do Encontro.
+- **"no mês"** = mês civil corrente, pela data de solicitação (transferências) ou pela data do encontro pós.
+- **Gráfico mensal do Pós-Encontro** = 6 meses retroativos incluindo o corrente; meses sem encontro aparecem zerados, para o gráfico não mudar de largura.
+- Nenhum KPI conta pela data de conclusão do fato, sempre pela de início.
+
+### 6.2 Escopo e recortes
+- Nenhum endpoint de painel recebe território por parâmetro: o escopo vem das claims do usuário autenticado (RN-04). Um perfil não consegue pedir o painel de outra diocese, setor ou paróquia, e cada rota é restrita ao seu perfil (RN-DASH-01).
+- Os painéis das equipes (Fichas, Montagem, Comando, Finanças) não têm seletor de Encontro no protótipo: falam do **Encontro corrente** da paróquia — o próximo Encontro ativo que ainda não terminou e, na falta dele, o último realizado. Paróquia sem Encontro nenhum devolve o painel zerado com a ação "Novo encontro", nunca erro.
+- **"Solicitações ao setorial"** (Painel da Diocese) conta transferências pendentes e empréstimos em aberto. As "aprovações de encontro" citadas no protótipo ficam de fora porque esse fluxo não existe no modelo (pendência #5).
+- **"Equipe com maior prioridade"** (Painel de Montagem) = a de mais vagas abertas, com empate resolvido pelo nome para o painel não trocar de equipe entre duas cargas iguais.
+- **Checklist de "equipes-chave"** (Painel da Paróquia): o protótipo não define quais equipes são chave, então o painel lista todas as equipes do Encontro e marca as completas, sem eleger um subconjunto.
+- **"Confirmados" do próximo encontro pós** (Painel Pós-Encontro) é exibido como *chamada registrada*: não existe confirmação prévia de presença no modelo, apenas a chamada — que pode estar em branco.
+- As etapas "Seguimistas" e "Seguidores" do funil de Fichas vêm da situação das pessoas da paróquia, não do funil do Encontro (onde `seguidores` segue sendo o placeholder da Fase 5).
+
+### 6.3 Região da diocese
+O gráfico "Encontros por região" exigiu um atributo que a hierarquia não tinha: `Diocese.regiao` (as cinco regiões do IBGE), **opcional** — não há tela de cadastro da hierarquia (pendência #25), então dioceses sem região informada são agrupadas no painel como "Não informada".
+
+### 6.4 Badges do menu (RN-DASH-02)
+O badge fica na rota que leva ao trabalho pendente — "Solicitações (inbox)" para o Setorial. Quando a tela de detalhe não é alcançável pelo menu (as que exigem um Encontro na URL), o badge fica no próprio item do painel: pendências da paróquia, fichas aguardando, equipes incompletas e convites pendentes.
+
+### 6.5 Ações sem destino definido
+"Relatório anual", "Exportar" e "Extrato" não têm formato de saída definido (Fase 13): no lugar de um botão inerte, os painéis levam à tela existente correspondente (dioceses, financeiro do Encontro, inbox de solicitações).

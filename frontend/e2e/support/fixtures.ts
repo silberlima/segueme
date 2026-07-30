@@ -39,8 +39,13 @@ async function ativarPerfilPosEncontro(page: Page): Promise<void> {
  * O menu lateral. Os locators de navegação são presos a ele porque o Mapa de Navegação exibe cards
  * com links de mesmo nome — sem o escopo, "Presenças" casaria com dois elementos.
  */
-function menuLateral(page: Page) {
+export function menuLateral(page: Page) {
   return page.getByRole('complementary')
+}
+
+/** Troca o perfil ativo pelo seletor do menu (RN-ACESSO-02) — o mesmo caminho do usuário real. */
+export async function ativarPerfil(page: Page, label: string): Promise<void> {
+  await page.getByLabel('Perfil de acesso').selectOption({ label })
 }
 
 /** Navega pelo menu lateral do perfil — o mesmo caminho que a equipe usaria. */

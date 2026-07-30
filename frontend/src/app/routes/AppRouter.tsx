@@ -1,6 +1,16 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { PanelRedirect } from './PanelRedirect'
 import { ProtectedRoute } from './ProtectedRoute'
 import { RootLayout } from './RootLayout'
+import { NationalPanelScreen } from '../../domains/dashboards/screens/NationalPanelScreen'
+import { DiocesePanelScreen } from '../../domains/dashboards/screens/DiocesePanelScreen'
+import { SectorPanelScreen } from '../../domains/dashboards/screens/SectorPanelScreen'
+import { ParishPanelScreen } from '../../domains/dashboards/screens/ParishPanelScreen'
+import { FormsPanelScreen } from '../../domains/dashboards/screens/FormsPanelScreen'
+import { TeamAssemblyPanelScreen } from '../../domains/dashboards/screens/TeamAssemblyPanelScreen'
+import { CommandPanelScreen } from '../../domains/dashboards/screens/CommandPanelScreen'
+import { FinancePanelScreen } from '../../domains/dashboards/screens/FinancePanelScreen'
+import { PostEncounterPanelScreen } from '../../domains/dashboards/screens/PostEncounterPanelScreen'
 import { LoginScreen } from '../../domains/sistema/screens/LoginScreen'
 import { RecuperarSenhaScreen } from '../../domains/sistema/screens/RecuperarSenhaScreen'
 import { NavigationMapScreen } from '../../domains/sistema/screens/NavigationMapScreen'
@@ -55,8 +65,17 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="/mapa" replace />} />
+          <Route index element={<PanelRedirect />} />
           <Route path="mapa" element={<NavigationMapScreen />} />
+          <Route path="painel/nacional" element={<NationalPanelScreen />} />
+          <Route path="painel/diocese" element={<DiocesePanelScreen />} />
+          <Route path="painel/setor" element={<SectorPanelScreen />} />
+          <Route path="painel/paroquia" element={<ParishPanelScreen />} />
+          <Route path="painel/fichas" element={<FormsPanelScreen />} />
+          <Route path="painel/montagem" element={<TeamAssemblyPanelScreen />} />
+          <Route path="painel/comando" element={<CommandPanelScreen />} />
+          <Route path="painel/financas" element={<FinancePanelScreen />} />
+          <Route path="painel/pos-encontro" element={<PostEncounterPanelScreen />} />
           <Route path="hierarquia/dioceses" element={<DiocesesScreen />} />
           <Route path="hierarquia/paroquias" element={<ParoquiasScreen />} />
           <Route path="pessoas" element={<PersonListScreen />} />

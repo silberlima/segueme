@@ -11,15 +11,41 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
   { titulo: 'Relatórios', modulo: 'Sistema', status: 'previsto', path: null, perfis: 'todos' },
   { titulo: 'Configurações', modulo: 'Sistema', status: 'previsto', path: null, perfis: 'todos' },
 
-  { titulo: 'Painel Nacional', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['NACIONAL'] },
-  { titulo: 'Painel da Diocese', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['DIOCESE'] },
-  { titulo: 'Painel do Setor', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['SETORIAL'] },
-  { titulo: 'Painel da Paróquia', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['PAROQUIA'] },
-  { titulo: 'Painel de Fichas', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['EQUIPE_FICHAS'] },
-  { titulo: 'Painel de Montagem', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['EQUIPE_MONTAGEM'] },
-  { titulo: 'Painel de Comando', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['EQUIPE_COMANDO'] },
-  { titulo: 'Painel Financeiro', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['EQUIPE_FINANCAS'] },
-  { titulo: 'Painel Pós-Encontro', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['POS_ENCONTRO'] },
+  // Um painel por perfil operacional (RN-DASH-01): cada item é visível só ao seu perfil, e é o
+  // destino da entrada no sistema (ver `PanelRedirect`).
+  { titulo: 'Painel Nacional', modulo: 'Dashboards', status: 'pronto', path: '/painel/nacional', perfis: ['NACIONAL'] },
+  { titulo: 'Painel da Diocese', modulo: 'Dashboards', status: 'pronto', path: '/painel/diocese', perfis: ['DIOCESE'] },
+  { titulo: 'Painel do Setor', modulo: 'Dashboards', status: 'pronto', path: '/painel/setor', perfis: ['SETORIAL'] },
+  { titulo: 'Painel da Paróquia', modulo: 'Dashboards', status: 'pronto', path: '/painel/paroquia', perfis: ['PAROQUIA'] },
+  { titulo: 'Painel de Fichas', modulo: 'Dashboards', status: 'pronto', path: '/painel/fichas', perfis: ['EQUIPE_FICHAS'] },
+  {
+    titulo: 'Painel de Montagem',
+    modulo: 'Dashboards',
+    status: 'pronto',
+    path: '/painel/montagem',
+    perfis: ['EQUIPE_MONTAGEM'],
+  },
+  {
+    titulo: 'Painel de Comando',
+    modulo: 'Dashboards',
+    status: 'pronto',
+    path: '/painel/comando',
+    perfis: ['EQUIPE_COMANDO'],
+  },
+  {
+    titulo: 'Painel Financeiro',
+    modulo: 'Dashboards',
+    status: 'pronto',
+    path: '/painel/financas',
+    perfis: ['EQUIPE_FINANCAS'],
+  },
+  {
+    titulo: 'Painel Pós-Encontro',
+    modulo: 'Dashboards',
+    status: 'pronto',
+    path: '/painel/pos-encontro',
+    perfis: ['POS_ENCONTRO'],
+  },
   { titulo: 'Meu Perfil', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['SEGUIDOR'] },
 
   {
