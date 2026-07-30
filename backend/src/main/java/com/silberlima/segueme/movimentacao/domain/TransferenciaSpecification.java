@@ -1,6 +1,7 @@
 package com.silberlima.segueme.movimentacao.domain;
 
 import com.silberlima.segueme.hierarquia.domain.EscopoTerritorial;
+import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -24,6 +25,18 @@ public final class TransferenciaSpecification {
             return Specification.unrestricted();
         }
         return (root, query, cb) -> cb.equal(root.get("status"), status);
+    }
+
+    /**
+     * Solicitada a partir de um instante — recorte do KPI "Transferências no mês" do Painel do
+     * Setor (`dashboards-por-perfil.md` 3.3). Conta pela data de solicitação, não de aprovação:
+     * o período exato de apuração dos KPIs é pendência de validação com o PO (seção 5 do mesmo doc).
+     */
+    public static Specification<Transferencia> solicitadaDesde(Instant desde) {
+        if (desde == null) {
+            return Specification.unrestricted();
+        }
+        return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("createdAt"), desde);
     }
 
     public static Specification<Transferencia> comPessoa(UUID pessoaId) {

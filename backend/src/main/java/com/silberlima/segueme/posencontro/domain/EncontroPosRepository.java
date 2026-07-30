@@ -21,6 +21,11 @@ public interface EncontroPosRepository extends JpaRepository<EncontroPos, UUID> 
 
     boolean existsByParoquia_IdAndDataAndDeletedFalse(UUID paroquiaId, LocalDate data);
 
+    /** Cartão "Próximo encontro pós" do Painel Pós-Encontro (`dashboards-por-perfil.md` 3.9). */
+    @EntityGraph(attributePaths = {"paroquia"})
+    Optional<EncontroPos> findTopByParoquia_IdAndDataGreaterThanEqualAndDeletedFalseOrderByDataAsc(
+            UUID paroquiaId, LocalDate data);
+
     /** Denominador das faixas de prioridade: quantos encontros pós a paróquia realizou na janela apurada (RN-POS-03). */
     long countByParoquia_IdAndDataBetweenAndDeletedFalse(UUID paroquiaId, LocalDate de, LocalDate ate);
 

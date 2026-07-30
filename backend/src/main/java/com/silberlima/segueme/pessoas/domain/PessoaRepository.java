@@ -1,5 +1,6 @@
 package com.silberlima.segueme.pessoas.domain;
 
+import com.silberlima.segueme.domain.model.ContagemPorTerritorio;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,35 @@ public interface PessoaRepository extends JpaRepository<Pessoa, UUID>, JpaSpecif
     @Query("select comp.id as competenciaId, count(p) as total "
             + "from Pessoa p join p.competencias comp where p.deleted = false group by comp.id")
     List<ContagemPorCompetencia> contarPorCompetencia();
+
+    /* KPIs de pessoas dos dashboards por perfil (Fase 12, RF-053), um nível territorial por método. */
+
+    long countBySituacaoAndDeletedFalse(SituacaoPessoa situacao);
+
+    long countByParoquia_Setor_Diocese_IdAndSituacaoAndDeletedFalse(UUID dioceseId, SituacaoPessoa situacao);
+
+    long countByParoquia_Setor_IdAndSituacaoAndDeletedFalse(UUID setorId, SituacaoPessoa situacao);
+
+    long countByParoquia_IdAndSituacaoAndDeletedFalse(UUID paroquiaId, SituacaoPessoa situacao);
+
+    /** Ranking "Dioceses em destaque" do Painel Nacional: uma consulta agrupada, nunca uma por diocese. */
+    @Query("select p.paroquia.setor.diocese.id as territorioId, count(p) as total from Pessoa p "
+            + "where p.deleted = false and p.situacao = :situacao group by p.paroquia.setor.diocese.id")
+    List<ContagemPorTerritorio> contarPorDiocese(@Param("situacao") SituacaoPessoa situacao);
+
+    /** Gráfico "Seguidores por setor" do Painel da Diocese. */
+    @Query("select p.paroquia.setor.id as territorioId, count(p) as total from Pessoa p "
+            + "where p.deleted = false and p.situacao = :situacao "
+            + "and p.paroquia.setor.diocese.id = :dioceseId group by p.paroquia.setor.id")
+    List<ContagemPorTerritorio> contarPorSetorDaDiocese(
+            @Param("dioceseId") UUID dioceseId, @Param("situacao") SituacaoPessoa situacao);
+
+    /** Lista "Paróquias do setor" do Painel do Setor. */
+    @Query("select p.paroquia.id as territorioId, count(p) as total from Pessoa p "
+            + "where p.deleted = false and p.situacao = :situacao "
+            + "and p.paroquia.setor.id = :setorId group by p.paroquia.id")
+    List<ContagemPorTerritorio> contarPorParoquiaDoSetor(
+            @Param("setorId") UUID setorId, @Param("situacao") SituacaoPessoa situacao);
 
     /**
      * Inicializa a coleção {@code competencias} das pessoas informadas (por id) numa única

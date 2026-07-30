@@ -189,4 +189,24 @@
         </insert>
     </changeSet>
 
+    <!-- Região da diocese: dado agregador do gráfico "Encontros por região" do Painel Nacional
+         (Fase 12, dashboards-por-perfil.md 3.1). Nulo é permitido — não há tela de cadastro da
+         hierarquia (pendência #25), então dioceses sem região são agrupadas como "Não informada". -->
+    <changeSet id="hierarquia-0003-add-regiao-diocese" author="segueme">
+        <addColumn tableName="diocese">
+            <column name="regiao" type="varchar(20)"/>
+        </addColumn>
+        <createIndex tableName="diocese" indexName="idx_diocese_regiao">
+            <column name="regiao"/>
+        </createIndex>
+        <update tableName="diocese">
+            <column name="regiao" value="SUDESTE"/>
+            <where>id = '00000000-0000-4000-8000-000000000001'</where>
+        </update>
+        <update tableName="diocese">
+            <column name="regiao" value="NORTE"/>
+            <where>id = '00000000-0000-4000-8000-000000000002'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>
