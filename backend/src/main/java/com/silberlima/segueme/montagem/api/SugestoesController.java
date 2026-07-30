@@ -34,7 +34,7 @@ public class SugestoesController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_MONTAGEM)
+    @PreAuthorize(PERFIS_MONTAGEM + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Gera a lista ranqueada de candidatos a uma vaga de equipe (RF-029/030, visível só à Montagem)")
     public ResponseEntity<List<CandidatoSugeridoResponse>> listar(
             @RequestParam UUID encontroId, @RequestParam UUID equipeId) {

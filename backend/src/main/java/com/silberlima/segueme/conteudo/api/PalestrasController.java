@@ -48,7 +48,7 @@ public class PalestrasController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Lista os 7 temas oficiais do Encontro, em ordem fixa, com o palestrante designado (RN-CONTEUDO-01)")
     public List<PalestraResponse> listar(@PathVariable UUID encontroId) {
         List<PalestraDoEncontro> palestras = listarPalestrasDoEncontroUseCase.execute(encontroId);
@@ -56,7 +56,7 @@ public class PalestrasController {
     }
 
     @PatchMapping("/{palestraId}/designar")
-    @PreAuthorize(PERFIS_DESIGNACAO)
+    @PreAuthorize(PERFIS_DESIGNACAO + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Designa (ou substitui) o palestrante de um tema (UC — Designar palestrante)")
     public PalestraResponse designar(
             @PathVariable UUID encontroId,

@@ -2,6 +2,7 @@ package com.silberlima.segueme.movimentacao.application;
 
 import com.silberlima.segueme.domain.exception.ResourceNotFoundException;
 import com.silberlima.segueme.movimentacao.domain.Transferencia;
+import com.silberlima.segueme.movimentacao.domain.TransferenciaDecididaEvent;
 import com.silberlima.segueme.movimentacao.domain.TransferenciaRepository;
 import com.silberlima.segueme.pessoas.domain.HistoricoEvento;
 import com.silberlima.segueme.pessoas.domain.HistoricoEventoRepository;
@@ -9,6 +10,7 @@ import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.TipoEventoHistorico;
 import java.time.Instant;
 import java.util.UUID;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +24,15 @@ public class AprovarTransferenciaUseCase {
 
     private final TransferenciaRepository transferenciaRepository;
     private final HistoricoEventoRepository historicoEventoRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public AprovarTransferenciaUseCase(
-            TransferenciaRepository transferenciaRepository, HistoricoEventoRepository historicoEventoRepository) {
+            TransferenciaRepository transferenciaRepository,
+            HistoricoEventoRepository historicoEventoRepository,
+            ApplicationEventPublisher eventPublisher) {
         this.transferenciaRepository = transferenciaRepository;
         this.historicoEventoRepository = historicoEventoRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -46,6 +52,14 @@ public class AprovarTransferenciaUseCase {
                 Instant.now(),
                 "Transferido(a) da paróquia " + transferencia.getParoquiaOrigem().getNome() + " para "
                         + transferencia.getParoquiaDestino().getNome() + " (aprovado pelo Setorial)."));
+
+        eventPublisher.publishEvent(new TransferenciaDecididaEvent(
+                pessoa.getNomeCompleto(),
+                transferencia.getParoquiaOrigem().getNome(),
+                transferencia.getParoquiaDestino().getNome(),
+                true,
+                null,
+                transferencia.getCreatedBy()));
 
         return transferencia;
     }

@@ -12,7 +12,7 @@ import { useNotificationPreferences } from './useNotificationPreferences'
  * desatualizada em relação à consulta.
  */
 export function useNotificationPreferencesForm() {
-  const { data, isLoading, isError, salvar, isSalvando, salvou } = useNotificationPreferences()
+  const { data, isLoading, isError, refetch, salvar, isSalvando, salvou } = useNotificationPreferences()
   const [ajustes, setAjustes] = useState<AjustesDePreferencia>({})
 
   const persistidas = data ?? []
@@ -27,6 +27,7 @@ export function useNotificationPreferencesForm() {
     preferencias,
     isLoading,
     isError,
+    recarregar: refetch,
     alternar,
     salvar: () => salvar(preferencias, { onSuccess: () => setAjustes({}) }),
     isSalvando,

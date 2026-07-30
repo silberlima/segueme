@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { Button, Skeleton, Table } from '../../../shared/ui'
+import { Button, ListState, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import type { CadastroReserva } from '../domain/inscricao.types'
 import { useCadastroReserva } from '../hooks/useCadastroReserva'
@@ -48,34 +48,18 @@ export function WaitlistScreen() {
         paróquia.
       </p>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton key={index} variant="rect" height="52px" />
-          ))}
-        </div>
-      )}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar o cadastro de reserva. Tente novamente mais tarde.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {data && data.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum candidato em reserva para a paróquia deste encontro.
-        </div>
-      )}
-
-      {data && data.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={data?.length === 0}
+        onRetry={() => refetch()}
+        errorMessage="Não foi possível carregar o cadastro de reserva. Tente novamente mais tarde."
+        emptyMessage="Nenhum candidato em reserva para a paróquia deste encontro."
+      >
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <Table columns={columns} rows={data} getRowKey={(reserva) => reserva.id} />
+          <Table columns={columns} rows={data ?? []} getRowKey={(reserva) => reserva.id} />
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

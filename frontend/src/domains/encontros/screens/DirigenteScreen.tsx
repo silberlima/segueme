@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Skeleton, Tabs } from '../../../shared/ui'
+import { ListState, Tabs } from '../../../shared/ui'
 import { PASTAS_DIRIGENTE, PASTA_DIRIGENTE_LABEL } from '../domain/encontro.types'
 import type { PastaDirigente } from '../domain/encontro.types'
 import { useEncontro } from '../hooks/useEncontro'
 
 export function DirigenteScreen() {
   const { id } = useParams<{ id: string }>()
-  const { data: encontro, isLoading, isError } = useEncontro(id)
+  const { data: encontro, isLoading, isError, refetch } = useEncontro(id)
   const [pastaAtiva, setPastaAtiva] = useState<PastaDirigente>('FINANCAS')
 
   return (
@@ -16,17 +16,14 @@ export function DirigenteScreen() {
         ← Detalhes do Encontro
       </Link>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          <Skeleton variant="rect" height="160px" />
-        </div>
-      )}
-
-      {isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          Não foi possível carregar a Equipe Dirigente deste encontro.
-        </p>
-      )}
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="160px"
+        errorMessage="Não foi possível carregar a Equipe Dirigente deste encontro."
+      />
 
       {encontro && (
         <div className="rounded-xl border border-slate-200 bg-white p-6">

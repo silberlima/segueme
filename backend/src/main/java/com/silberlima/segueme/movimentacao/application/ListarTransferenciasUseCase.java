@@ -29,7 +29,8 @@ public class ListarTransferenciasUseCase {
                 TransferenciaSpecification.naoDeletada(),
                 TransferenciaSpecification.comEscopo(escopo),
                 TransferenciaSpecification.comStatus(status),
-                TransferenciaSpecification.comPessoa(pessoaId));
+                TransferenciaSpecification.comPessoa(pessoaId),
+                TransferenciaSpecification.comAssociacoesCarregadas());
         return transferenciaRepository.findAll(spec, pageable);
     }
 }

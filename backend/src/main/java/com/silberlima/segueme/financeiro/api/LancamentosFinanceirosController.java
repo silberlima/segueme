@@ -73,7 +73,7 @@ public class LancamentosFinanceirosController {
     }
 
     @PostMapping
-    @PreAuthorize(PERFIS_LANCAR)
+    @PreAuthorize(PERFIS_LANCAR + " and @escopoTerritorial.podeVerEncontro(#request.encontroId())")
     @Operation(summary = "Registra um lançamento (receita ou despesa) de um Encontro (RF-047)")
     public ResponseEntity<LancamentoFinanceiroResponse> registrar(@Valid @RequestBody RegistrarLancamentoRequest request) {
         var lancamento = registrarLancamentoUseCase.execute(
@@ -82,7 +82,7 @@ public class LancamentosFinanceirosController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Lista lançamentos financeiros do escopo territorial do usuário (RF-048/049)")
     public ResponseEntity<PageResponse<LancamentoFinanceiroResponse>> listar(
             @AuthenticationPrincipal Jwt jwt,

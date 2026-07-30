@@ -83,7 +83,7 @@ class ConvitesControllerIT extends AbstractIntegrationTest {
                         .param("encontroId", encontro.getId().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
                 .andExpect(status().isForbidden());
     }
 
@@ -100,8 +100,9 @@ class ConvitesControllerIT extends AbstractIntegrationTest {
                         .param("encontroId", encontro.getId().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
-                .andExpect(status().isBadRequest());
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
+                // Violação de regra de negócio (RN-CONVITE-01) responde 409 pelo GlobalExceptionHandler.
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -118,7 +119,7 @@ class ConvitesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new EmitirConviteRequest(equipe.getId(), coordenador.getId(), PapelIntegrante.COORDENADOR)))
-                        .with(jwt().jwt(builder -> builder.subject("comando-1"))
+                        .with(jwt().jwt(builder -> builder.subject("comando-1").claim("paroquia_id", paroquia.getId().toString()))
                                 .authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDENTE"))
@@ -129,7 +130,7 @@ class ConvitesControllerIT extends AbstractIntegrationTest {
 
         // 2. Coordenador aceita.
         mockMvc.perform(patch("/api/v1/convites/{id}/aceitar", conviteCoordenadorId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("ACEITO"));
 
@@ -139,7 +140,7 @@ class ConvitesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new EmitirConviteRequest(equipe.getId(), integrante.getId(), PapelIntegrante.INTEGRANTE)))
-                        .with(jwt().jwt(builder -> builder.subject("comando-1"))
+                        .with(jwt().jwt(builder -> builder.subject("comando-1").claim("paroquia_id", paroquia.getId().toString()))
                                 .authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
                 .andExpect(status().isCreated())
                 .andReturn()
@@ -151,7 +152,7 @@ class ConvitesControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(patch("/api/v1/convites/{id}/recusar", conviteIntegranteId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RecusarConviteRequest("Mudança de agenda.")))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("RECUSADO"))
                 .andExpect(jsonPath("$.justificativaRecusa").value("Mudança de agenda."));
@@ -165,7 +166,7 @@ class ConvitesControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/v1/convites")
                         .param("encontroId", encontro.getId().toString())
                         .param("status", "RECUSADO")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
@@ -182,7 +183,7 @@ class ConvitesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new EmitirConviteRequest(equipe.getId(), coordenador.getId(), PapelIntegrante.COORDENADOR)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -190,7 +191,7 @@ class ConvitesControllerIT extends AbstractIntegrationTest {
         UUID conviteId = UUID.fromString(objectMapper.readTree(conviteJson).get("id").asText());
 
         mockMvc.perform(patch("/api/v1/convites/{id}/reenviar", conviteId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_COMANDO"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.reenvios").value(1));
     }

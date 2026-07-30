@@ -1,5 +1,5 @@
 import { MASSA, STACK, USUARIO_E2E } from './config'
-import { provisionarUsuarioE2E } from './keycloak'
+import { provisionarUsuarioE2E, provisionarUsuarioSetorialE2E } from './keycloak'
 import { semearMassaPosEncontro } from './seed'
 
 /**
@@ -12,6 +12,7 @@ export default async function globalSetup(): Promise<void> {
 
   semearMassaPosEncontro()
   await provisionarUsuarioE2E(MASSA.paroquiaId)
+  await provisionarUsuarioSetorialE2E(MASSA.setorId, MASSA.paroquiaId)
   await validarLogin()
 }
 

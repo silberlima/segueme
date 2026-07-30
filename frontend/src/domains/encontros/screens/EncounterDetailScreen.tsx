@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { Badge, Skeleton } from '../../../shared/ui'
+import { Badge, ListState } from '../../../shared/ui'
 import { STATUS_ENCONTRO_LABEL } from '../domain/encontro.types'
 import { useEncontro } from '../hooks/useEncontro'
 
@@ -14,7 +14,7 @@ function Campo({ label, valor }: { label: string; valor: string }) {
 
 export function EncounterDetailScreen() {
   const { id } = useParams<{ id: string }>()
-  const { data: encontro, isLoading, isError } = useEncontro(id)
+  const { data: encontro, isLoading, isError, refetch } = useEncontro(id)
 
   return (
     <div className="p-6">
@@ -22,17 +22,14 @@ export function EncounterDetailScreen() {
         ← Lista de Encontros
       </Link>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          <Skeleton variant="rect" height="160px" />
-        </div>
-      )}
-
-      {isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          Não foi possível carregar os detalhes deste encontro.
-        </p>
-      )}
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="160px"
+        errorMessage="Não foi possível carregar os detalhes deste encontro."
+      />
 
       {encontro && (
         <div className="rounded-xl border border-slate-200 bg-white p-6">

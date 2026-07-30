@@ -53,7 +53,7 @@ public class ParticipantesController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Lista os Participantes (fichas confirmadas) de um Encontro, com status de pagamento (RF-027)")
     public ResponseEntity<PageResponse<ParticipanteResponse>> listar(
             @RequestParam UUID encontroId,
@@ -63,7 +63,7 @@ public class ParticipantesController {
     }
 
     @GetMapping("/funil")
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Consolida o funil de inscrição de um Encontro por etapa (RF-027)")
     public ResponseEntity<FunilResponse> funil(@RequestParam UUID encontroId) {
         return ResponseEntity.ok(FunilResponse.from(consultarFunilUseCase.execute(encontroId)));

@@ -84,7 +84,7 @@ public class EmprestimosController {
     }
 
     @PostMapping
-    @PreAuthorize(PERFIS_MONTAGEM)
+    @PreAuthorize(PERFIS_MONTAGEM + " and @escopoTerritorial.podeVerEncontro(#request.encontroId())")
     @Operation(summary = "Solicita um empréstimo de seguidor de outra paróquia ao Setorial (RF-042)")
     public ResponseEntity<EmprestimoResponse> solicitar(@Valid @RequestBody SolicitarEmprestimoRequest request) {
         Emprestimo emprestimo =
@@ -93,7 +93,7 @@ public class EmprestimosController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Lista Empréstimos do escopo territorial do usuário, com filtro opcional por encontro/equipe/status")
     public ResponseEntity<List<EmprestimoResponse>> listar(
             @AuthenticationPrincipal Jwt jwt,

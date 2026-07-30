@@ -72,7 +72,7 @@ class EquipesControllerIT extends AbstractIntegrationTest {
 
         mockMvc.perform(get("/api/v1/equipes")
                         .param("encontroId", encontro.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].preenchidos").value(0))
                 .andExpect(jsonPath("$[0].vagasAbertas").value(org.hamcrest.Matchers.greaterThan(0)));
@@ -90,7 +90,7 @@ class EquipesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new AdicionarIntegranteRequest(pessoa.getId(), PapelIntegrante.INTEGRANTE)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isForbidden());
     }
 
@@ -106,14 +106,14 @@ class EquipesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new AdicionarIntegranteRequest(pessoa.getId(), PapelIntegrante.INTEGRANTE)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDENTE"))
                 .andExpect(jsonPath("$.pessoaId").value(pessoa.getId().toString()));
 
         mockMvc.perform(get("/api/v1/equipes/" + equipe.getId())
                         .param("encontroId", encontro.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.preenchidos").value(1))
                 .andExpect(jsonPath("$.integrantes.length()").value(1));
@@ -132,7 +132,7 @@ class EquipesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new AdicionarIntegranteRequest(pessoaForasteira.getId(), PapelIntegrante.INTEGRANTE)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isConflict());
     }
 

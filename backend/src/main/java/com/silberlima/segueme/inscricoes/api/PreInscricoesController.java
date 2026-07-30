@@ -92,7 +92,7 @@ public class PreInscricoesController {
     }
 
     @PostMapping
-    @PreAuthorize(PERFIS_ESCRITA)
+    @PreAuthorize(PERFIS_ESCRITA + " and @escopoTerritorial.podeVerEncontro(#request.encontroId())")
     @Operation(summary = "Pré-inscreve uma Pessoa num Encontro; entra em reserva se as vagas estiverem esgotadas (RF-022, RN-INSCRICAO-03)")
     public ResponseEntity<CriarPreInscricaoResponse> criar(@Valid @RequestBody CriarPreInscricaoRequest request) {
         ResultadoPreInscricao resultado =
@@ -106,7 +106,7 @@ public class PreInscricoesController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Lista Pré-inscrições do escopo territorial do usuário, com busca por encontro/status/nome (`inscricoes.md` 2.1)")
     public ResponseEntity<PageResponse<PreInscricaoResponse>> listar(
             @AuthenticationPrincipal Jwt jwt,

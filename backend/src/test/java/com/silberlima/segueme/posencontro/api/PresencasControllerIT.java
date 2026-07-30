@@ -68,7 +68,7 @@ class PresencasControllerIT extends AbstractIntegrationTest {
         EncontroPos encontroPos = criarEncontroPos(paroquia);
 
         mockMvc.perform(get("/api/v1/encontros-pos/{id}/presencas", encontroPos.getId())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].pessoaId").value(seguimista.getId().toString()))
@@ -84,7 +84,7 @@ class PresencasControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(put("/api/v1/encontros-pos/{id}/presencas", encontroPos.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(umaChamada(pessoa, true)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
                 .andExpect(status().isForbidden());
     }
 
@@ -97,7 +97,7 @@ class PresencasControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(put("/api/v1/encontros-pos/{id}/presencas", encontroPos.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(umaChamada(pessoa, true)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].presente").value(true));
@@ -105,7 +105,7 @@ class PresencasControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(put("/api/v1/encontros-pos/{id}/presencas", encontroPos.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(umaChamada(pessoa, false)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].presente").value(false));
@@ -120,7 +120,7 @@ class PresencasControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(put("/api/v1/encontros-pos/{id}/presencas", encontroPos.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(umaChamada(forasteiro, true)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
                 .andExpect(status().isConflict());
     }
 

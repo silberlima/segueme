@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Select, Skeleton } from '../../../shared/ui'
+import { Badge, Button, ListState, Select } from '../../../shared/ui'
 import { PessoaSearchSelect } from '../components/PessoaSearchSelect'
 import { TIPO_PALESTRANTE_LABEL } from '../domain/conteudo.types'
 import type { TipoPalestrante } from '../domain/conteudo.types'
@@ -106,26 +106,18 @@ export function SpeakersScreen() {
         </div>
       )}
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar os palestrantes.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {!isLoading && palestrantes && palestrantes.content.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum palestrante cadastrado.
-        </div>
-      )}
-
-      {palestrantes && palestrantes.content.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={palestrantes?.content.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar os palestrantes."
+        emptyMessage="Nenhum palestrante cadastrado."
+      >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {palestrantes.content.map((palestrante) => (
+          {(palestrantes?.content ?? []).map((palestrante) => (
             <div key={palestrante.id} className="rounded-xl border border-slate-200 bg-white p-4">
               <p className="text-sm font-medium text-slate-900">{palestrante.nome}</p>
               <div className="mt-2">
@@ -134,7 +126,7 @@ export function SpeakersScreen() {
             </div>
           ))}
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

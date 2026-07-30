@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Badge, Button, Skeleton } from '../../../shared/ui'
+import { Badge, Button, ListState } from '../../../shared/ui'
 import { PessoaSearchSelect } from '../components/PessoaSearchSelect'
 import { PAPEL_INTEGRANTE_LABEL } from '../domain/montagem.types'
 import { useConvites } from '../hooks/useConvites'
@@ -47,7 +47,7 @@ export function CoordinatorPanelScreen() {
         ← Equipes do Encontro
       </Link>
 
-      {equipeCarregando && <Skeleton variant="rect" height="80px" />}
+      <ListState isLoading={equipeCarregando} skeletonRows={1} skeletonHeight="80px" />
 
       {equipe && (
         <div className="mb-6">
@@ -86,26 +86,18 @@ export function CoordinatorPanelScreen() {
 
       <h2 className="mb-3 text-sm font-semibold text-slate-900">Convites da equipe</h2>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar os convites desta equipe.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {convites && convites.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum convite emitido para esta equipe ainda.
-        </div>
-      )}
-
-      {convites && convites.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={convites?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar os convites desta equipe."
+        emptyMessage="Nenhum convite emitido para esta equipe ainda."
+      >
         <div className="flex flex-col gap-2">
-          {convites.map((convite) => (
+          {(convites ?? []).map((convite) => (
             <div key={convite.id} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 text-sm">
               <div>
                 <p className="font-medium text-slate-900">{convite.pessoaNome}</p>
@@ -133,7 +125,7 @@ export function CoordinatorPanelScreen() {
             </div>
           ))}
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Select, Skeleton } from '../../../shared/ui'
+import { Badge, Button, ConfirmDialog, ListState, Select } from '../../../shared/ui'
 import { PessoaSearchSelect } from '../components/PessoaSearchSelect'
 import { PAPEL_INTEGRANTE_LABEL } from '../domain/montagem.types'
-import type { PapelIntegrante } from '../domain/montagem.types'
+import type { Convite, PapelIntegrante } from '../domain/montagem.types'
 import { useAceitarConvite } from '../hooks/useAceitarConvite'
 import { useConvites } from '../hooks/useConvites'
 import { useEmitirConvite } from '../hooks/useEmitirConvite'
@@ -25,7 +25,7 @@ export function InvitesScreen() {
   const [papel, setPapel] = useState<PapelIntegrante>('COORDENADOR')
   const [pessoaId, setPessoaId] = useState('')
   const [pessoaNome, setPessoaNome] = useState('')
-  const [justificativaPorConvite, setJustificativaPorConvite] = useState<Record<string, string>>({})
+  const [conviteEmRecusa, setConviteEmRecusa] = useState<Convite | null>(null)
 
   const { data: equipes } = useEquipes(encontroId)
   const { data: convites, isLoading, isError, refetch } = useConvites(encontroId, { status: 'PENDENTE' })
@@ -47,12 +47,11 @@ export function InvitesScreen() {
     emitirConvite.mutate({ encontroId, equipeId, pessoaId, papel }, { onSuccess: limparFormulario })
   }
 
-  function recusar(conviteId: string) {
-    const justificativa = (justificativaPorConvite[conviteId] ?? '').trim()
-    if (!justificativa) return
+  function confirmarRecusa(justificativa: string) {
+    if (!conviteEmRecusa) return
     recusarConvite.mutate(
-      { conviteId, justificativa },
-      { onSuccess: () => setJustificativaPorConvite((atual) => ({ ...atual, [conviteId]: '' })) },
+      { conviteId: conviteEmRecusa.id, justificativa },
+      { onSuccess: () => setConviteEmRecusa(null) },
     )
   }
 
@@ -125,26 +124,18 @@ export function InvitesScreen() {
 
       <h2 className="mb-3 text-sm font-semibold text-slate-900">Convites pendentes</h2>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar os convites.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {convites && convites.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum convite pendente neste encontro.
-        </div>
-      )}
-
-      {convites && convites.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={convites?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar os convites."
+        emptyMessage="Nenhum convite pendente neste encontro."
+      >
         <div className="flex flex-col gap-3">
-          {convites.map((convite) => (
+          {(convites ?? []).map((convite) => (
             <div key={convite.id} className="rounded-lg border border-slate-200 bg-white p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -158,37 +149,42 @@ export function InvitesScreen() {
               </div>
 
               {podeGerenciar && (
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <input
-                    type="text"
-                    value={justificativaPorConvite[convite.id] ?? ''}
-                    onChange={(event) =>
-                      setJustificativaPorConvite((atual) => ({ ...atual, [convite.id]: event.target.value }))
-                    }
-                    placeholder="Justificativa (obrigatória para recusar)"
-                    className="h-9 flex-1 rounded-lg border border-slate-200 px-3 text-sm text-slate-900 outline-none focus:border-violet-500"
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      disabled={aceitarConvite.isPending}
-                      onClick={() => aceitarConvite.mutate(convite.id)}
-                    >
-                      Aceitar
-                    </Button>
-                    <Button
-                      variant="danger"
-                      disabled={!(justificativaPorConvite[convite.id] ?? '').trim() || recusarConvite.isPending}
-                      onClick={() => recusar(convite.id)}
-                    >
-                      Recusar
-                    </Button>
-                  </div>
+                <div className="mt-3 flex justify-end gap-2">
+                  <Button disabled={aceitarConvite.isPending} onClick={() => aceitarConvite.mutate(convite.id)}>
+                    Aceitar
+                  </Button>
+                  <Button variant="danger" onClick={() => setConviteEmRecusa(convite)}>
+                    Recusar
+                  </Button>
                 </div>
               )}
             </div>
           ))}
         </div>
-      )}
+      </ListState>
+
+      <ConfirmDialog
+        isOpen={conviteEmRecusa !== null}
+        title="Recusar convite"
+        tone="danger"
+        confirmLabel="Recusar convite"
+        description={
+          conviteEmRecusa && (
+            <>
+              O convite de <strong>{conviteEmRecusa.pessoaNome}</strong> para {conviteEmRecusa.equipeNome} (
+              {PAPEL_INTEGRANTE_LABEL[conviteEmRecusa.papel]}) será recusado. A justificativa fica registrada no
+              histórico do convite e não pode ser apagada (RN-CONVITE-02).
+            </>
+          )
+        }
+        justification={{
+          label: 'Justificativa da recusa',
+          placeholder: 'Descreva o motivo da recusa',
+        }}
+        isPending={recusarConvite.isPending}
+        onCancel={() => setConviteEmRecusa(null)}
+        onConfirm={confirmarRecusa}
+      />
     </div>
   )
 }

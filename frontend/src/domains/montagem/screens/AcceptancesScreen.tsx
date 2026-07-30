@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { Badge, Button, Skeleton } from '../../../shared/ui'
+import { Badge, ListState } from '../../../shared/ui'
 import { PAPEL_INTEGRANTE_LABEL } from '../domain/montagem.types'
 import { useConvites } from '../hooks/useConvites'
 
@@ -20,26 +20,18 @@ export function AcceptancesScreen() {
 
       <h1 className="mb-6 text-xl font-semibold text-slate-900">Aceites</h1>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar os aceites.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {convites && convites.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum convite aceito neste encontro ainda.
-        </div>
-      )}
-
-      {convites && convites.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={convites?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar os aceites."
+        emptyMessage="Nenhum convite aceito neste encontro ainda."
+      >
         <div className="flex flex-col gap-2">
-          {convites.map((convite) => (
+          {(convites ?? []).map((convite) => (
             <div key={convite.id} className="rounded-lg border border-slate-200 bg-white p-4 text-sm">
               <div className="flex items-center justify-between">
                 <p className="font-medium text-slate-900">{convite.pessoaNome}</p>
@@ -52,7 +44,7 @@ export function AcceptancesScreen() {
             </div>
           ))}
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Badge, Button, Skeleton, Table } from '../../../shared/ui'
+import { Badge, Button, ListState, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import type { Participante } from '../domain/inscricao.types'
 import { useAtualizarPagamento } from '../hooks/useAtualizarPagamento'
@@ -70,53 +70,41 @@ export function ParticipantsScreen() {
         </div>
       )}
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} variant="rect" height="52px" />
-          ))}
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={data?.content.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={4}
+        errorMessage="Não foi possível carregar os participantes. Tente novamente mais tarde."
+        emptyMessage="Nenhum participante confirmado ainda."
+      >
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+          <Table
+            columns={columns}
+            rows={data?.content ?? []}
+            getRowKey={(participante) => participante.fichaInscricaoId}
+          />
         </div>
-      )}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar os participantes. Tente novamente mais tarde.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {data && data.content.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum participante confirmado ainda.
-        </div>
-      )}
-
-      {data && data.content.length > 0 && (
-        <>
-          <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-            <Table columns={columns} rows={data.content} getRowKey={(participante) => participante.fichaInscricaoId} />
+        <div className="mt-4 flex items-center justify-between text-sm text-slate-500">
+          <span>
+            Página {(data?.page ?? 0) + 1} de {Math.max(data?.totalPages ?? 1, 1)} · {data?.totalElements ?? 0}{' '}
+            participantes
+          </span>
+          <div className="flex gap-2">
+            <Button variant="secondary" disabled={page === 0} onClick={() => setPage((current) => current - 1)}>
+              Anterior
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={(data?.page ?? 0) + 1 >= (data?.totalPages ?? 0)}
+              onClick={() => setPage((current) => current + 1)}
+            >
+              Próxima
+            </Button>
           </div>
-          <div className="mt-4 flex items-center justify-between text-sm text-slate-500">
-            <span>
-              Página {data.page + 1} de {Math.max(data.totalPages, 1)} · {data.totalElements} participantes
-            </span>
-            <div className="flex gap-2">
-              <Button variant="secondary" disabled={page === 0} onClick={() => setPage((current) => current - 1)}>
-                Anterior
-              </Button>
-              <Button
-                variant="secondary"
-                disabled={data.page + 1 >= data.totalPages}
-                onClick={() => setPage((current) => current + 1)}
-              >
-                Próxima
-              </Button>
-            </div>
-          </div>
-        </>
-      )}
+        </div>
+      </ListState>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { Badge, Skeleton, Table } from '../../../shared/ui'
+import { Badge, ListState, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import { useDioceses } from '../hooks/useDioceses'
 import type { Diocese } from '../domain/hierarquia.types'
@@ -91,7 +91,7 @@ const columns: TableColumn<LinhaHierarquia>[] = [
 ]
 
 export function DiocesesScreen() {
-  const { data, isLoading, isError } = useDioceses(0, 100)
+  const { data, isLoading, isError, refetch } = useDioceses(0, 100)
 
   return (
     <div className="p-6">
@@ -100,31 +100,18 @@ export function DiocesesScreen() {
         Estrutura hierárquica Nacional → Diocese → Setor → Paróquia.
       </p>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          <Skeleton variant="text" />
-          <Skeleton variant="text" />
-          <Skeleton variant="text" />
-        </div>
-      )}
-
-      {isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          Não foi possível carregar a estrutura hierárquica. Tente novamente mais tarde.
-        </p>
-      )}
-
-      {data && data.content.length === 0 && (
-        <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhuma diocese encontrada para o seu escopo de acesso.
-        </p>
-      )}
-
-      {data && data.content.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={data?.content.length === 0}
+        onRetry={() => refetch()}
+        errorMessage="Não foi possível carregar a estrutura hierárquica. Tente novamente mais tarde."
+        emptyMessage="Nenhuma diocese encontrada para o seu escopo de acesso."
+      >
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <Table columns={columns} rows={achatar(data.content)} getRowKey={(linha) => linha.key} />
+          <Table columns={columns} rows={achatar(data?.content ?? [])} getRowKey={(linha) => linha.key} />
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Skeleton, Table } from '../../../shared/ui'
+import { ListState, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import { FrequenciaBar } from '../components/FrequenciaBar'
 import { ParoquiaSelect } from '../components/ParoquiaSelect'
@@ -70,34 +70,24 @@ export function FrequencyScreen() {
         </label>
       </div>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar a frequência.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {!paroquiaId && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Selecione a paróquia para ver a frequência dos jovens acompanhados.
-        </div>
-      )}
-
-      {paroquiaId && frequencias && frequencias.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum jovem acompanhado nesta paróquia ainda.
-        </div>
-      )}
-
-      {frequencias && frequencias.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={!paroquiaId || frequencias?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar a frequência."
+        emptyMessage={
+          paroquiaId
+            ? 'Nenhum jovem acompanhado nesta paróquia ainda.'
+            : 'Selecione a paróquia para ver a frequência dos jovens acompanhados.'
+        }
+      >
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <Table columns={columns} rows={frequencias} getRowKey={(frequencia) => frequencia.pessoaId} />
+          <Table columns={columns} rows={frequencias ?? []} getRowKey={(frequencia) => frequencia.pessoaId} />
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

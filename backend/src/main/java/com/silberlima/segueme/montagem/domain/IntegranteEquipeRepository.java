@@ -18,6 +18,14 @@ public interface IntegranteEquipeRepository extends JpaRepository<IntegranteEqui
     @EntityGraph(attributePaths = {"pessoa", "equipe"})
     List<IntegranteEquipe> findByEncontro_IdAndStatus(UUID encontroId, StatusIntegrante status);
 
+    /**
+     * Convite com equipe e pessoa carregadas. O mapeamento para DTO acontece no Controller, fora da
+     * transação do Use Case, e `open-in-view` está desligado: sem este grafo, ler `equipe.nome` na
+     * resposta de aceitar/recusar/reenviar estoura {@code LazyInitializationException}.
+     */
+    @EntityGraph(attributePaths = {"pessoa", "equipe", "encontro"})
+    Optional<IntegranteEquipe> findWithEquipeAndPessoaById(UUID id);
+
     /** RN-CONVITE-01: convite de integrante só pode ser emitido após o coordenador aceitar o dele. */
     boolean existsByEncontro_IdAndEquipe_IdAndPapelAndStatus(
             UUID encontroId, UUID equipeId, PapelIntegrante papel, StatusIntegrante status);

@@ -42,7 +42,7 @@ class RecusarConviteUseCaseTest {
         UUID conviteId = UUID.randomUUID();
         IntegranteEquipe convite = umConvite();
         ReflectionTestUtils.setField(convite, "createdBy", "comando-user-1");
-        when(integranteEquipeRepository.findById(conviteId)).thenReturn(Optional.of(convite));
+        when(integranteEquipeRepository.findWithEquipeAndPessoaById(conviteId)).thenReturn(Optional.of(convite));
 
         IntegranteEquipe resultado = new RecusarConviteUseCase(integranteEquipeRepository, eventPublisher)
                 .execute(conviteId, "Não poderei participar.");
@@ -57,7 +57,7 @@ class RecusarConviteUseCaseTest {
     @Test
     void shouldThrowWhenConviteNotFound() {
         UUID conviteId = UUID.randomUUID();
-        when(integranteEquipeRepository.findById(conviteId)).thenReturn(Optional.empty());
+        when(integranteEquipeRepository.findWithEquipeAndPessoaById(conviteId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> new RecusarConviteUseCase(integranteEquipeRepository, eventPublisher)
                         .execute(conviteId, "Justificativa"))

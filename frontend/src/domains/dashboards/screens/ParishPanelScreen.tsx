@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
-import { Badge, Button, KpiCard, KpiRow, PageHeader, PanelCard, Table } from '../../../shared/ui'
+import { Badge, Button, KpiCard, KpiRow, ListState, PageHeader, PanelCard, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
-import { PanelState } from '../components/PanelState'
 import { ProgressBar } from '../components/ProgressBar'
 import { TeamStatusList } from '../components/TeamStatusList'
 import {
@@ -22,7 +21,7 @@ import { useDashboardParoquia } from '../hooks/useDashboardParoquia'
  * protótipo prevê nesse momento.
  */
 export function ParishPanelScreen() {
-  const { data: painel, isLoading, isError } = useDashboardParoquia()
+  const { data: painel, isLoading, isError, refetch } = useDashboardParoquia()
 
   const colunasEncontros: TableColumn<EncontroDoPainel>[] = [
     { key: 'numero', header: 'Nº', render: (encontro) => encontro.numero },
@@ -66,7 +65,14 @@ export function ParishPanelScreen() {
         }
       />
 
-      <PanelState isLoading={isLoading} isError={isError} />
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o painel. Tente novamente."
+      />
 
       {painel && (
         <div className="flex flex-col gap-6">

@@ -34,7 +34,7 @@ class AceitarConviteUseCaseTest {
     void shouldAcceptExistingConvite() {
         UUID conviteId = UUID.randomUUID();
         IntegranteEquipe convite = umConvite();
-        when(integranteEquipeRepository.findById(conviteId)).thenReturn(Optional.of(convite));
+        when(integranteEquipeRepository.findWithEquipeAndPessoaById(conviteId)).thenReturn(Optional.of(convite));
 
         IntegranteEquipe resultado = new AceitarConviteUseCase(integranteEquipeRepository).execute(conviteId);
 
@@ -44,7 +44,7 @@ class AceitarConviteUseCaseTest {
     @Test
     void shouldThrowWhenConviteNotFound() {
         UUID conviteId = UUID.randomUUID();
-        when(integranteEquipeRepository.findById(conviteId)).thenReturn(Optional.empty());
+        when(integranteEquipeRepository.findWithEquipeAndPessoaById(conviteId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> new AceitarConviteUseCase(integranteEquipeRepository).execute(conviteId))
                 .isInstanceOf(ResourceNotFoundException.class);

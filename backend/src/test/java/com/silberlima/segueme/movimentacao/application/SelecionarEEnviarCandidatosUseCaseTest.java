@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -42,6 +43,9 @@ class SelecionarEEnviarCandidatosUseCaseTest {
 
     @Mock
     private EmprestimoCandidatoRepository emprestimoCandidatoRepository;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     private final Paroquia paroquia = new Paroquia("Paróquia", new Setor("Setor", new Diocese("Diocese")));
     private final Pessoa diretor = new Pessoa(
@@ -61,7 +65,8 @@ class SelecionarEEnviarCandidatosUseCaseTest {
         when(emprestimoCandidatoRepository.existsByEmprestimo_IdAndPessoa_Id(emprestimoId, pessoaId)).thenReturn(false);
         when(pessoaRepository.findByIdAndDeletedFalse(pessoaId)).thenReturn(Optional.of(candidato));
 
-        Emprestimo resultado = new SelecionarEEnviarCandidatosUseCase(emprestimoRepository, pessoaRepository, emprestimoCandidatoRepository)
+        Emprestimo resultado = new SelecionarEEnviarCandidatosUseCase(
+                        emprestimoRepository, pessoaRepository, emprestimoCandidatoRepository, eventPublisher)
                 .execute(emprestimoId, List.of(pessoaId));
 
         assertThat(resultado.getStatus()).isEqualTo(StatusEmprestimo.SUGESTOES_ENVIADAS);
@@ -76,7 +81,8 @@ class SelecionarEEnviarCandidatosUseCaseTest {
         when(emprestimoRepository.findByIdAndDeletedFalse(emprestimoId)).thenReturn(Optional.of(emprestimo));
         when(emprestimoCandidatoRepository.existsByEmprestimo_IdAndPessoa_Id(emprestimoId, pessoaId)).thenReturn(true);
 
-        new SelecionarEEnviarCandidatosUseCase(emprestimoRepository, pessoaRepository, emprestimoCandidatoRepository)
+        new SelecionarEEnviarCandidatosUseCase(
+                        emprestimoRepository, pessoaRepository, emprestimoCandidatoRepository, eventPublisher)
                 .execute(emprestimoId, List.of(pessoaId));
 
         verify(emprestimoCandidatoRepository, never()).save(org.mockito.ArgumentMatchers.any());
@@ -88,7 +94,8 @@ class SelecionarEEnviarCandidatosUseCaseTest {
         UUID emprestimoId = UUID.randomUUID();
         when(emprestimoRepository.findByIdAndDeletedFalse(emprestimoId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> new SelecionarEEnviarCandidatosUseCase(emprestimoRepository, pessoaRepository, emprestimoCandidatoRepository)
+        assertThatThrownBy(() -> new SelecionarEEnviarCandidatosUseCase(
+                        emprestimoRepository, pessoaRepository, emprestimoCandidatoRepository, eventPublisher)
                         .execute(emprestimoId, List.of()))
                 .isInstanceOf(ResourceNotFoundException.class);
     }

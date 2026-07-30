@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { Button, Skeleton, Table } from '../../../shared/ui'
+import { ListState, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import { useLancamentos } from '../hooks/useLancamentos'
 
@@ -36,28 +36,20 @@ export function RevenuesScreen() {
       </Link>
       <h1 className="mb-6 text-xl font-semibold text-slate-900">Receitas</h1>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar as receitas.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {!isLoading && totaisPorCategoria.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhuma receita registrada.
-        </div>
-      )}
-
-      {totaisPorCategoria.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={totaisPorCategoria.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar as receitas."
+        emptyMessage="Nenhuma receita registrada."
+      >
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
           <Table columns={columns} rows={totaisPorCategoria} getRowKey={(item) => item.categoria} />
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

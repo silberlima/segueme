@@ -11,13 +11,23 @@ import type { NotificationBellProps } from './NotificationBell.types'
  */
 export function NotificationBell({ className = '' }: NotificationBellProps) {
   const { isOpen, open, close } = useDisclosure()
-  const { data, naoLidas, marcarComoLidas, isMarcandoLidas, isLoading } = useNotifications()
+  const { data, naoLidas, marcarComoLidas, isMarcandoLidas, isLoading, isError, refetch } = useNotifications()
+
+  /**
+   * O sino fica montado o tempo todo, então a consulta da lista só rodaria uma vez por carga de
+   * página: sem recarregar ao abrir, o badge já contaria a notificação nova (ele tem intervalo
+   * próprio) e o drawer ainda mostraria "Nenhuma notificação".
+   */
+  function abrir() {
+    open()
+    void refetch()
+  }
 
   return (
     <>
       <button
         type="button"
-        onClick={open}
+        onClick={abrir}
         aria-label="Notificações"
         className={`relative rounded-full p-2 text-lg hover:bg-slate-100 ${className}`}
       >
@@ -53,6 +63,8 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         <NotificationList
           notificacoes={data?.content ?? []}
           isLoading={isLoading}
+          isError={isError}
+          onRetry={() => refetch()}
           mensagemVazio="Nenhuma notificação."
         />
       </Drawer>

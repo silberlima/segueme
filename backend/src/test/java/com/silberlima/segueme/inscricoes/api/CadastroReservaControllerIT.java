@@ -73,7 +73,7 @@ class CadastroReservaControllerIT extends AbstractIntegrationTest {
 
         mockMvc.perform(get("/api/v1/cadastro-reserva")
                         .param("encontroId", encontro.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].ordem").value(1))
@@ -93,7 +93,7 @@ class CadastroReservaControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new PromoverReservaRequest(encontroDestino.getId())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.encontroId").value(encontroDestino.getId().toString()))
                 .andExpect(jsonPath("$.status").value("AGUARDANDO_FICHA"));

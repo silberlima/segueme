@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
-import { Badge, BarChart, Button, KpiCard, KpiRow, PageHeader, PanelCard, Table } from '../../../shared/ui'
+import { Badge, BarChart, Button, KpiCard, KpiRow, ListState, PageHeader, PanelCard, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
-import { PanelState } from '../components/PanelState'
 import { formatarDataHora } from '../domain/dashboard.entity'
 import type { ConviteDoPainel } from '../domain/dashboard.types'
 import { useDashboardComando } from '../hooks/useDashboardComando'
@@ -20,7 +19,7 @@ const statusLabel = {
 
 /** Painel de Comando (`dash_comando`, RF-053, RN-DASH-01): acompanhamento dos convites do Encontro. */
 export function CommandPanelScreen() {
-  const { data: painel, isLoading, isError } = useDashboardComando()
+  const { data: painel, isLoading, isError, refetch } = useDashboardComando()
   const encontro = painel?.encontroCorrente ?? null
 
   const colunas: TableColumn<ConviteDoPainel>[] = [
@@ -57,7 +56,14 @@ export function CommandPanelScreen() {
         }
       />
 
-      <PanelState isLoading={isLoading} isError={isError} />
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o painel. Tente novamente."
+      />
 
       {painel && (
         <div className="flex flex-col gap-6">

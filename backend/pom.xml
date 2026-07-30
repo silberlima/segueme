@@ -180,6 +180,61 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+			<!--
+				Cobertura mínima de 80% (skills/09), verificada no `verify` — o mesmo goal que o CI já
+				roda. As exclusões abaixo são classes sem lógica própria (DTOs, interfaces de repositório,
+				configuração, mappers gerados pelo MapStruct): cobri-las mediria o framework, não o sistema.
+			-->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.13</version>
+				<configuration>
+					<excludes>
+						<exclude>com/silberlima/segueme/SeguemeApplication.class</exclude>
+						<exclude>com/silberlima/segueme/**/api/dto/**</exclude>
+						<exclude>com/silberlima/segueme/**/application/dto/**</exclude>
+						<exclude>com/silberlima/segueme/infrastructure/config/**</exclude>
+						<exclude>com/silberlima/segueme/**/*MapperImpl.class</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>INSTRUCTION</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.80</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 

@@ -83,7 +83,8 @@ class EmprestimosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new SolicitarEmprestimoRequest(encontro.getId(), equipe.getId(), null)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
+                                .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isForbidden());
     }
 
@@ -102,7 +103,7 @@ class EmprestimosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new SolicitarEmprestimoRequest(encontro.getId(), equipe.getId(), null)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM")).jwt(builder -> builder.claim("paroquia_id", paroquiaDoEncontro.getId().toString()))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("SOLICITADO"))
                 .andReturn()
@@ -130,7 +131,7 @@ class EmprestimosControllerIT extends AbstractIntegrationTest {
 
         // 4. Montagem efetiva: candidato passa a integrar o roster da equipe.
         mockMvc.perform(patch("/api/v1/emprestimos/{id}/efetivar", emprestimoId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM")).jwt(builder -> builder.claim("paroquia_id", paroquiaDoEncontro.getId().toString()))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("EFETIVADO"))
                 .andExpect(jsonPath("$.candidatos[0].status").value("EFETIVADO"));
@@ -150,7 +151,7 @@ class EmprestimosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new SolicitarEmprestimoRequest(encontro.getId(), equipe.getId(), null)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()

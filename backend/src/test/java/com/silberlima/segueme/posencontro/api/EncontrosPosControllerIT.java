@@ -55,7 +55,7 @@ class EncontrosPosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new AgendarEncontroPosRequest(paroquia.getId(), LocalDate.now(), null)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
                 .andExpect(status().isForbidden());
     }
 
@@ -68,7 +68,7 @@ class EncontrosPosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new AgendarEncontroPosRequest(paroquia.getId(), data, "Perseverança")))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data").value(data.toString()))
                 .andExpect(jsonPath("$.tema").value("Perseverança"))
@@ -76,7 +76,7 @@ class EncontrosPosControllerIT extends AbstractIntegrationTest {
 
         mockMvc.perform(get("/api/v1/encontros-pos")
                         .param("paroquiaId", paroquia.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].data").value(data.toString()));
@@ -91,13 +91,13 @@ class EncontrosPosControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(post("/api/v1/encontros-pos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/v1/encontros-pos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
                 .andExpect(status().isConflict());
     }
 

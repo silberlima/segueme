@@ -67,7 +67,7 @@ public class ConvitesController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Lista os convites de um Encontro, com filtros opcionais de status/equipe/papel (RF-036/037)")
     public ResponseEntity<List<ConviteResponse>> listar(
             @RequestParam UUID encontroId,
@@ -81,7 +81,7 @@ public class ConvitesController {
     }
 
     @PostMapping
-    @PreAuthorize(PERFIS_ESCRITA)
+    @PreAuthorize(PERFIS_ESCRITA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Emite um convite de coordenador (RF-034) ou de integrante (RF-035)")
     public ResponseEntity<ConviteResponse> emitir(
             @RequestParam UUID encontroId, @Valid @RequestBody EmitirConviteRequest request) {

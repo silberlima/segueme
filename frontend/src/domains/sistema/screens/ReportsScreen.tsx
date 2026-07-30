@@ -1,4 +1,4 @@
-import { Badge, Button, PageHeader, PanelCard, Skeleton, Table } from '../../../shared/ui'
+import { Badge, Button, ListState, PageHeader, PanelCard, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import { ReportTypeCard } from '../components/ReportTypeCard'
 import { STATUS_LABEL, STATUS_TONE, formatarDataHora, podeBaixar } from '../domain/relatorio.entity'
@@ -19,6 +19,7 @@ export function ReportsScreen() {
     relatorios,
     isLoadingRelatorios,
     isErrorRelatorios,
+    recarregarRelatorios,
     gerar,
     tipoEmGeracao,
     baixar,
@@ -63,38 +64,42 @@ export function ReportsScreen() {
         subtitulo="Documentos consolidados a partir dos dados do seu escopo"
       />
 
-      {isLoadingTipos && <Skeleton variant="rect" height="8rem" />}
-
-      {!isLoadingTipos && tipos.length === 0 && (
-        <p className="mb-6 text-sm text-slate-500">Nenhum tipo de relatório disponível para o seu perfil.</p>
-      )}
-
-      {tipos.length > 0 && (
-        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {tipos.map((tipoDeRelatorio) => (
-            <ReportTypeCard
-              key={tipoDeRelatorio.tipo}
-              tipoDeRelatorio={tipoDeRelatorio}
-              gerando={tipoEmGeracao === tipoDeRelatorio.tipo}
-              onGerar={gerar}
-            />
-          ))}
-        </div>
-      )}
+      <div className="mb-6">
+        <ListState
+          isLoading={isLoadingTipos}
+          isEmpty={tipos.length === 0}
+          skeletonRows={1}
+          skeletonHeight="8rem"
+          emptyMessage="Nenhum tipo de relatório disponível para o seu perfil."
+        >
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {tipos.map((tipoDeRelatorio) => (
+              <ReportTypeCard
+                key={tipoDeRelatorio.tipo}
+                tipoDeRelatorio={tipoDeRelatorio}
+                gerando={tipoEmGeracao === tipoDeRelatorio.tipo}
+                onGerar={gerar}
+              />
+            ))}
+          </div>
+        </ListState>
+      </div>
 
       <PanelCard titulo="Gerados recentemente">
-        {isLoadingRelatorios && <Skeleton variant="rect" height="6rem" />}
-        {isErrorRelatorios && (
-          <p className="text-sm text-rose-600">Não foi possível carregar os relatórios gerados.</p>
-        )}
-        {!isLoadingRelatorios && !isErrorRelatorios && relatorios.length === 0 && (
-          <p className="text-sm text-slate-500">Nenhum relatório gerado ainda.</p>
-        )}
-        {relatorios.length > 0 && (
+        <ListState
+          isLoading={isLoadingRelatorios}
+          isError={isErrorRelatorios}
+          isEmpty={relatorios.length === 0}
+          onRetry={() => recarregarRelatorios()}
+          skeletonRows={1}
+          skeletonHeight="6rem"
+          errorMessage="Não foi possível carregar os relatórios gerados."
+          emptyMessage="Nenhum relatório gerado ainda."
+        >
           <div className="overflow-x-auto">
             <Table columns={colunas} rows={relatorios} getRowKey={(relatorio) => relatorio.id} />
           </div>
-        )}
+        </ListState>
       </PanelCard>
     </div>
   )

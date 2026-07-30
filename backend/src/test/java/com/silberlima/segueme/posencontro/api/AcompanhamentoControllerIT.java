@@ -66,9 +66,12 @@ class AcompanhamentoControllerIT extends AbstractIntegrationTest {
 
     @Test
     void shouldReturn404WhenParoquiaNotFound() throws Exception {
+        Paroquia paroquia = criarParoquia();
+
         mockMvc.perform(get("/api/v1/pos-encontro/frequencia")
                         .param("paroquiaId", UUID.randomUUID().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString()))
+                                .authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
                 .andExpect(status().isNotFound());
     }
 
@@ -85,7 +88,7 @@ class AcompanhamentoControllerIT extends AbstractIntegrationTest {
 
         mockMvc.perform(get("/api/v1/pos-encontro/prioridades")
                         .param("paroquiaId", paroquia.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].pessoaId").value(assiduo.getId().toString()))
@@ -111,7 +114,7 @@ class AcompanhamentoControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/v1/pos-encontro/frequencia")
                         .param("paroquiaId", paroquia.getId().toString())
                         .param("de", LocalDate.now().minusDays(30).toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].totalEncontros").value(1))
                 .andExpect(jsonPath("$[0].presencas").value(1))
@@ -127,7 +130,8 @@ class AcompanhamentoControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(put("/api/v1/encontros-pos/{id}/presencas", encontroPos.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RegistrarPresencasRequest(presencas)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", encontroPos.getParoquia().getId().toString()))
+                                .authorities(new SimpleGrantedAuthority("ROLE_POS_ENCONTRO"))))
                 .andExpect(status().isOk());
     }
 

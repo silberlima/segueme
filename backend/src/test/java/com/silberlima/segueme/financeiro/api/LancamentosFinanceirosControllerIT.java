@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.silberlima.segueme.encontros.domain.Encontro;
 import com.silberlima.segueme.encontros.domain.EncontroRepository;
 import com.silberlima.segueme.financeiro.api.dto.RegistrarLancamentoRequest;
@@ -37,7 +38,8 @@ class LancamentosFinanceirosControllerIT extends AbstractIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    /** `data` do lançamento é um LocalDate: sem o módulo de datas o request nem chega a ser serializado. */
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Autowired
     private DioceseRepository dioceseRepository;
@@ -69,7 +71,7 @@ class LancamentosFinanceirosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RegistrarLancamentoRequest(
                                 encontro.getId(), TipoLancamento.RECEITA, "Doações", new BigDecimal("100.00"), LocalDate.now())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isForbidden());
     }
 
@@ -83,7 +85,7 @@ class LancamentosFinanceirosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RegistrarLancamentoRequest(
                                 encontro.getId(), TipoLancamento.DESPESA, "Alimentação", BigDecimal.ZERO, LocalDate.now())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isBadRequest());
     }
 
@@ -98,7 +100,7 @@ class LancamentosFinanceirosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RegistrarLancamentoRequest(
                                 encontro.getId(), TipoLancamento.RECEITA, "Doações", new BigDecimal("300.00"), LocalDate.now())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("RECEITA"));
 
@@ -107,7 +109,7 @@ class LancamentosFinanceirosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RegistrarLancamentoRequest(
                                 encontro.getId(), TipoLancamento.DESPESA, "Alimentação", new BigDecimal("120.00"), LocalDate.now())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.situacao").value("PENDENTE"))
                 .andReturn()
@@ -117,7 +119,7 @@ class LancamentosFinanceirosControllerIT extends AbstractIntegrationTest {
 
         // 3. Equipe Finanças aprova a despesa.
         mockMvc.perform(patch("/api/v1/lancamentos-financeiros/{id}/aprovar", despesaId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.situacao").value("APROVADA"))
                 .andExpect(jsonPath("$.aprovadoPor").exists());
@@ -132,7 +134,7 @@ class LancamentosFinanceirosControllerIT extends AbstractIntegrationTest {
         // 5. Saldo do resumo reflete receita - despesa.
         mockMvc.perform(get("/api/v1/financeiro/resumo")
                         .param("encontroId", encontro.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalReceitas").value(300.00))
                 .andExpect(jsonPath("$.totalDespesas").value(120.00))
@@ -149,7 +151,7 @@ class LancamentosFinanceirosControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RegistrarLancamentoRequest(
                                 encontro.getId(), TipoLancamento.RECEITA, "Doações", new BigDecimal("50.00"), LocalDate.now())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/lancamentos-financeiros")

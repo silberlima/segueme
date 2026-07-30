@@ -69,7 +69,7 @@ class CampanhasControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriarCampanhaRequest(encontro.getId(), "Festa Junina", new BigDecimal("1000.00"))))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
                 .andExpect(status().isForbidden());
     }
 
@@ -82,7 +82,7 @@ class CampanhasControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(post("/api/v1/campanhas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CriarCampanhaRequest(encontro.getId(), "Festa Junina", BigDecimal.ZERO)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
                 .andExpect(status().isBadRequest());
     }
 
@@ -96,7 +96,7 @@ class CampanhasControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriarCampanhaRequest(encontro.getId(), "Festa Junina", new BigDecimal("1000.00"))))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("ATIVA"))
                 .andReturn()
@@ -107,12 +107,12 @@ class CampanhasControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(patch("/api/v1/campanhas/{id}/arrecadacao", campanhaId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new RegistrarArrecadacaoRequest(new BigDecimal("300.00"))))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.valorArrecadado").value(300.00));
 
         mockMvc.perform(patch("/api/v1/campanhas/{id}/encerrar", campanhaId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("ENCERRADA"));
     }
@@ -127,12 +127,12 @@ class CampanhasControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriarCampanhaRequest(encontro.getId(), "Rifa Solidária", new BigDecimal("500.00"))))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FINANCAS"))))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/campanhas")
                         .param("encontroId", encontro.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
                                 .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1));

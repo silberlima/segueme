@@ -53,7 +53,7 @@ public class CadastroReservaController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Lista o Cadastro de Reserva da paróquia do Encontro, em ordem de chegada (RF-025, RN-INSCRICAO-04)")
     public ResponseEntity<List<CadastroReservaResponse>> listar(@RequestParam UUID encontroId) {
         List<CadastroReserva> reservas = listarCadastroReservaUseCase.execute(encontroId);

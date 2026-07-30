@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Badge, Button, Select, Skeleton } from '../../../shared/ui'
+import { Badge, Button, ConfirmDialog, ListState, Select } from '../../../shared/ui'
 import { PessoaSearchSelect } from '../components/PessoaSearchSelect'
 import { useEquipe } from '../hooks/useEquipe'
 import { useEquipes } from '../hooks/useEquipes'
@@ -19,14 +19,22 @@ export function SubstitutionsScreen() {
   const [motivoSaida, setMotivoSaida] = useState('')
   const [pessoaEntraId, setPessoaEntraId] = useState('')
   const [pessoaEntraNome, setPessoaEntraNome] = useState('')
-  const [justificativa, setJustificativa] = useState('')
+  const [confirmando, setConfirmando] = useState(false)
 
   const { data: equipeSelecionada } = useEquipe(equipeId || undefined, encontroId)
-  const { data: historico, isLoading: historicoCarregando } = useSubstituicoes(encontroId)
+  const {
+    data: historico,
+    isLoading: historicoCarregando,
+    isError: historicoComErro,
+    refetch: recarregarHistorico,
+  } = useSubstituicoes(encontroId)
   const registrarSubstituicao = useRegistrarSubstituicao()
 
   const formularioValido =
-    Boolean(encontroId) && equipeId && pessoaSaiId && motivoSaida.trim() && pessoaEntraId && justificativa.trim();
+    Boolean(encontroId) && Boolean(equipeId) && Boolean(pessoaSaiId) && Boolean(motivoSaida.trim()) && Boolean(pessoaEntraId)
+
+  const pessoaSaiNome =
+    equipeSelecionada?.integrantes.find((integrante) => integrante.pessoaId === pessoaSaiId)?.pessoaNome ?? ''
 
   function limparFormulario() {
     setEquipeId('')
@@ -34,14 +42,18 @@ export function SubstitutionsScreen() {
     setMotivoSaida('')
     setPessoaEntraId('')
     setPessoaEntraNome('')
-    setJustificativa('')
   }
 
-  function registrar() {
+  function registrar(justificativa: string) {
     if (!formularioValido || !encontroId) return
     registrarSubstituicao.mutate(
       { encontroId, equipeId, pessoaSaiId, motivoSaida, pessoaEntraId, justificativa },
-      { onSuccess: limparFormulario },
+      {
+        onSuccess: () => {
+          setConfirmando(false)
+          limparFormulario()
+        },
+      },
     )
   }
 
@@ -109,20 +121,10 @@ export function SubstitutionsScreen() {
             />
           </div>
 
-          <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <span className="text-sm font-medium text-slate-700">Justificativa</span>
-            <textarea
-              value={justificativa}
-              onChange={(event) => setJustificativa(event.target.value)}
-              rows={3}
-              placeholder="Justificativa obrigatória para esta substituição"
-              className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-violet-500"
-            />
-          </div>
         </div>
 
         <div className="mt-4 flex justify-end">
-          <Button disabled={!formularioValido || registrarSubstituicao.isPending} onClick={registrar}>
+          <Button disabled={!formularioValido || registrarSubstituicao.isPending} onClick={() => setConfirmando(true)}>
             Registrar substituição
           </Button>
         </div>
@@ -130,17 +132,18 @@ export function SubstitutionsScreen() {
 
       <h2 className="mb-3 text-sm font-semibold text-slate-900">Histórico recente</h2>
 
-      {historicoCarregando && <Skeleton variant="rect" height="120px" />}
-
-      {historico && historico.content.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhuma substituição registrada neste encontro.
-        </div>
-      )}
-
-      {historico && historico.content.length > 0 && (
+      <ListState
+        isLoading={historicoCarregando}
+        isError={historicoComErro}
+        isEmpty={historico?.content.length === 0}
+        onRetry={() => recarregarHistorico()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o histórico de substituições."
+        emptyMessage="Nenhuma substituição registrada neste encontro."
+      >
         <div className="flex flex-col gap-2">
-          {historico.content.map((item) => (
+          {(historico?.content ?? []).map((item) => (
             <div key={item.id} className="rounded-lg border border-slate-200 bg-white p-4 text-sm">
               <div className="flex items-center justify-between">
                 <p className="font-medium text-slate-900">
@@ -154,7 +157,28 @@ export function SubstitutionsScreen() {
             </div>
           ))}
         </div>
-      )}
+      </ListState>
+
+      <ConfirmDialog
+        isOpen={confirmando}
+        title="Registrar substituição"
+        tone="danger"
+        confirmLabel="Registrar substituição"
+        description={
+          <>
+            <strong>{pessoaSaiNome || 'Quem sai'}</strong> deixa a equipe e{' '}
+            <strong>{pessoaEntraNome || 'quem entra'}</strong> assume a vaga. A troca é registrada no histórico das
+            duas pessoas, que nunca é apagado, e notifica os responsáveis (RNF-07).
+          </>
+        }
+        justification={{
+          label: 'Justificativa da substituição',
+          placeholder: 'Descreva o motivo da substituição',
+        }}
+        isPending={registrarSubstituicao.isPending}
+        onCancel={() => setConfirmando(false)}
+        onConfirm={registrar}
+      />
     </div>
   )
 }

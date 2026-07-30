@@ -61,7 +61,7 @@ class SugestoesControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/v1/sugestoes")
                         .param("encontroId", encontro.getId().toString())
                         .param("equipeId", equipe.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isForbidden());
     }
 
@@ -78,9 +78,12 @@ class SugestoesControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/v1/sugestoes")
                         .param("encontroId", encontro.getId().toString())
                         .param("equipeId", equipe.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM")).jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
+                // Sem contagem absoluta: o banco é compartilhado entre as classes de IT e outras
+                // suítes semeiam seguidores próprios. O que esta suíte prova é quem entra e quem
+                // não entra no pool, não quantos existem no país.
+                .andExpect(jsonPath("$[?(@.pessoaNome=='Seguimista Não Elegível')]").isEmpty())
                 .andExpect(jsonPath("$[?(@.pessoaNome=='Seguidor Local')].mesmaParoquia").value(true))
                 .andExpect(jsonPath("$[?(@.pessoaNome=='Seguidor de Outra Paróquia')].mesmaParoquia").value(false))
                 .andExpect(jsonPath("$[?(@.pessoaNome=='Seguidor de Outra Paróquia')].requerEmprestimoSetor")

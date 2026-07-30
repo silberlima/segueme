@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Badge, Button, Skeleton, Table } from '../../../shared/ui'
+import { Badge, ListState, Table } from '../../../shared/ui'
 import type { BadgeTone } from '../../../shared/ui/Badge/Badge.types'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import { FrequenciaBar } from '../components/FrequenciaBar'
@@ -67,34 +67,24 @@ export function PriorityScreen() {
         <ParoquiaSelect value={paroquiaId} onChange={setParoquiaId} />
       </div>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar o ranking de prioridade.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {!paroquiaId && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Selecione a paróquia para ver o ranking de prioridade.
-        </div>
-      )}
-
-      {paroquiaId && prioridades && prioridades.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum jovem acompanhado nesta paróquia ainda.
-        </div>
-      )}
-
-      {prioridades && prioridades.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={!paroquiaId || prioridades?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o ranking de prioridade."
+        emptyMessage={
+          paroquiaId
+            ? 'Nenhum jovem acompanhado nesta paróquia ainda.'
+            : 'Selecione a paróquia para ver o ranking de prioridade.'
+        }
+      >
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <Table columns={columns} rows={prioridades} getRowKey={(prioridade) => prioridade.pessoaId} />
+          <Table columns={columns} rows={prioridades ?? []} getRowKey={(prioridade) => prioridade.pessoaId} />
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

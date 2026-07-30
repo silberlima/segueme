@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Select, Skeleton, Table } from '../../../shared/ui'
+import { Badge, Button, ListState, Select, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import { ParoquiaSelect } from '../components/ParoquiaSelect'
 import type { Presenca } from '../domain/posencontro.types'
@@ -178,52 +178,38 @@ export function AttendanceScreen() {
         </div>
       )}
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar a lista de chamada.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={!encontroPosId || presencas?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar a lista de chamada."
+        emptyMessage={
+          encontroPosId
+            ? 'Nenhum jovem acompanhado nesta paróquia ainda.'
+            : 'Selecione a paróquia e o encontro pós para fazer a chamada.'
+        }
+      >
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+          <Table columns={columns} rows={presencas ?? []} getRowKey={(presenca) => presenca.pessoaId} />
         </div>
-      )}
 
-      {!encontroPosId && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Selecione a paróquia e o encontro pós para fazer a chamada.
-        </div>
-      )}
-
-      {encontroPosId && presencas && presencas.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum jovem acompanhado nesta paróquia ainda.
-        </div>
-      )}
-
-      {presencas && presencas.length > 0 && (
-        <>
-          <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-            <Table columns={columns} rows={presencas} getRowKey={(presenca) => presenca.pessoaId} />
+        {podeRegistrar && (
+          <div className="mt-4 flex items-center justify-end gap-4">
+            {registrar.isError && (
+              <p className="text-xs text-rose-600">Não foi possível salvar a chamada. Tente novamente.</p>
+            )}
+            {/* Sem esta confirmação a tela fica idêntica antes e depois de salvar — a marcação já
+                aparece só por ter sido clicada, e a equipe não tem como saber se a chamada foi. */}
+            {registrar.isSuccess && !registrar.isPending && <p className="text-xs text-emerald-600">Chamada salva.</p>}
+            <Button disabled={registrar.isPending} onClick={salvarChamada}>
+              Salvar chamada
+            </Button>
           </div>
-
-          {podeRegistrar && (
-            <div className="mt-4 flex items-center justify-end gap-4">
-              {registrar.isError && (
-                <p className="text-xs text-rose-600">Não foi possível salvar a chamada. Tente novamente.</p>
-              )}
-              {/* Sem esta confirmação a tela fica idêntica antes e depois de salvar — a marcação já
-                  aparece só por ter sido clicada, e a equipe não tem como saber se a chamada foi. */}
-              {registrar.isSuccess && !registrar.isPending && (
-                <p className="text-xs text-emerald-600">Chamada salva.</p>
-              )}
-              <Button disabled={registrar.isPending} onClick={salvarChamada}>
-                Salvar chamada
-              </Button>
-            </div>
-          )}
-        </>
-      )}
+        )}
+      </ListState>
     </div>
   )
 }

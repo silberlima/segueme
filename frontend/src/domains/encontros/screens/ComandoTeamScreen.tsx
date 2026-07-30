@@ -1,10 +1,10 @@
 import { Link, useParams } from 'react-router-dom'
-import { Skeleton } from '../../../shared/ui'
+import { ListState } from '../../../shared/ui'
 import { useEncontro } from '../hooks/useEncontro'
 
 export function ComandoTeamScreen() {
   const { id } = useParams<{ id: string }>()
-  const { data: encontro, isLoading, isError } = useEncontro(id)
+  const { data: encontro, isLoading, isError, refetch } = useEncontro(id)
 
   return (
     <div className="p-6">
@@ -12,17 +12,14 @@ export function ComandoTeamScreen() {
         ← Detalhes do Encontro
       </Link>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          <Skeleton variant="rect" height="120px" />
-        </div>
-      )}
-
-      {isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          Não foi possível carregar a Equipe Comando deste encontro.
-        </p>
-      )}
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar a Equipe Comando deste encontro."
+      />
 
       {encontro && (
         <div className="rounded-xl border border-slate-200 bg-white p-6">

@@ -34,7 +34,7 @@ class ReenviarConviteUseCaseTest {
     void shouldResendPendingConvite() {
         UUID conviteId = UUID.randomUUID();
         IntegranteEquipe convite = umConvite();
-        when(integranteEquipeRepository.findById(conviteId)).thenReturn(Optional.of(convite));
+        when(integranteEquipeRepository.findWithEquipeAndPessoaById(conviteId)).thenReturn(Optional.of(convite));
 
         IntegranteEquipe resultado = new ReenviarConviteUseCase(integranteEquipeRepository).execute(conviteId);
 
@@ -46,7 +46,7 @@ class ReenviarConviteUseCaseTest {
         UUID conviteId = UUID.randomUUID();
         IntegranteEquipe convite = umConvite();
         convite.aceitar();
-        when(integranteEquipeRepository.findById(conviteId)).thenReturn(Optional.of(convite));
+        when(integranteEquipeRepository.findWithEquipeAndPessoaById(conviteId)).thenReturn(Optional.of(convite));
 
         assertThatThrownBy(() -> new ReenviarConviteUseCase(integranteEquipeRepository).execute(conviteId))
                 .isInstanceOf(BusinessRuleViolationException.class);
@@ -55,7 +55,7 @@ class ReenviarConviteUseCaseTest {
     @Test
     void shouldThrowWhenConviteNotFound() {
         UUID conviteId = UUID.randomUUID();
-        when(integranteEquipeRepository.findById(conviteId)).thenReturn(Optional.empty());
+        when(integranteEquipeRepository.findWithEquipeAndPessoaById(conviteId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> new ReenviarConviteUseCase(integranteEquipeRepository).execute(conviteId))
                 .isInstanceOf(ResourceNotFoundException.class);

@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { Skeleton } from '../../../shared/ui'
+import { ListState } from '../../../shared/ui'
 import { useCompetencias } from '../hooks/useCompetencias'
 
 export function CompetenciesScreen() {
   const navigate = useNavigate()
-  const { data: competencias, isLoading, isError } = useCompetencias()
+  const { data: competencias, isLoading, isError, refetch } = useCompetencias()
 
   return (
     <div className="p-6">
@@ -13,29 +13,17 @@ export function CompetenciesScreen() {
         Catálogo nacional de dons/habilidades (RF-013), usado na composição de equipes.
       </p>
 
-      {isLoading && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={competencias?.length === 0}
+        onRetry={() => refetch()}
+        skeletonHeight="80px"
+        errorMessage="Não foi possível carregar o catálogo de competências."
+        emptyMessage="Nenhuma competência cadastrada."
+      >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <Skeleton variant="rect" height="80px" />
-          <Skeleton variant="rect" height="80px" />
-          <Skeleton variant="rect" height="80px" />
-        </div>
-      )}
-
-      {isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          Não foi possível carregar o catálogo de competências.
-        </p>
-      )}
-
-      {competencias && competencias.length === 0 && (
-        <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhuma competência cadastrada.
-        </p>
-      )}
-
-      {competencias && competencias.length > 0 && (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {competencias.map((competencia) => (
+          {(competencias ?? []).map((competencia) => (
             <button
               key={competencia.id}
               type="button"
@@ -47,7 +35,7 @@ export function CompetenciesScreen() {
             </button>
           ))}
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 package com.silberlima.segueme.encontros.domain;
 
 import com.silberlima.segueme.domain.model.ContagemPorTerritorio;
+import com.silberlima.segueme.hierarquia.domain.Territorio;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,12 @@ public interface EncontroRepository extends JpaRepository<Encontro, UUID>, JpaSp
 
     @EntityGraph(attributePaths = {"paroquia", "diretorEspiritual"})
     Optional<Encontro> findByIdAndDeletedFalse(UUID id);
+
+    /** Território do Encontro para a checagem de escopo do {@code @PreAuthorize} (RNF-06). */
+    @Query("select new com.silberlima.segueme.hierarquia.domain.Territorio("
+            + "e.paroquia.id, e.paroquia.setor.id, e.paroquia.setor.diocese.id) "
+            + "from Encontro e where e.id = :id and e.deleted = false")
+    Optional<Territorio> buscarTerritorio(@Param("id") UUID id);
 
     /* Agregações dos dashboards por perfil (Fase 12, RF-053). */
 

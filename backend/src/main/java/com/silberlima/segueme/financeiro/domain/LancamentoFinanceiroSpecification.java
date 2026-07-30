@@ -1,6 +1,7 @@
 package com.silberlima.segueme.financeiro.domain;
 
 import com.silberlima.segueme.hierarquia.domain.EscopoTerritorial;
+import jakarta.persistence.criteria.JoinType;
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -48,6 +49,19 @@ public final class LancamentoFinanceiroSpecification {
                     root.get("encontro").get("paroquia").get("setor").get("id"), deSetor.setorId());
             case EscopoTerritorial.DeParoquia deParoquia -> (root, query, cb) -> cb.equal(
                     root.get("encontro").get("paroquia").get("id"), deParoquia.paroquiaId());
+        };
+    }
+    /**
+     * Fetch join de {@code encontro}, lido na resposta. Necessário porque {@code open-in-view} está
+     * desligado e o mapeamento para DTO ocorre no Controller, fora da transação do Use Case.
+     * Ignorado na sub-consulta de contagem do Spring Data (paginação).
+     */
+    public static Specification<LancamentoFinanceiro> comEncontroCarregado() {
+        return (root, query, cb) -> {
+            if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+                root.fetch("encontro", JoinType.LEFT);
+            }
+            return cb.conjunction();
         };
     }
 }

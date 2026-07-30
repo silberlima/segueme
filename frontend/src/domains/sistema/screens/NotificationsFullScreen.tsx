@@ -9,7 +9,7 @@ const TAMANHO_DA_PAGINA = 50
  * maior de histórico. Reaproveita a mesma lista do drawer para que as duas visões nunca divirjam.
  */
 export function NotificationsFullScreen() {
-  const { data, isLoading, isError, naoLidas, marcarComoLidas, isMarcandoLidas } =
+  const { data, isLoading, isError, refetch, naoLidas, marcarComoLidas, isMarcandoLidas } =
     useNotifications(TAMANHO_DA_PAGINA)
 
   return (
@@ -27,15 +27,13 @@ export function NotificationsFullScreen() {
       />
 
       <PanelCard titulo="Recebidas">
-        {isError ? (
-          <p className="text-sm text-rose-600">Não foi possível carregar as notificações.</p>
-        ) : (
-          <NotificationList
-            notificacoes={data?.content ?? []}
-            isLoading={isLoading}
-            mensagemVazio="Nenhuma notificação até agora."
-          />
-        )}
+        <NotificationList
+          notificacoes={data?.content ?? []}
+          isLoading={isLoading}
+          isError={isError}
+          onRetry={() => refetch()}
+          mensagemVazio="Nenhuma notificação até agora."
+        />
       </PanelCard>
     </div>
   )

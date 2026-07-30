@@ -83,7 +83,7 @@ class SubstituicoesControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(post("/api/v1/substituicoes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.pessoaSaiNome").value("Vai Sair"))
                 .andExpect(jsonPath("$.pessoaEntraNome").value("Vai Entrar"))
@@ -91,7 +91,7 @@ class SubstituicoesControllerIT extends AbstractIntegrationTest {
 
         mockMvc.perform(get("/api/v1/substituicoes")
                         .param("encontroId", encontro.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1));
     }
@@ -111,7 +111,7 @@ class SubstituicoesControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(post("/api/v1/substituicoes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
                 .andExpect(status().isBadRequest());
     }
 

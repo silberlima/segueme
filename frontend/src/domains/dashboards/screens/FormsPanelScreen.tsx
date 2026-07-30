@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
-import { Button, KpiCard, KpiRow, PageHeader, PanelCard, Table } from '../../../shared/ui'
+import { Button, KpiCard, KpiRow, ListState, PageHeader, PanelCard, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
-import { PanelState } from '../components/PanelState'
 import { formatarDataHora } from '../domain/dashboard.entity'
 import type { PreInscricaoDoPainel, ReservaDoPainel } from '../domain/dashboard.types'
 import { useDashboardFichas } from '../hooks/useDashboardFichas'
@@ -11,7 +10,7 @@ import { useDashboardFichas } from '../hooks/useDashboardFichas'
  * pré-inscrições aguardando ficha e fila de reserva por prioridade (RN-INSCRICAO-04).
  */
 export function FormsPanelScreen() {
-  const { data: painel, isLoading, isError } = useDashboardFichas()
+  const { data: painel, isLoading, isError, refetch } = useDashboardFichas()
   const encontro = painel?.encontroCorrente ?? null
 
   const colunasPreInscricoes: TableColumn<PreInscricaoDoPainel>[] = [
@@ -58,7 +57,14 @@ export function FormsPanelScreen() {
         }
       />
 
-      <PanelState isLoading={isLoading} isError={isError} />
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o painel. Tente novamente."
+      />
 
       {painel && (
         <div className="flex flex-col gap-6">

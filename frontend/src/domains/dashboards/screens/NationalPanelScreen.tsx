@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
-import { BarChart, KpiCard, KpiRow, PageHeader, PanelCard, Table } from '../../../shared/ui'
+import { BarChart, KpiCard, KpiRow, ListState, PageHeader, PanelCard, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
-import { PanelState } from '../components/PanelState'
 import { rotuloRegiao } from '../domain/dashboard.entity'
 import type { DioceseDestaque } from '../domain/dashboard.types'
 import { useDashboardNacional } from '../hooks/useDashboardNacional'
@@ -12,7 +11,7 @@ import { useDashboardNacional } from '../hooks/useDashboardNacional'
  * (`sistema-relatorios-config.md`, Fase 13) — por isso aponta para a tela de relatórios.
  */
 export function NationalPanelScreen() {
-  const { data: painel, isLoading, isError } = useDashboardNacional()
+  const { data: painel, isLoading, isError, refetch } = useDashboardNacional()
 
   const columns: TableColumn<DioceseDestaque>[] = [
     { key: 'nome', header: 'Diocese', render: (diocese) => diocese.nome },
@@ -36,7 +35,14 @@ export function NationalPanelScreen() {
         }
       />
 
-      <PanelState isLoading={isLoading} isError={isError} />
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o painel. Tente novamente."
+      />
 
       {painel && (
         <div className="flex flex-col gap-6">

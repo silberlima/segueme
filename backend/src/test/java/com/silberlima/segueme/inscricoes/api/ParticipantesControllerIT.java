@@ -86,7 +86,7 @@ class ParticipantesControllerIT extends AbstractIntegrationTest {
 
         mockMvc.perform(get("/api/v1/participantes/funil")
                         .param("encontroId", encontro.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.preInscritos").value(1))
                 .andExpect(jsonPath("$.confirmados").value(1))
@@ -107,14 +107,14 @@ class ParticipantesControllerIT extends AbstractIntegrationTest {
 
         mockMvc.perform(get("/api/v1/participantes")
                         .param("encontroId", encontro.getId().toString())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].statusPagamento").value("PENDENTE"));
 
         mockMvc.perform(patch("/api/v1/participantes/" + ficha.getId() + "/pagamento")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new AtualizarPagamentoRequest(StatusPagamento.PAGO)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.statusPagamento").value("PAGO"));
     }

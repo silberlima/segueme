@@ -32,8 +32,18 @@ jobs:
       - name: Unit tests
         run: ./mvnw -B test
 
-      - name: Integration tests
+      # `verify` roda os testes de integração (Testcontainers) e, na sequência, o gate de
+      # cobertura do JaCoCo — mínimo de 80% (skills/09). O build falha abaixo disso.
+      - name: Integration tests and coverage gate
         run: ./mvnw -B verify
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: backend/target/site/jacoco
+          if-no-files-found: warn
 
       - name: Build Docker image
         run: docker build -t segueme-backend:${{ github.sha }} .

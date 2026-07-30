@@ -55,7 +55,7 @@ public class EquipesController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Lista as equipes de serviço de um Encontro, com vagas preenchidas/abertas de cada uma (RF-028)")
     public ResponseEntity<List<EquipeResumoResponse>> listar(@RequestParam UUID encontroId) {
         List<EquipeResumoResponse> equipes = listarEquipesUseCase.execute(encontroId).stream()
@@ -65,7 +65,7 @@ public class EquipesController {
     }
 
     @GetMapping("/{equipeId}")
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Exibe o detalhe de uma equipe de serviço: integrantes, vagas e pré-requisito (RF-028)")
     public ResponseEntity<EquipeDetalheResponse> consultar(
             @PathVariable UUID equipeId, @RequestParam UUID encontroId) {
@@ -74,7 +74,7 @@ public class EquipesController {
     }
 
     @PostMapping("/{equipeId}/integrantes")
-    @PreAuthorize(PERFIS_ESCRITA)
+    @PreAuthorize(PERFIS_ESCRITA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Adiciona um candidato (sugerido ou não) à equipe (RF-031, restrito à Equipe Montagem)")
     public ResponseEntity<IntegranteResponse> adicionarIntegrante(
             @PathVariable UUID equipeId,

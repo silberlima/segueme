@@ -21,8 +21,12 @@ export function semearMassaPosEncontro(): void {
      where encontro_pos_id in (select id from encontro_pos where paroquia_id = '${MASSA.paroquiaId}')
         or pessoa_id in (${MASSA.jovens.map((jovem) => `'${jovem.id}'`).join(', ')});
     delete from encontro_pos where paroquia_id = '${MASSA.paroquiaId}';
-    delete from pessoa where paroquia_id = '${MASSA.paroquiaId}';
-    delete from paroquia where id = '${MASSA.paroquiaId}';
+    delete from transferencia
+     where pessoa_id in (${MASSA.jovens.map((jovem) => `'${jovem.id}'`).join(', ')})
+        or paroquia_origem_id in ('${MASSA.paroquiaId}', '${MASSA.paroquiaDestinoId}')
+        or paroquia_destino_id in ('${MASSA.paroquiaId}', '${MASSA.paroquiaDestinoId}');
+    delete from pessoa where paroquia_id in ('${MASSA.paroquiaId}', '${MASSA.paroquiaDestinoId}');
+    delete from paroquia where id in ('${MASSA.paroquiaId}', '${MASSA.paroquiaDestinoId}');
     delete from setor where id = '${MASSA.setorId}';
     delete from diocese where id = '${MASSA.dioceseId}';
 
@@ -32,6 +36,8 @@ export function semearMassaPosEncontro(): void {
       values ('${MASSA.setorId}', 'Setor E2E Pós-Encontro', '${MASSA.dioceseId}', now(), now(), false);
     insert into paroquia (id, nome, setor_id, created_at, updated_at, deleted)
       values ('${MASSA.paroquiaId}', '${MASSA.paroquiaNome}', '${MASSA.setorId}', now(), now(), false);
+    insert into paroquia (id, nome, setor_id, created_at, updated_at, deleted)
+      values ('${MASSA.paroquiaDestinoId}', '${MASSA.paroquiaDestinoNome}', '${MASSA.setorId}', now(), now(), false);
 
     ${MASSA.jovens
       .map(
@@ -76,6 +82,24 @@ export function limparDadosDeSistemaDoUsuarioE2E(usuarioId: string): void {
     delete from relatorio where solicitante_id = '${usuarioId}';
     delete from preferencia_notificacao where usuario_id = '${usuarioId}';
     delete from notificacao where destinatario_id = '${usuarioId}';
+    commit;
+  `)
+}
+
+/**
+ * Zera as transferências da massa (Fase 14). A pessoa volta para a paróquia de origem porque uma
+ * aprovação anterior teria mudado o vínculo dela, e a spec parte sempre do mesmo estado. Com
+ * `usuarioId`, apaga também as notificações daquele usuário — senão a notificação da execução
+ * anterior, de mesmo título, passaria pela asserção no lugar da que o teste acabou de provocar.
+ */
+export function limparTransferenciasDaMassa(usuarioId?: string): void {
+  psql(`
+    begin;
+    delete from transferencia
+     where pessoa_id in (${MASSA.jovens.map((jovem) => `'${jovem.id}'`).join(', ')});
+    ${usuarioId ? `delete from notificacao where destinatario_id = '${usuarioId}';` : ''}
+    update pessoa set paroquia_id = '${MASSA.paroquiaId}'
+     where id in (${MASSA.jovens.map((jovem) => `'${jovem.id}'`).join(', ')});
     commit;
   `)
 }

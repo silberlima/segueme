@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Skeleton } from '../../../shared/ui'
+import { Badge, Button, ListState } from '../../../shared/ui'
 import { CampanhaProgressBar } from '../components/CampanhaProgressBar'
 import { STATUS_CAMPANHA_LABEL } from '../domain/financeiro.types'
 import { useCampanhas } from '../hooks/useCampanhas'
@@ -86,26 +86,18 @@ export function CampaignsScreen() {
         </div>
       )}
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar as campanhas.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {campanhas && campanhas.content.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhuma campanha registrada.
-        </div>
-      )}
-
-      {campanhas && campanhas.content.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={campanhas?.content.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar as campanhas."
+        emptyMessage="Nenhuma campanha registrada."
+      >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {campanhas.content.map((campanha) => (
+          {(campanhas?.content ?? []).map((campanha) => (
             <div key={campanha.id} className="rounded-xl border border-slate-200 bg-white p-4">
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-sm font-medium text-slate-900">{campanha.nome}</p>
@@ -145,7 +137,7 @@ export function CampaignsScreen() {
             </div>
           ))}
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

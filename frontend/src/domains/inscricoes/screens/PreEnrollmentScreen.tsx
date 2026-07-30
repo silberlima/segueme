@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Button, Modal, Skeleton, Table, Tabs } from '../../../shared/ui'
+import { Button, ListState, Modal, Table, Tabs } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import type { TabItem } from '../../../shared/ui/Tabs/Tabs.types'
 import { PessoaSearchSelect } from '../components/PessoaSearchSelect'
@@ -139,53 +139,37 @@ export function PreEnrollmentScreen() {
       />
 
       <div className="mt-4">
-        {isLoading && (
-          <div className="flex flex-col gap-2">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <Skeleton key={index} variant="rect" height="52px" />
-            ))}
+        <ListState
+          isLoading={isLoading}
+          isError={isError}
+          isEmpty={data?.content.length === 0}
+          onRetry={() => refetch()}
+          skeletonRows={4}
+          errorMessage="Não foi possível carregar as pré-inscrições. Tente novamente mais tarde."
+          emptyMessage={`Nenhum candidato em ${STATUS_PRE_INSCRICAO_LABEL[activeTab].toLowerCase()}.`}
+        >
+          <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+            <Table columns={columns} rows={data?.content ?? []} getRowKey={(candidato) => candidato.id} />
           </div>
-        )}
-
-        {isError && (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-            <p className="mb-3">Não foi possível carregar as pré-inscrições. Tente novamente mais tarde.</p>
-            <Button variant="secondary" onClick={() => refetch()}>
-              Tentar novamente
-            </Button>
-          </div>
-        )}
-
-        {data && data.content.length === 0 && (
-          <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-            Nenhum candidato em {STATUS_PRE_INSCRICAO_LABEL[activeTab].toLowerCase()}.
-          </div>
-        )}
-
-        {data && data.content.length > 0 && (
-          <>
-            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-              <Table columns={columns} rows={data.content} getRowKey={(candidato) => candidato.id} />
+          <div className="mt-4 flex items-center justify-between text-sm text-slate-500">
+            <span>
+              Página {(data?.page ?? 0) + 1} de {Math.max(data?.totalPages ?? 1, 1)} · {data?.totalElements ?? 0}{' '}
+              candidatos
+            </span>
+            <div className="flex gap-2">
+              <Button variant="secondary" disabled={page === 0} onClick={() => setPage((current) => current - 1)}>
+                Anterior
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={(data?.page ?? 0) + 1 >= (data?.totalPages ?? 0)}
+                onClick={() => setPage((current) => current + 1)}
+              >
+                Próxima
+              </Button>
             </div>
-            <div className="mt-4 flex items-center justify-between text-sm text-slate-500">
-              <span>
-                Página {data.page + 1} de {Math.max(data.totalPages, 1)} · {data.totalElements} candidatos
-              </span>
-              <div className="flex gap-2">
-                <Button variant="secondary" disabled={page === 0} onClick={() => setPage((current) => current - 1)}>
-                  Anterior
-                </Button>
-                <Button
-                  variant="secondary"
-                  disabled={data.page + 1 >= data.totalPages}
-                  onClick={() => setPage((current) => current + 1)}
-                >
-                  Próxima
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
+          </div>
+        </ListState>
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Nova pré-inscrição">

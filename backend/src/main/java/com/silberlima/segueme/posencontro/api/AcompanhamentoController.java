@@ -42,7 +42,7 @@ public class AcompanhamentoController {
     }
 
     @GetMapping("/frequencia")
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerParoquia(#paroquiaId)")
     @Operation(summary = "Frequência de cada acompanhado da paróquia no período informado (sem filtro: desde o início até hoje)")
     public List<FrequenciaPessoaResponse> frequencia(
             @RequestParam UUID paroquiaId,
@@ -54,7 +54,7 @@ public class AcompanhamentoController {
     }
 
     @GetMapping("/prioridades")
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerParoquia(#paroquiaId)")
     @Operation(summary = "Ranking de prioridade para as próximas equipes, da maior para a menor frequência (RN-POS-02/03)")
     public List<FrequenciaPessoaResponse> prioridades(@RequestParam UUID paroquiaId) {
         return listarPrioridadesUseCase.execute(paroquiaId).stream()

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Select, Skeleton } from '../../../shared/ui'
+import { Badge, Button, ConfirmDialog, ListState, Select } from '../../../shared/ui'
 import { STATUS_EMPRESTIMO_LABEL } from '../domain/setorial.types'
 import type { Emprestimo } from '../domain/setorial.types'
 import { useCandidatosEmprestimo } from '../hooks/useCandidatosEmprestimo'
@@ -41,28 +41,27 @@ export function LoansScreen() {
 
       <h2 className="mb-3 text-sm font-semibold text-slate-900">Solicitações</h2>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar os empréstimos.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={emprestimos?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar os empréstimos."
+        emptyMessage="Nenhum empréstimo registrado."
+      >
+        <div className="flex flex-col gap-3">
+          {(emprestimos ?? []).map((emprestimo) => (
+            <EmprestimoCard
+              key={emprestimo.id}
+              emprestimo={emprestimo}
+              isMontagem={isMontagem}
+              isSetorial={isSetorial}
+            />
+          ))}
         </div>
-      )}
-
-      {emprestimos && emprestimos.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum empréstimo registrado.
-        </div>
-      )}
-
-      <div className="flex flex-col gap-3">
-        {emprestimos?.map((emprestimo) => (
-          <EmprestimoCard key={emprestimo.id} emprestimo={emprestimo} isMontagem={isMontagem} isSetorial={isSetorial} />
-        ))}
-      </div>
+      </ListState>
     </div>
   )
 }
@@ -195,11 +194,16 @@ function SelecaoCandidatos({ emprestimoId, onEnviado }: { emprestimoId: string; 
   const [paroquiaId, setParoquiaId] = useState('')
   const [competenciaId, setCompetenciaId] = useState('')
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set())
-  const [justificativaRecusa, setJustificativaRecusa] = useState('')
+  const [recusando, setRecusando] = useState(false)
 
   const { data: paroquias } = useParoquiaOptions()
   const { data: competencias } = useCompetenciaOptions()
-  const { data: candidatos, isLoading } = useCandidatosEmprestimo(emprestimoId, {
+  const {
+    data: candidatos,
+    isLoading,
+    isError,
+    refetch,
+  } = useCandidatosEmprestimo(emprestimoId, {
     paroquiaId: paroquiaId || undefined,
     competenciaId: competenciaId || undefined,
   })
@@ -237,17 +241,18 @@ function SelecaoCandidatos({ emprestimoId, onEnviado }: { emprestimoId: string; 
         />
       </div>
 
-      {isLoading && <Skeleton variant="rect" height="60px" />}
-
-      {candidatos && candidatos.length === 0 && (
-        <div className="rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-500">
-          Nenhum candidato encontrado para este filtro.
-        </div>
-      )}
-
-      {candidatos && candidatos.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={candidatos?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="60px"
+        errorMessage="Não foi possível carregar os candidatos."
+        emptyMessage="Nenhum candidato encontrado para este filtro."
+      >
         <div className="flex flex-col gap-2">
-          {candidatos.map((candidato) => (
+          {(candidatos ?? []).map((candidato) => (
             <label
               key={candidato.pessoaId}
               className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
@@ -265,37 +270,36 @@ function SelecaoCandidatos({ emprestimoId, onEnviado }: { emprestimoId: string; 
             </label>
           ))}
         </div>
-      )}
+      </ListState>
 
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <input
-          type="text"
-          value={justificativaRecusa}
-          onChange={(event) => setJustificativaRecusa(event.target.value)}
-          placeholder="Justificativa (obrigatória para recusar)"
-          className="h-9 flex-1 rounded-lg border border-slate-200 px-3 text-sm text-slate-900 outline-none focus:border-violet-500"
-        />
-        <div className="flex gap-2">
-          <Button
-            variant="danger"
-            disabled={!justificativaRecusa.trim() || recusar.isPending}
-            onClick={() => recusar.mutate({ emprestimoId, justificativa: justificativaRecusa })}
-          >
-            Recusar solicitação
-          </Button>
-          <Button
-            disabled={selecionados.size === 0 || enviar.isPending}
-            onClick={() =>
-              enviar.mutate(
-                { emprestimoId, pessoaIds: Array.from(selecionados) },
-                { onSuccess: onEnviado },
-              )
-            }
-          >
-            Enviar à Montagem
-          </Button>
-        </div>
+      <div className="mt-4 flex justify-end gap-2">
+        <Button variant="danger" onClick={() => setRecusando(true)}>
+          Recusar solicitação
+        </Button>
+        <Button
+          disabled={selecionados.size === 0 || enviar.isPending}
+          onClick={() => enviar.mutate({ emprestimoId, pessoaIds: Array.from(selecionados) }, { onSuccess: onEnviado })}
+        >
+          Enviar à Montagem
+        </Button>
       </div>
+
+      <ConfirmDialog
+        isOpen={recusando}
+        title="Recusar empréstimo"
+        tone="danger"
+        confirmLabel="Recusar solicitação"
+        description="A solicitação será recusada sem candidatos e a Equipe Montagem é notificada com a justificativa (RNF-07)."
+        justification={{
+          label: 'Justificativa da recusa',
+          placeholder: 'Descreva o motivo da recusa',
+        }}
+        isPending={recusar.isPending}
+        onCancel={() => setRecusando(false)}
+        onConfirm={(justificativa) =>
+          recusar.mutate({ emprestimoId, justificativa }, { onSuccess: () => setRecusando(false) })
+        }
+      />
     </div>
   )
 }

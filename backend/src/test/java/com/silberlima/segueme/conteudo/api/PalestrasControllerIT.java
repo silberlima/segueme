@@ -67,7 +67,7 @@ class PalestrasControllerIT extends AbstractIntegrationTest {
         Encontro encontro = criarEncontro();
 
         mockMvc.perform(get("/api/v1/encontros/{id}/palestras", encontro.getId())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", encontro.getParoquia().getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(7))
                 .andExpect(jsonPath("$[0].numero").value(1))
@@ -84,7 +84,7 @@ class PalestrasControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(patch("/api/v1/encontros/{id}/palestras/{palestraId}/designar", encontro.getId(), palestraId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new DesignarPalestranteRequest(palestrante.getId())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", encontro.getParoquia().getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
                 .andExpect(status().isForbidden());
     }
 
@@ -97,20 +97,20 @@ class PalestrasControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(patch("/api/v1/encontros/{id}/palestras/{palestraId}/designar", encontro.getId(), palestraId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new DesignarPalestranteRequest(palestrante.getId())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", encontro.getParoquia().getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.palestranteId").value(palestrante.getId().toString()))
                 .andExpect(jsonPath("$.palestranteNome").value("Convidado Designado"));
 
         mockMvc.perform(get("/api/v1/encontros/{id}/palestras", encontro.getId())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", encontro.getParoquia().getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].palestranteNome").value("Convidado Designado"));
     }
 
     private UUID primeiraPalestraId(Encontro encontro) throws Exception {
         String json = mockMvc.perform(get("/api/v1/encontros/{id}/palestras", encontro.getId())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", encontro.getParoquia().getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();

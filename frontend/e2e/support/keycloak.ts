@@ -1,4 +1,4 @@
-import { STACK, USUARIO_E2E } from './config'
+import { STACK, USUARIO_E2E, USUARIO_SETORIAL_E2E } from './config'
 
 /**
  * Provisiona no Keycloak o usuário que os testes usam para logar de verdade pela tela de login. O
@@ -9,8 +9,36 @@ import { STACK, USUARIO_E2E } from './config'
 export async function provisionarUsuarioE2E(paroquiaId: string): Promise<void> {
   const adminToken = await obterTokenAdmin()
   const userId = await criarOuAtualizarUsuario(adminToken, paroquiaId)
-  await definirSenha(adminToken, userId)
-  await atribuirRoles(adminToken, userId)
+  await definirSenha(adminToken, userId, USUARIO_E2E.password)
+  await atribuirRoles(adminToken, userId, USUARIO_E2E.roles)
+}
+
+/**
+ * Provisiona o usuário Setorial da Fase 14, com a claim `setor_id` do setor semeado — é ela que o
+ * backend usa para decidir o que este perfil enxerga e pode decidir (RN-04/RNF-06).
+ */
+export async function provisionarUsuarioSetorialE2E(setorId: string, paroquiaId: string): Promise<void> {
+  const adminToken = await obterTokenAdmin()
+  const representacao = {
+    username: USUARIO_SETORIAL_E2E.username,
+    email: USUARIO_SETORIAL_E2E.email,
+    firstName: USUARIO_SETORIAL_E2E.primeiroNome,
+    lastName: USUARIO_SETORIAL_E2E.sobrenome,
+    enabled: true,
+    emailVerified: true,
+    attributes: { setor_id: [setorId], paroquia_id: [paroquiaId] },
+  }
+
+  const existente = await buscarPorUsername(adminToken, USUARIO_SETORIAL_E2E.username)
+  if (existente) {
+    await admin(adminToken, `users/${existente}`, 'PUT', representacao)
+  } else {
+    await admin(adminToken, 'users', 'POST', representacao)
+  }
+
+  const userId = await exigirUsuario(adminToken, USUARIO_SETORIAL_E2E.username)
+  await definirSenha(adminToken, userId, USUARIO_SETORIAL_E2E.password)
+  await atribuirRoles(adminToken, userId, USUARIO_SETORIAL_E2E.roles)
 }
 
 /**
@@ -24,6 +52,11 @@ export async function obterIdDoUsuarioE2E(): Promise<string> {
     throw new Error('Usuário de E2E não encontrado no Keycloak. O global setup rodou?')
   }
   return id
+}
+
+/** Id do usuário Setorial de E2E — usado pela suíte da Fase 14 para limpar só as notificações dele. */
+export async function obterIdDoUsuarioSetorialE2E(): Promise<string> {
+  return exigirUsuario(await obterTokenAdmin(), USUARIO_SETORIAL_E2E.username)
 }
 
 async function obterTokenAdmin(): Promise<string> {
@@ -71,25 +104,37 @@ async function criarOuAtualizarUsuario(adminToken: string, paroquiaId: string): 
 }
 
 async function buscarUsuario(adminToken: string): Promise<string | null> {
+  return buscarPorUsername(adminToken, USUARIO_E2E.username)
+}
+
+async function buscarPorUsername(adminToken: string, username: string): Promise<string | null> {
   const usuarios = (await admin(
     adminToken,
-    `users?username=${encodeURIComponent(USUARIO_E2E.username)}&exact=true`,
+    `users?username=${encodeURIComponent(username)}&exact=true`,
     'GET',
   )) as { id: string }[]
   return usuarios.length > 0 ? usuarios[0].id : null
 }
 
-async function definirSenha(adminToken: string, userId: string): Promise<void> {
+async function exigirUsuario(adminToken: string, username: string): Promise<string> {
+  const id = await buscarPorUsername(adminToken, username)
+  if (!id) {
+    throw new Error(`Usuário ${username} não encontrado no Keycloak logo após ser criado.`)
+  }
+  return id
+}
+
+async function definirSenha(adminToken: string, userId: string, senha: string): Promise<void> {
   await admin(adminToken, `users/${userId}/reset-password`, 'PUT', {
     type: 'password',
-    value: USUARIO_E2E.password,
+    value: senha,
     temporary: false,
   })
 }
 
-async function atribuirRoles(adminToken: string, userId: string): Promise<void> {
+async function atribuirRoles(adminToken: string, userId: string, nomes: string[]): Promise<void> {
   const roles = []
-  for (const nome of USUARIO_E2E.roles) {
+  for (const nome of nomes) {
     roles.push(await admin(adminToken, `roles/${encodeURIComponent(nome)}`, 'GET'))
   }
   await admin(adminToken, `users/${userId}/role-mappings/realm`, 'POST', roles)

@@ -15,6 +15,9 @@ export function Drawer({ isOpen, onClose, position = 'right', title, children }:
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-slate-900/50" onClick={onClose} />
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         className={`absolute top-0 h-full w-full max-w-sm bg-white p-6 shadow-xl ${positionClasses[position]}`}
       >
         {title && <h2 className="mb-4 text-lg font-semibold text-slate-900">{title}</h2>}

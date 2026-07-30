@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,6 +55,9 @@ class RegistrarSubstituicaoUseCaseTest {
 
     @Mock
     private HistoricoEventoRepository historicoEventoRepository;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     private final Paroquia paroquia = umaParoquia("Paróquia Teste");
     private final Encontro encontro = umEncontro(paroquia);
@@ -86,7 +90,8 @@ class RegistrarSubstituicaoUseCaseTest {
                         integranteEquipeRepository,
                         substituicaoRepository,
                         pessoaRepository,
-                        historicoEventoRepository)
+                        historicoEventoRepository,
+                        eventPublisher)
                 .execute(new DadosSubstituicao(encontroId, equipeId, pessoaSaiId, "Recusou o convite", pessoaEntraId, "Justificativa válida"));
 
         assertThat(integranteSai.getStatus()).isEqualTo(StatusIntegrante.RECUSADO);
@@ -112,7 +117,8 @@ class RegistrarSubstituicaoUseCaseTest {
                         integranteEquipeRepository,
                         substituicaoRepository,
                         pessoaRepository,
-                        historicoEventoRepository)
+                        historicoEventoRepository,
+                        eventPublisher)
                 .execute(new DadosSubstituicao(encontroId, equipeId, pessoaSaiId, "Motivo", UUID.randomUUID(), "Justificativa")))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
@@ -138,7 +144,8 @@ class RegistrarSubstituicaoUseCaseTest {
                         integranteEquipeRepository,
                         substituicaoRepository,
                         pessoaRepository,
-                        historicoEventoRepository)
+                        historicoEventoRepository,
+                        eventPublisher)
                 .execute(new DadosSubstituicao(encontroId, equipeId, pessoaSaiId, "Motivo", pessoaEntraId, "Justificativa")))
                 .isInstanceOf(BusinessRuleViolationException.class);
     }

@@ -49,7 +49,7 @@ public class EncontrosPosController {
     }
 
     @PostMapping
-    @PreAuthorize(PERFIS_GESTAO)
+    @PreAuthorize(PERFIS_GESTAO + " and @escopoTerritorial.podeVerParoquia(#request.paroquiaId())")
     @Operation(summary = "Agenda um encontro pós na paróquia, numa data")
     public ResponseEntity<EncontroPosResponse> agendar(@Valid @RequestBody AgendarEncontroPosRequest request) {
         var encontroPos = agendarEncontroPosUseCase.execute(request.paroquiaId(), request.data(), request.tema());
@@ -57,7 +57,7 @@ public class EncontrosPosController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerParoquia(#paroquiaId)")
     @Operation(summary = "Lista os encontros pós de uma paróquia, do mais recente para o mais antigo")
     public ResponseEntity<PageResponse<EncontroPosResponse>> listar(
             @RequestParam UUID paroquiaId, @PageableDefault Pageable pageable) {

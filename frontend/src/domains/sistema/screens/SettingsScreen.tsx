@@ -1,5 +1,5 @@
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, PageHeader, PanelCard, Skeleton, Toggle } from '../../../shared/ui'
+import { Badge, Button, ListState, PageHeader, PanelCard, Toggle } from '../../../shared/ui'
 import { DESCRICAO_POR_TIPO, LABEL_POR_TIPO } from '../domain/notificacao.entity'
 import { PERFIL_LABEL } from '../domain/perfil.types'
 import { useMe } from '../hooks/useMe'
@@ -14,10 +14,19 @@ import { useNotificationPreferencesForm } from '../hooks/useNotificationPreferen
  * impressão de um poder que o sistema não tem.
  */
 export function SettingsScreen() {
-  const { data: me, isLoading: isLoadingMe } = useMe()
+  const { data: me, isLoading: isLoadingMe, isError: isErrorMe, refetch: recarregarMe } = useMe()
   const { perfilAtivo } = useProfile()
-  const { preferencias, isLoading, isError, alternar, salvar, isSalvando, mostrarConfirmacao, podeSalvar } =
-    useNotificationPreferencesForm()
+  const {
+    preferencias,
+    isLoading,
+    isError,
+    recarregar,
+    alternar,
+    salvar,
+    isSalvando,
+    mostrarConfirmacao,
+    podeSalvar,
+  } = useNotificationPreferencesForm()
 
   return (
     <div className="p-6">
@@ -25,9 +34,14 @@ export function SettingsScreen() {
 
       <div className="flex max-w-3xl flex-col gap-6">
         <PanelCard titulo="Conta">
-          {isLoadingMe ? (
-            <Skeleton variant="rect" height="4rem" />
-          ) : (
+          <ListState
+            isLoading={isLoadingMe}
+            isError={isErrorMe}
+            onRetry={() => recarregarMe()}
+            skeletonRows={1}
+            skeletonHeight="4rem"
+            errorMessage="Não foi possível carregar os dados da sua conta."
+          >
             <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-xs text-slate-500">Nome</dt>
@@ -38,7 +52,7 @@ export function SettingsScreen() {
                 <dd className="font-medium text-slate-900">{me?.email ?? '—'}</dd>
               </div>
             </dl>
-          )}
+          </ListState>
         </PanelCard>
 
         <PanelCard
@@ -52,9 +66,14 @@ export function SettingsScreen() {
             </div>
           }
         >
-          {isLoading && <Skeleton variant="rect" height="8rem" />}
-          {isError && <p className="text-sm text-rose-600">Não foi possível carregar as preferências.</p>}
-          {!isLoading && !isError && (
+          <ListState
+            isLoading={isLoading}
+            isError={isError}
+            onRetry={() => recarregar()}
+            skeletonRows={1}
+            skeletonHeight="8rem"
+            errorMessage="Não foi possível carregar as preferências."
+          >
             <div className="divide-y divide-slate-100">
               {preferencias.map((preferencia) => (
                 <Toggle
@@ -67,7 +86,7 @@ export function SettingsScreen() {
                 />
               ))}
             </div>
-          )}
+          </ListState>
         </PanelCard>
 
         <PanelCard titulo="Perfis de acesso">
@@ -75,9 +94,14 @@ export function SettingsScreen() {
             Perfis concedidos à sua conta. A troca do perfil ativo é feita no menu lateral
             (RN-ACESSO-02); a atribuição de perfis é administrada fora do sistema.
           </p>
-          {isLoadingMe ? (
-            <Skeleton variant="rect" height="3rem" />
-          ) : (
+          <ListState
+            isLoading={isLoadingMe}
+            isError={isErrorMe}
+            onRetry={() => recarregarMe()}
+            skeletonRows={1}
+            skeletonHeight="3rem"
+            errorMessage="Não foi possível carregar os seus perfis de acesso."
+          >
             <ul className="flex flex-wrap gap-2">
               {(me?.perfis ?? []).map((perfil) => (
                 <li key={perfil}>
@@ -88,7 +112,7 @@ export function SettingsScreen() {
                 </li>
               ))}
             </ul>
-          )}
+          </ListState>
         </PanelCard>
       </div>
     </div>

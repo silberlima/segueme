@@ -109,7 +109,7 @@ public class EncontrosController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#id)")
     @Operation(summary = "Exibe os Detalhes de um encontro, incluindo Equipe Dirigente e Equipe Comando (RF-021)")
     public ResponseEntity<EncontroResponse> consultar(@PathVariable UUID id) {
         EncontroDetalhado detalhado = consultarEncontroUseCase.execute(id);

@@ -1,0 +1,84 @@
+groups:
+  - name: segueme-disponibilidade
+    rules:
+      - alert: BackendForaDoAr
+        expr: up{job="segueme-backend"} == 0
+        for: 2m
+        labels:
+          severity: critico
+        annotations:
+          summary: "Backend do Segue-me sem responder ao scrape"
+          description: "O Prometheus não coleta métricas de {{ $labels.instance }} há 2 minutos."
+
+      - alert: HealthDegradado
+        # 1 = UP no gauge do Actuator; qualquer outro valor é DOWN/OUT_OF_SERVICE/UNKNOWN.
+        expr: min(health_status{job="segueme-backend"}) < 1
+        for: 2m
+        labels:
+          severity: critico
+        annotations:
+          summary: "/actuator/health degradado"
+          description: "Algum componente do health check saiu de UP (banco, Keycloak ou disco)."
+
+  - name: segueme-erros
+    rules:
+      - alert: TaxaDeErro5xxAlta
+        expr: |
+          sum(rate(http_server_requests_seconds_count{job="segueme-backend",status=~"5.."}[5m]))
+            /
+          sum(rate(http_server_requests_seconds_count{job="segueme-backend"}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critico
+        annotations:
+          summary: "Mais de 5% das requisições respondendo 5xx"
+          description: "Taxa de erro em {{ printf \"%.1f\" $value }} nos últimos 5 minutos."
+
+      - alert: PicoDe403
+        # RNF-06: 403 em volume é sinal de escopo territorial mal configurado no Keycloak
+        # (claim `paroquia_id`/`setor_id`/`diocese_id` ausente ou errada), não de ataque.
+        expr: sum(rate(http_server_requests_seconds_count{job="segueme-backend",status="403"}[10m])) > 1
+        for: 10m
+        labels:
+          severity: atencao
+        annotations:
+          summary: "Volume atípico de 403"
+          description: "Verifique as claims territoriais dos usuários no Keycloak."
+
+  - name: segueme-desempenho
+    rules:
+      - alert: LatenciaP95Alta
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le, uri) (rate(http_server_requests_seconds_bucket{job="segueme-backend"}[5m]))
+          ) > 2
+        for: 10m
+        labels:
+          severity: atencao
+        annotations:
+          summary: "p95 acima de 2s em {{ $labels.uri }}"
+          description: "RNF-09/10: endpoint lento o bastante para a tela parecer travada."
+
+      - alert: PoolDeConexoesEsgotado
+        expr: hikaricp_connections_pending{job="segueme-backend"} > 0
+        for: 5m
+        labels:
+          severity: atencao
+        annotations:
+          summary: "Requisições na fila por conexão de banco"
+          description: "O pool do Hikari está saturado há 5 minutos."
+
+  - name: segueme-negocio
+    rules:
+      - alert: RelatoriosFalhando
+        # A geração de relatório roda fora da requisição (Fase 13): sem alerta, uma falha só
+        # aparece como notificação para quem pediu, e ninguém de plantão fica sabendo.
+        expr: |
+          sum(rate(spring_data_repository_invocations_seconds_count{job="segueme-backend",exception!="None"}[15m])) > 0.2
+        for: 15m
+        labels:
+          severity: atencao
+        annotations:
+          summary: "Repositórios lançando exceção com frequência"
+          description: "Consultas falhando podem indicar migration pendente ou banco degradado."

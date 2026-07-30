@@ -29,7 +29,7 @@ public class RecusarConviteUseCase {
     @Transactional
     public IntegranteEquipe execute(UUID conviteId, String justificativa) {
         IntegranteEquipe convite = integranteEquipeRepository
-                .findById(conviteId)
+                .findWithEquipeAndPessoaById(conviteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Convite não encontrado: " + conviteId));
         convite.recusar(justificativa);
 

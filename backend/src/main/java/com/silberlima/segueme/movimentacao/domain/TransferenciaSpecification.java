@@ -1,6 +1,7 @@
 package com.silberlima.segueme.movimentacao.domain;
 
 import com.silberlima.segueme.hierarquia.domain.EscopoTerritorial;
+import jakarta.persistence.criteria.JoinType;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
@@ -58,6 +59,22 @@ public final class TransferenciaSpecification {
             case EscopoTerritorial.DeParoquia deParoquia -> (root, query, cb) -> cb.or(
                     cb.equal(root.get("paroquiaOrigem").get("id"), deParoquia.paroquiaId()),
                     cb.equal(root.get("paroquiaDestino").get("id"), deParoquia.paroquiaId()));
+        };
+    }
+    /**
+     * Fetch join das associações que a resposta lê. Necessário porque {@code open-in-view} está
+     * desligado e o mapeamento para DTO ocorre no Controller, fora da transação do Use Case —
+     * sem isto a listagem estoura {@code LazyInitializationException}. Ignorado na sub-consulta de
+     * contagem do Spring Data (paginação).
+     */
+    public static Specification<Transferencia> comAssociacoesCarregadas() {
+        return (root, query, cb) -> {
+            if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+                root.fetch("pessoa", JoinType.LEFT);
+                root.fetch("paroquiaOrigem", JoinType.LEFT);
+                root.fetch("paroquiaDestino", JoinType.LEFT);
+            }
+            return cb.conjunction();
         };
     }
 }

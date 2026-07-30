@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Badge, Button, Skeleton } from '../../../shared/ui'
+import { Badge, Button, ConfirmDialog, ListState } from '../../../shared/ui'
+import type { Solicitacao } from '../domain/setorial.types'
 import { useAprovarTransferencia } from '../hooks/useAprovarTransferencia'
 import { useRecusarEmprestimo } from '../hooks/useRecusarEmprestimo'
 import { useRecusarTransferencia } from '../hooks/useRecusarTransferencia'
@@ -15,16 +16,16 @@ import { useSolicitacoes } from '../hooks/useSolicitacoes'
  */
 export function RequestsInboxScreen() {
   const { data: solicitacoes, isLoading, isError, refetch } = useSolicitacoes()
-  const [justificativaPorId, setJustificativaPorId] = useState<Record<string, string>>({})
+  const [solicitacaoEmRecusa, setSolicitacaoEmRecusa] = useState<Solicitacao | null>(null)
 
   const aprovarTransferencia = useAprovarTransferencia()
   const recusarTransferencia = useRecusarTransferencia()
   const recusarEmprestimo = useRecusarEmprestimo()
 
-  function recusar(id: string, tipo: 'TRANSFERENCIA' | 'EMPRESTIMO') {
-    const justificativa = (justificativaPorId[id] ?? '').trim()
-    if (!justificativa) return
-    const onSuccess = () => setJustificativaPorId((atual) => ({ ...atual, [id]: '' }))
+  function confirmarRecusa(justificativa: string) {
+    if (!solicitacaoEmRecusa) return
+    const { id, tipo } = solicitacaoEmRecusa
+    const onSuccess = () => setSolicitacaoEmRecusa(null)
     if (tipo === 'TRANSFERENCIA') {
       recusarTransferencia.mutate({ transferenciaId: id, justificativa }, { onSuccess })
     } else {
@@ -39,26 +40,18 @@ export function RequestsInboxScreen() {
         <Badge tone="info">{solicitacoes?.length ?? 0} pendente(s)</Badge>
       </div>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar as solicitações.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {solicitacoes && solicitacoes.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhuma solicitação pendente.
-        </div>
-      )}
-
-      {solicitacoes && solicitacoes.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={solicitacoes?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar as solicitações."
+        emptyMessage="Nenhuma solicitação pendente."
+      >
         <div className="flex flex-col gap-3">
-          {solicitacoes.map((solicitacao) => (
+          {(solicitacoes ?? []).map((solicitacao) => (
             <div key={solicitacao.id} className="rounded-lg border border-slate-200 bg-white p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -69,46 +62,49 @@ export function RequestsInboxScreen() {
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-                <input
-                  type="text"
-                  value={justificativaPorId[solicitacao.id] ?? ''}
-                  onChange={(event) =>
-                    setJustificativaPorId((atual) => ({ ...atual, [solicitacao.id]: event.target.value }))
-                  }
-                  placeholder="Justificativa (obrigatória para recusar)"
-                  className="h-9 flex-1 rounded-lg border border-slate-200 px-3 text-sm text-slate-900 outline-none focus:border-violet-500"
-                />
-                <div className="flex gap-2">
-                  {solicitacao.tipo === 'TRANSFERENCIA' ? (
-                    <Button
-                      disabled={aprovarTransferencia.isPending}
-                      onClick={() => aprovarTransferencia.mutate(solicitacao.id)}
-                    >
-                      Aprovar
-                    </Button>
-                  ) : (
-                    <Link to="/setorial/emprestimos">
-                      <Button>Autorizar</Button>
-                    </Link>
-                  )}
+              <div className="mt-3 flex justify-end gap-2">
+                {solicitacao.tipo === 'TRANSFERENCIA' ? (
                   <Button
-                    variant="danger"
-                    disabled={
-                      !(justificativaPorId[solicitacao.id] ?? '').trim() ||
-                      recusarTransferencia.isPending ||
-                      recusarEmprestimo.isPending
-                    }
-                    onClick={() => recusar(solicitacao.id, solicitacao.tipo)}
+                    disabled={aprovarTransferencia.isPending}
+                    onClick={() => aprovarTransferencia.mutate(solicitacao.id)}
                   >
-                    Recusar
+                    Aprovar
                   </Button>
-                </div>
+                ) : (
+                  <Link to="/setorial/emprestimos">
+                    <Button>Autorizar</Button>
+                  </Link>
+                )}
+                <Button variant="danger" onClick={() => setSolicitacaoEmRecusa(solicitacao)}>
+                  Recusar
+                </Button>
               </div>
             </div>
           ))}
         </div>
-      )}
+      </ListState>
+
+      <ConfirmDialog
+        isOpen={solicitacaoEmRecusa !== null}
+        title={solicitacaoEmRecusa?.tipo === 'EMPRESTIMO' ? 'Recusar empréstimo' : 'Recusar transferência'}
+        tone="danger"
+        confirmLabel="Recusar solicitação"
+        description={
+          solicitacaoEmRecusa && (
+            <>
+              {solicitacaoEmRecusa.descricao}. A justificativa fica registrada e o solicitante é notificado
+              (RNF-07).
+            </>
+          )
+        }
+        justification={{
+          label: 'Justificativa da recusa',
+          placeholder: 'Descreva o motivo da recusa',
+        }}
+        isPending={recusarTransferencia.isPending || recusarEmprestimo.isPending}
+        onCancel={() => setSolicitacaoEmRecusa(null)}
+        onConfirm={confirmarRecusa}
+      />
     </div>
   )
 }

@@ -11,6 +11,7 @@ import com.silberlima.segueme.montagem.domain.IntegranteEquipe;
 import com.silberlima.segueme.montagem.domain.IntegranteEquipeRepository;
 import com.silberlima.segueme.montagem.domain.StatusIntegrante;
 import com.silberlima.segueme.montagem.domain.Substituicao;
+import com.silberlima.segueme.montagem.domain.SubstituicaoRegistradaEvent;
 import com.silberlima.segueme.montagem.domain.SubstituicaoRepository;
 import com.silberlima.segueme.pessoas.domain.HistoricoEvento;
 import com.silberlima.segueme.pessoas.domain.HistoricoEventoRepository;
@@ -19,6 +20,7 @@ import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.pessoas.domain.TipoEventoHistorico;
 import java.time.Instant;
 import java.util.Objects;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,7 @@ public class RegistrarSubstituicaoUseCase {
     private final SubstituicaoRepository substituicaoRepository;
     private final PessoaRepository pessoaRepository;
     private final HistoricoEventoRepository historicoEventoRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RegistrarSubstituicaoUseCase(
             EncontroRepository encontroRepository,
@@ -45,13 +48,15 @@ public class RegistrarSubstituicaoUseCase {
             IntegranteEquipeRepository integranteEquipeRepository,
             SubstituicaoRepository substituicaoRepository,
             PessoaRepository pessoaRepository,
-            HistoricoEventoRepository historicoEventoRepository) {
+            HistoricoEventoRepository historicoEventoRepository,
+            ApplicationEventPublisher eventPublisher) {
         this.encontroRepository = encontroRepository;
         this.equipeRepository = equipeRepository;
         this.integranteEquipeRepository = integranteEquipeRepository;
         this.substituicaoRepository = substituicaoRepository;
         this.pessoaRepository = pessoaRepository;
         this.historicoEventoRepository = historicoEventoRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -108,6 +113,14 @@ public class RegistrarSubstituicaoUseCase {
                 agora,
                 "Entrou na equipe " + equipe.getNome() + " do encontro #" + encontro.getNumero()
                         + " via substituição."));
+
+        eventPublisher.publishEvent(new SubstituicaoRegistradaEvent(
+                equipe.getNome(),
+                encontro.getNumero(),
+                integranteSai.getPessoa().getNomeCompleto(),
+                pessoaEntra.getNomeCompleto(),
+                dados.justificativa(),
+                integranteSai.getCreatedBy()));
 
         return substituicao;
     }

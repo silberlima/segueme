@@ -1,15 +1,24 @@
 import { test as base, expect, type Page } from '@playwright/test'
-import { MASSA, USUARIO_E2E } from './config'
+import { MASSA, USUARIO_E2E, USUARIO_SETORIAL_E2E } from './config'
 
 interface PosEncontroFixtures {
   /** Página já autenticada de verdade no Keycloak e com o perfil Pós-Encontro ativo. */
   paginaPosEncontro: Page
+  /** Página autenticada como o usuário Setorial da Fase 14, com o perfil Paróquia ativo. */
+  paginaSetorial: Page
 }
 
 export const test = base.extend<PosEncontroFixtures>({
   paginaPosEncontro: async ({ page }, use) => {
     await autenticar(page)
     await ativarPerfilPosEncontro(page)
+    await use(page)
+  },
+
+  paginaSetorial: async ({ page }, use) => {
+    await autenticar(page, USUARIO_SETORIAL_E2E.email, USUARIO_SETORIAL_E2E.password)
+    // Começa como Paróquia: é o perfil que solicita a transferência que o Setorial vai decidir.
+    await ativarPerfil(page, 'Paróquia')
     await use(page)
   },
 })
@@ -21,10 +30,10 @@ export { expect }
  * `sessionStorage` (ver `AuthProvider`), que o `storageState` do Playwright não persiste — por isso
  * cada teste loga de novo em vez de reaproveitar estado gravado.
  */
-async function autenticar(page: Page): Promise<void> {
+async function autenticar(page: Page, email = USUARIO_E2E.email, senha = USUARIO_E2E.password): Promise<void> {
   await page.goto('/login')
-  await page.getByLabel('E-mail').fill(USUARIO_E2E.email)
-  await page.getByLabel('Senha').fill(USUARIO_E2E.password)
+  await page.getByLabel('E-mail').fill(email)
+  await page.getByLabel('Senha').fill(senha)
   await page.getByRole('button', { name: 'Entrar' }).click()
 
   await expect(page.getByLabel('Perfil de acesso')).toBeVisible()

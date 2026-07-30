@@ -47,6 +47,7 @@ export function useReports() {
     relatorios: relatoriosQuery.data?.content ?? [],
     isLoadingRelatorios: relatoriosQuery.isLoading,
     isErrorRelatorios: relatoriosQuery.isError,
+    recarregarRelatorios: relatoriosQuery.refetch,
     gerar: gerarMutation.mutate,
     tipoEmGeracao: gerarMutation.isPending ? gerarMutation.variables : null,
     baixar: baixarMutation.mutate,

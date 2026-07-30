@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Skeleton } from '../../../shared/ui'
+import { Badge, ListState } from '../../../shared/ui'
 import { PAPEL_INTEGRANTE_LABEL, STATUS_INTEGRANTE_LABEL } from '../domain/montagem.types'
 import { useEquipe } from '../hooks/useEquipe'
 import { useEquipes } from '../hooks/useEquipes'
@@ -40,31 +40,19 @@ export function TeamsWorkspaceScreen() {
         )}
       </div>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          <Skeleton variant="rect" height="200px" />
-        </div>
-      )}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar as equipes deste encontro.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {equipes && equipes.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum tipo de equipe cadastrado no catálogo nacional.
-        </div>
-      )}
-
-      {equipes && equipes.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={equipes?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="200px"
+        errorMessage="Não foi possível carregar as equipes deste encontro."
+        emptyMessage="Nenhum tipo de equipe cadastrado no catálogo nacional."
+      >
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[280px_1fr]">
           <div className="flex flex-col gap-2">
-            {equipes.map((equipe) => (
+            {(equipes ?? []).map((equipe) => (
               <button
                 key={equipe.id}
                 onClick={() => setSearchParams({ equipeId: equipe.id })}
@@ -88,7 +76,7 @@ export function TeamsWorkspaceScreen() {
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-white p-6">
-            {detalheCarregando && <Skeleton variant="rect" height="200px" />}
+            <ListState isLoading={detalheCarregando} skeletonRows={1} skeletonHeight="200px" />
 
             {detalhe && (
               <>
@@ -159,7 +147,7 @@ export function TeamsWorkspaceScreen() {
             )}
           </div>
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Select, Skeleton, Table } from '../../../shared/ui'
+import { Badge, Button, ListState, Select, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import { RevenueExpenseChart } from '../components/RevenueExpenseChart'
 import { SITUACAO_DESPESA_LABEL, TIPO_LANCAMENTO_LABEL } from '../domain/financeiro.types'
@@ -77,7 +77,7 @@ export function FinanceOverviewScreen() {
         </Link>
       </div>
 
-      {isLoadingResumo && <Skeleton variant="rect" height="100px" />}
+      <ListState isLoading={isLoadingResumo} skeletonRows={1} skeletonHeight="100px" />
 
       {resumo && (
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -164,19 +164,17 @@ export function FinanceOverviewScreen() {
 
       <h2 className="mb-3 text-sm font-semibold text-slate-900">Últimas movimentações</h2>
 
-      {isLoadingLancamentos && <Skeleton variant="rect" height="120px" />}
-
-      {!isLoadingLancamentos && ultimosLancamentos.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhuma movimentação registrada.
-        </div>
-      )}
-
-      {ultimosLancamentos.length > 0 && (
+      <ListState
+        isLoading={isLoadingLancamentos}
+        isEmpty={ultimosLancamentos.length === 0}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        emptyMessage="Nenhuma movimentação registrada."
+      >
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
           <Table columns={columns} rows={ultimosLancamentos} getRowKey={(l) => l.id} />
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

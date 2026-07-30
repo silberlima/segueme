@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Select, Skeleton } from '../../../shared/ui'
+import { Badge, Button, ConfirmDialog, ListState, Select } from '../../../shared/ui'
 import { PessoaSearchSelect } from '../components/PessoaSearchSelect'
 import { STATUS_TRANSFERENCIA_LABEL } from '../domain/setorial.types'
+import type { Transferencia } from '../domain/setorial.types'
 import { useAprovarTransferencia } from '../hooks/useAprovarTransferencia'
 import { useParoquiaOptions } from '../hooks/useParoquiaOptions'
 import { useRecusarTransferencia } from '../hooks/useRecusarTransferencia'
@@ -23,7 +24,7 @@ export function TransfersScreen() {
   const [pessoaNome, setPessoaNome] = useState('')
   const [paroquiaDestinoId, setParoquiaDestinoId] = useState('')
   const [motivo, setMotivo] = useState('')
-  const [justificativaPorId, setJustificativaPorId] = useState<Record<string, string>>({})
+  const [transferenciaEmRecusa, setTransferenciaEmRecusa] = useState<Transferencia | null>(null)
 
   const { data: paroquias } = useParoquiaOptions()
   const { data: transferencias, isLoading, isError, refetch } = useTransferencias()
@@ -48,12 +49,11 @@ export function TransfersScreen() {
     )
   }
 
-  function recusarTransferencia(transferenciaId: string) {
-    const justificativa = (justificativaPorId[transferenciaId] ?? '').trim()
-    if (!justificativa) return
+  function confirmarRecusa(justificativa: string) {
+    if (!transferenciaEmRecusa) return
     recusar.mutate(
-      { transferenciaId, justificativa },
-      { onSuccess: () => setJustificativaPorId((atual) => ({ ...atual, [transferenciaId]: '' })) },
+      { transferenciaId: transferenciaEmRecusa.id, justificativa },
+      { onSuccess: () => setTransferenciaEmRecusa(null) },
     )
   }
 
@@ -112,26 +112,18 @@ export function TransfersScreen() {
 
       <h2 className="mb-3 text-sm font-semibold text-slate-900">Solicitações</h2>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar as transferências.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {transferencias && transferencias.content.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhuma transferência registrada.
-        </div>
-      )}
-
-      {transferencias && transferencias.content.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={transferencias?.content.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar as transferências."
+        emptyMessage="Nenhuma transferência registrada."
+      >
         <div className="flex flex-col gap-3">
-          {transferencias.content.map((transferencia) => (
+          {(transferencias?.content ?? []).map((transferencia) => (
             <div key={transferencia.id} className="rounded-lg border border-slate-200 bg-white p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -155,28 +147,13 @@ export function TransfersScreen() {
               </div>
 
               {isSetorial && transferencia.status === 'PENDENTE' && (
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <input
-                    type="text"
-                    value={justificativaPorId[transferencia.id] ?? ''}
-                    onChange={(event) =>
-                      setJustificativaPorId((atual) => ({ ...atual, [transferencia.id]: event.target.value }))
-                    }
-                    placeholder="Justificativa (obrigatória para recusar)"
-                    className="h-9 flex-1 rounded-lg border border-slate-200 px-3 text-sm text-slate-900 outline-none focus:border-violet-500"
-                  />
-                  <div className="flex gap-2">
-                    <Button disabled={aprovar.isPending} onClick={() => aprovar.mutate(transferencia.id)}>
-                      Aprovar
-                    </Button>
-                    <Button
-                      variant="danger"
-                      disabled={!(justificativaPorId[transferencia.id] ?? '').trim() || recusar.isPending}
-                      onClick={() => recusarTransferencia(transferencia.id)}
-                    >
-                      Recusar
-                    </Button>
-                  </div>
+                <div className="mt-3 flex justify-end gap-2">
+                  <Button disabled={aprovar.isPending} onClick={() => aprovar.mutate(transferencia.id)}>
+                    Aprovar
+                  </Button>
+                  <Button variant="danger" onClick={() => setTransferenciaEmRecusa(transferencia)}>
+                    Recusar
+                  </Button>
                 </div>
               )}
 
@@ -186,7 +163,30 @@ export function TransfersScreen() {
             </div>
           ))}
         </div>
-      )}
+      </ListState>
+
+      <ConfirmDialog
+        isOpen={transferenciaEmRecusa !== null}
+        title="Recusar transferência"
+        tone="danger"
+        confirmLabel="Recusar transferência"
+        description={
+          transferenciaEmRecusa && (
+            <>
+              A transferência de <strong>{transferenciaEmRecusa.pessoaNome}</strong> de{' '}
+              {transferenciaEmRecusa.paroquiaOrigemNome} para {transferenciaEmRecusa.paroquiaDestinoNome} será
+              recusada. A justificativa fica registrada e a paróquia solicitante é notificada (RNF-07).
+            </>
+          )
+        }
+        justification={{
+          label: 'Justificativa da recusa',
+          placeholder: 'Descreva o motivo da recusa',
+        }}
+        isPending={recusar.isPending}
+        onCancel={() => setTransferenciaEmRecusa(null)}
+        onConfirm={confirmarRecusa}
+      />
     </div>
   )
 }

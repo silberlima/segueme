@@ -67,7 +67,7 @@ class PreInscricoesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriarPreInscricaoRequest(pessoa.getId(), encontro.getId())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
                 .andExpect(status().isForbidden());
     }
 
@@ -81,7 +81,7 @@ class PreInscricoesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriarPreInscricaoRequest(pessoa.getId(), encontro.getId())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.emReserva").value(false))
                 .andExpect(jsonPath("$.preInscricao.status").value("AGUARDANDO_FICHA"))
@@ -99,7 +99,7 @@ class PreInscricoesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriarPreInscricaoRequest(primeiro.getId(), encontro.getId())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.emReserva").value(false));
 
@@ -107,7 +107,7 @@ class PreInscricoesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriarPreInscricaoRequest(segundo.getId(), encontro.getId())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.emReserva").value(true))
                 .andExpect(jsonPath("$.cadastroReserva.pessoaNome").value("Segundo Candidato"));
@@ -123,7 +123,7 @@ class PreInscricoesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriarPreInscricaoRequest(pessoa.getId(), encontro.getId())))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -132,7 +132,7 @@ class PreInscricoesControllerIT extends AbstractIntegrationTest {
         String preInscricaoId = objectMapper.readTree(responseJson).get("preInscricao").get("id").asText();
 
         mockMvc.perform(post("/api/v1/pre-inscricoes/" + preInscricaoId + "/ficha")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
+                        .with(jwt().jwt(token -> token.claim("paroquia_id", paroquia.getId().toString())).authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_FICHAS"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.statusPagamento").value("PENDENTE"));
     }

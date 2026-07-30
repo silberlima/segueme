@@ -68,7 +68,7 @@ public class CampanhasController {
     }
 
     @PostMapping
-    @PreAuthorize(PERFIS_GESTAO)
+    @PreAuthorize(PERFIS_GESTAO + " and @escopoTerritorial.podeVerEncontro(#request.encontroId())")
     @Operation(summary = "Cria uma campanha de arrecadação de um Encontro (RF-050)")
     public ResponseEntity<CampanhaResponse> criar(@Valid @RequestBody CriarCampanhaRequest request) {
         var campanha = criarCampanhaUseCase.execute(request.encontroId(), request.nome(), request.meta());
@@ -76,7 +76,7 @@ public class CampanhasController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Lista campanhas do escopo territorial do usuário (RF-050)")
     public ResponseEntity<PageResponse<CampanhaResponse>> listar(
             @AuthenticationPrincipal Jwt jwt,

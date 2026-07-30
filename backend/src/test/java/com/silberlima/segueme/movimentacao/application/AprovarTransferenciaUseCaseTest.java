@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -35,6 +36,9 @@ class AprovarTransferenciaUseCaseTest {
     @Mock
     private HistoricoEventoRepository historicoEventoRepository;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     @Test
     void shouldApproveAndChangePessoaParoquiaAndRecordHistory() {
         UUID transferenciaId = UUID.randomUUID();
@@ -46,7 +50,7 @@ class AprovarTransferenciaUseCaseTest {
         Transferencia transferencia = new Transferencia(pessoa, origem, destino, null);
         when(transferenciaRepository.findByIdAndDeletedFalse(transferenciaId)).thenReturn(Optional.of(transferencia));
 
-        Transferencia resultado = new AprovarTransferenciaUseCase(transferenciaRepository, historicoEventoRepository)
+        Transferencia resultado = new AprovarTransferenciaUseCase(transferenciaRepository, historicoEventoRepository, eventPublisher)
                 .execute(transferenciaId);
 
         assertThat(resultado.getStatus()).isEqualTo(StatusTransferencia.APROVADA);
@@ -62,7 +66,7 @@ class AprovarTransferenciaUseCaseTest {
         UUID transferenciaId = UUID.randomUUID();
         when(transferenciaRepository.findByIdAndDeletedFalse(transferenciaId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> new AprovarTransferenciaUseCase(transferenciaRepository, historicoEventoRepository)
+        assertThatThrownBy(() -> new AprovarTransferenciaUseCase(transferenciaRepository, historicoEventoRepository, eventPublisher)
                         .execute(transferenciaId))
                 .isInstanceOf(ResourceNotFoundException.class);
     }

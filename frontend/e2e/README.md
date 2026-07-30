@@ -49,7 +49,11 @@ cd frontend && npm run test:e2e:ui
   percorrendo a Fase 5 inteira (pré-inscrição → ficha, que exige um Encontro com equipe dirigente e
   comando montadas), o que tornaria o E2E desta fase refém daquela;
 - provisiona no Keycloak o usuário `e2e.posencontro@segueme.test` com os perfis `POS_ENCONTRO` e
-  `PAROQUIA` e o atributo `paroquia_id` da paróquia semeada (o realm compartilhado não é alterado).
+  `PAROQUIA` e o atributo `paroquia_id` da paróquia semeada (o realm compartilhado não é alterado);
+- provisiona `e2e.setorial@segueme.test` com `SETORIAL` + `PAROQUIA` e a claim `setor_id`, usado
+  pela suíte da Fase 14 para decidir a transferência que o perfil Paróquia solicita. É um usuário à
+  parte porque `EscopoTerritorialResolver` prioriza o perfil de maior alcance: dar `SETORIAL` ao
+  usuário acima resolveria o escopo dele como "de setor" e quebraria o Painel da Paróquia.
 
 Cada teste limpa os encontros pós e as presenças da massa antes de rodar, então a suíte é repetível e
 os testes não dependem da ordem. As specs da Fase 13 também apagam relatórios, preferências e
@@ -65,3 +69,4 @@ levar junto dado de outro usuário do banco de desenvolvimento.
 | `prioridades.spec.ts` | Ranking por frequência, faixas Alta/Média/Baixa da régua default e a regra exibida (RN-POS-02/03) |
 | `paineis.spec.ts` | Entrada no painel do perfil ativo, menu restrito a esse painel (RN-DASH-01), KPIs reais dos painéis Pós-Encontro e Paróquia (RF-053) |
 | `sistema.spec.ts` | Relatório gerado e baixado de ponta a ponta (UC-22), falha registrada com motivo, notificação de conclusão e badge de não lida (RN-SISTEMA-01/02), toggle de preferência persistido barrando a notificação (RF-057) |
+| `hardening.spec.ts` | Os quatro estados de lista do `ListState` — skeleton, dados, vazio com orientação e erro com nova tentativa que **recupera** a lista (RNF-02); recusa de transferência pelo `ConfirmDialog`, que só libera o confirmar com justificativa (RNF-03/RNF-08), e a notificação automática que a decisão dispara (RNF-07) |

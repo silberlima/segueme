@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { Badge, Skeleton } from '../../../shared/ui'
+import { Badge, ListState } from '../../../shared/ui'
 import { calcularIdade } from '../domain/pessoa.entity'
 import { ESTADO_CIVIL_LABEL, SITUACAO_LABEL } from '../domain/pessoa.types'
 import type { SituacaoPessoa } from '../domain/pessoa.types'
@@ -24,7 +24,7 @@ function Campo({ label, valor }: { label: string; valor: string | null }) {
 
 export function PersonProfileScreen() {
   const { id } = useParams<{ id: string }>()
-  const { data: pessoa, isLoading, isError } = usePessoa(id)
+  const { data: pessoa, isLoading, isError, refetch } = usePessoa(id)
 
   return (
     <div className="p-6">
@@ -32,17 +32,14 @@ export function PersonProfileScreen() {
         ← Lista de Pessoas
       </Link>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          <Skeleton variant="rect" height="120px" />
-        </div>
-      )}
-
-      {isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          Não foi possível carregar o perfil desta pessoa.
-        </p>
-      )}
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o perfil desta pessoa."
+      />
 
       {pessoa && (
         <div className="rounded-xl border border-slate-200 bg-white p-6">

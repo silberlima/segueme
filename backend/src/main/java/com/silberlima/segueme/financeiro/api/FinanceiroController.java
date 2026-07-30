@@ -27,7 +27,7 @@ public class FinanceiroController {
     }
 
     @GetMapping("/resumo")
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Consolida saldo, receitas, despesas e campanhas ativas de um Encontro (RN-FINANCEIRO-04)")
     public ResumoFinanceiroResponse resumo(@RequestParam UUID encontroId) {
         var resumo = obterResumoFinanceiroUseCase.execute(encontroId);

@@ -4,11 +4,13 @@ import com.silberlima.segueme.domain.exception.ResourceNotFoundException;
 import com.silberlima.segueme.movimentacao.domain.Emprestimo;
 import com.silberlima.segueme.movimentacao.domain.EmprestimoCandidato;
 import com.silberlima.segueme.movimentacao.domain.EmprestimoCandidatoRepository;
+import com.silberlima.segueme.movimentacao.domain.EmprestimoDecididoEvent;
 import com.silberlima.segueme.movimentacao.domain.EmprestimoRepository;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,14 +25,17 @@ public class SelecionarEEnviarCandidatosUseCase {
     private final EmprestimoRepository emprestimoRepository;
     private final PessoaRepository pessoaRepository;
     private final EmprestimoCandidatoRepository emprestimoCandidatoRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public SelecionarEEnviarCandidatosUseCase(
             EmprestimoRepository emprestimoRepository,
             PessoaRepository pessoaRepository,
-            EmprestimoCandidatoRepository emprestimoCandidatoRepository) {
+            EmprestimoCandidatoRepository emprestimoCandidatoRepository,
+            ApplicationEventPublisher eventPublisher) {
         this.emprestimoRepository = emprestimoRepository;
         this.pessoaRepository = pessoaRepository;
         this.emprestimoCandidatoRepository = emprestimoCandidatoRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -50,6 +55,15 @@ public class SelecionarEEnviarCandidatosUseCase {
         }
 
         emprestimo.enviarSugestoes();
+
+        eventPublisher.publishEvent(new EmprestimoDecididoEvent(
+                emprestimo.getEquipe().getNome(),
+                emprestimo.getEncontro().getNumero(),
+                emprestimoCandidatoRepository.countByEmprestimo_Id(emprestimoId),
+                false,
+                null,
+                emprestimo.getCreatedBy()));
+
         return emprestimo;
     }
 }

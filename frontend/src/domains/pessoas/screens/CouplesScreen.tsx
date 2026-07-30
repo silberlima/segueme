@@ -1,4 +1,4 @@
-import { Badge, Button, Input, Modal, Select, Skeleton, Table } from '../../../shared/ui'
+import { Badge, Button, Input, ListState, Modal, Select, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import { useDisclosure } from '../../../shared/hooks/useDisclosure'
 import type { Casal, PessoaResumo, SituacaoPessoa } from '../domain/pessoa.types'
@@ -61,30 +61,29 @@ export function CouplesScreen() {
         </Button>
       </div>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          <Skeleton variant="rect" height="52px" />
-          <Skeleton variant="rect" height="52px" />
-        </div>
-      )}
-
-      {isError && (
-        <p className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          Não foi possível carregar os casais. Tente novamente mais tarde.
-        </p>
-      )}
-
-      {data && data.content.length === 0 && (
-        <p className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhum casal vinculado no seu escopo de acesso.
-        </p>
-      )}
-
-      {data && data.content.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={data?.content.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={2}
+        errorMessage="Não foi possível carregar os casais. Tente novamente mais tarde."
+        emptyMessage="Nenhum casal vinculado no seu escopo de acesso."
+        emptyAction={
+          <Button
+            onClick={() => {
+              form.reset()
+              modal.open()
+            }}
+          >
+            Vincular casal
+          </Button>
+        }
+      >
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <Table columns={columns} rows={data.content} getRowKey={(casal) => casal.id} />
+          <Table columns={columns} rows={data?.content ?? []} getRowKey={(casal) => casal.id} />
         </div>
-      )}
+      </ListState>
 
       <Modal isOpen={modal.isOpen} onClose={modal.close} title="Vincular casal">
         <div className="flex flex-col gap-4">

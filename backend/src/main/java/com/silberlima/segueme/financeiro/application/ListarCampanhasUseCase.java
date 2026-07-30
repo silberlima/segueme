@@ -28,7 +28,8 @@ public class ListarCampanhasUseCase {
                 CampanhaSpecification.naoDeletada(),
                 CampanhaSpecification.comEscopo(escopo),
                 CampanhaSpecification.comEncontro(encontroId),
-                CampanhaSpecification.comStatus(status));
+                CampanhaSpecification.comStatus(status),
+                CampanhaSpecification.comEncontroCarregado());
         return campanhaRepository.findAll(spec, pageable);
     }
 }

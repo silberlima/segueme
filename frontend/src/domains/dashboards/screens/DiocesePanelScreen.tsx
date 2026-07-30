@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
-import { BarChart, KpiCard, KpiRow, PageHeader, PanelCard } from '../../../shared/ui'
-import { PanelState } from '../components/PanelState'
+import { BarChart, KpiCard, KpiRow, ListState, PageHeader, PanelCard } from '../../../shared/ui'
 import { useDashboardDiocese } from '../hooks/useDashboardDiocese'
 
 /**
@@ -9,7 +8,7 @@ import { useDashboardDiocese } from '../hooks/useDashboardDiocese'
  * porque não existe fluxo de aprovação de Encontro no modelo.
  */
 export function DiocesePanelScreen() {
-  const { data: painel, isLoading, isError } = useDashboardDiocese()
+  const { data: painel, isLoading, isError, refetch } = useDashboardDiocese()
 
   return (
     <div className="p-6">
@@ -23,7 +22,14 @@ export function DiocesePanelScreen() {
         }
       />
 
-      <PanelState isLoading={isLoading} isError={isError} />
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o painel. Tente novamente."
+      />
 
       {painel && (
         <div className="flex flex-col gap-6">

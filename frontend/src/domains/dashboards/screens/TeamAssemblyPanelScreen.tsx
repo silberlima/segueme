@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Badge, KpiCard, KpiRow, PageHeader, PanelCard } from '../../../shared/ui'
-import { PanelState } from '../components/PanelState'
+import { Badge, KpiCard, KpiRow, ListState, PageHeader, PanelCard } from '../../../shared/ui'
 import { ProgressBar } from '../components/ProgressBar'
 import { TeamStatusList } from '../components/TeamStatusList'
 import { useDashboardMontagem } from '../hooks/useDashboardMontagem'
@@ -11,7 +10,7 @@ import { useDashboardMontagem } from '../hooks/useDashboardMontagem'
  * equipe" leva à tela de sugestões da equipe, onde a inclusão é confirmada.
  */
 export function TeamAssemblyPanelScreen() {
-  const { data: painel, isLoading, isError } = useDashboardMontagem()
+  const { data: painel, isLoading, isError, refetch } = useDashboardMontagem()
   const encontro = painel?.encontroCorrente ?? null
   const prioritaria = painel?.equipePrioritaria ?? null
 
@@ -36,7 +35,14 @@ export function TeamAssemblyPanelScreen() {
         }
       />
 
-      <PanelState isLoading={isLoading} isError={isError} />
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o painel. Tente novamente."
+      />
 
       {painel && (
         <div className="flex flex-col gap-6">

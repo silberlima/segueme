@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,6 +28,9 @@ class RecusarTransferenciaUseCaseTest {
 
     @Mock
     private TransferenciaRepository transferenciaRepository;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @Test
     void shouldRefuseAndKeepPessoaAtOrigem() {
@@ -39,7 +43,7 @@ class RecusarTransferenciaUseCaseTest {
         Transferencia transferencia = new Transferencia(pessoa, origem, destino, null);
         when(transferenciaRepository.findByIdAndDeletedFalse(transferenciaId)).thenReturn(Optional.of(transferencia));
 
-        Transferencia resultado = new RecusarTransferenciaUseCase(transferenciaRepository)
+        Transferencia resultado = new RecusarTransferenciaUseCase(transferenciaRepository, eventPublisher)
                 .execute(transferenciaId, "Pendências não resolvidas.");
 
         assertThat(resultado.getStatus()).isEqualTo(StatusTransferencia.RECUSADA);
@@ -57,7 +61,7 @@ class RecusarTransferenciaUseCaseTest {
         Transferencia transferencia = new Transferencia(pessoa, origem, destino, null);
         when(transferenciaRepository.findByIdAndDeletedFalse(transferenciaId)).thenReturn(Optional.of(transferencia));
 
-        assertThatThrownBy(() -> new RecusarTransferenciaUseCase(transferenciaRepository).execute(transferenciaId, " "))
+        assertThatThrownBy(() -> new RecusarTransferenciaUseCase(transferenciaRepository, eventPublisher).execute(transferenciaId, " "))
                 .isInstanceOf(BusinessRuleViolationException.class);
     }
 
@@ -66,7 +70,7 @@ class RecusarTransferenciaUseCaseTest {
         UUID transferenciaId = UUID.randomUUID();
         when(transferenciaRepository.findByIdAndDeletedFalse(transferenciaId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> new RecusarTransferenciaUseCase(transferenciaRepository).execute(transferenciaId, "Motivo"))
+        assertThatThrownBy(() -> new RecusarTransferenciaUseCase(transferenciaRepository, eventPublisher).execute(transferenciaId, "Motivo"))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 }

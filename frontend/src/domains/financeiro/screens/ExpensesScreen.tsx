@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Skeleton, Table } from '../../../shared/ui'
+import { Badge, Button, ListState, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
 import { SITUACAO_DESPESA_LABEL } from '../domain/financeiro.types'
 import type { LancamentoFinanceiro } from '../domain/financeiro.types'
@@ -67,28 +67,20 @@ export function ExpensesScreen() {
       </Link>
       <h1 className="mb-6 text-xl font-semibold text-slate-900">Despesas</h1>
 
-      {isLoading && <Skeleton variant="rect" height="120px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar as despesas.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {!isLoading && lancamentos && lancamentos.content.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-500">
-          Nenhuma despesa registrada.
-        </div>
-      )}
-
-      {lancamentos && lancamentos.content.length > 0 && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={lancamentos?.content.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar as despesas."
+        emptyMessage="Nenhuma despesa registrada."
+      >
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <Table columns={columns} rows={lancamentos.content} getRowKey={(l) => l.id} />
+          <Table columns={columns} rows={lancamentos?.content ?? []} getRowKey={(l) => l.id} />
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

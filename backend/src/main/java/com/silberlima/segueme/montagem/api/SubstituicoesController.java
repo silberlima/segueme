@@ -49,7 +49,7 @@ public class SubstituicoesController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_MONTAGEM)
+    @PreAuthorize(PERFIS_MONTAGEM + " and @escopoTerritorial.podeVerEncontro(#encontroId)")
     @Operation(summary = "Histórico de substituições de um Encontro, opcionalmente filtrado por equipe (RF-033)")
     public ResponseEntity<PageResponse<SubstituicaoResponse>> listar(
             @RequestParam UUID encontroId,
@@ -62,7 +62,7 @@ public class SubstituicoesController {
     }
 
     @PostMapping
-    @PreAuthorize(PERFIS_MONTAGEM)
+    @PreAuthorize(PERFIS_MONTAGEM + " and @escopoTerritorial.podeVerEncontro(#request.encontroId())")
     @Operation(summary = "Registra a substituição de um integrante por outro, com justificativa obrigatória (RF-032, RN-MONTAGEM-05)")
     public ResponseEntity<SubstituicaoResponse> registrar(@Valid @RequestBody RegistrarSubstituicaoRequest request) {
         Substituicao substituicao = registrarSubstituicaoUseCase.execute(new DadosSubstituicao(

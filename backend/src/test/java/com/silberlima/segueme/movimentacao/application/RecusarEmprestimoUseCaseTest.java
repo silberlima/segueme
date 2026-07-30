@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,6 +29,9 @@ class RecusarEmprestimoUseCaseTest {
 
     @Mock
     private EmprestimoRepository emprestimoRepository;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     private final Paroquia paroquia = new Paroquia("Paróquia", new Setor("Setor", new Diocese("Diocese")));
     private final Pessoa diretor = new Pessoa(
@@ -43,7 +47,7 @@ class RecusarEmprestimoUseCaseTest {
         Emprestimo emprestimo = new Emprestimo(encontro, equipe, null);
         when(emprestimoRepository.findByIdAndDeletedFalse(emprestimoId)).thenReturn(Optional.of(emprestimo));
 
-        Emprestimo resultado = new RecusarEmprestimoUseCase(emprestimoRepository).execute(emprestimoId, "Sem candidatos.");
+        Emprestimo resultado = new RecusarEmprestimoUseCase(emprestimoRepository, eventPublisher).execute(emprestimoId, "Sem candidatos.");
 
         assertThat(resultado.getStatus()).isEqualTo(StatusEmprestimo.RECUSADO);
     }
@@ -53,7 +57,7 @@ class RecusarEmprestimoUseCaseTest {
         UUID emprestimoId = UUID.randomUUID();
         when(emprestimoRepository.findByIdAndDeletedFalse(emprestimoId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> new RecusarEmprestimoUseCase(emprestimoRepository).execute(emprestimoId, "Motivo"))
+        assertThatThrownBy(() -> new RecusarEmprestimoUseCase(emprestimoRepository, eventPublisher).execute(emprestimoId, "Motivo"))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 }

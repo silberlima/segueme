@@ -35,6 +35,15 @@ management:
   info:
     env:
       enabled: true
+  # Sem estes dois, o Prometheus recebe só contadores: a métrica de latência vem como soma/contagem
+  # e não dá para perguntar "qual o p95 do endpoint X" — que é o que o dashboard e os alertas de
+  # `observabilidade/` usam. A tag `application` separa as séries por serviço no mesmo Prometheus.
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
 
 info:
   app:

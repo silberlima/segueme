@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
-import { Badge, KpiCard, KpiRow, PageHeader, PanelCard, Table } from '../../../shared/ui'
+import { Badge, KpiCard, KpiRow, ListState, PageHeader, PanelCard, Table } from '../../../shared/ui'
 import type { TableColumn } from '../../../shared/ui/Table/Table.types'
-import { PanelState } from '../components/PanelState'
 import { formatarData, formatarDataHora } from '../domain/dashboard.entity'
 import type { ParoquiaDoSetor, SolicitacaoDoPainel } from '../domain/dashboard.types'
 import { useDashboardSetorial } from '../hooks/useDashboardSetorial'
@@ -12,7 +11,7 @@ import { useDashboardSetorial } from '../hooks/useDashboardSetorial'
  * lá, em vez de duplicar a decisão em dois lugares.
  */
 export function SectorPanelScreen() {
-  const { data: painel, isLoading, isError } = useDashboardSetorial()
+  const { data: painel, isLoading, isError, refetch } = useDashboardSetorial()
 
   const colunasSolicitacoes: TableColumn<SolicitacaoDoPainel>[] = [
     {
@@ -60,7 +59,14 @@ export function SectorPanelScreen() {
         }
       />
 
-      <PanelState isLoading={isLoading} isError={isError} />
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="120px"
+        errorMessage="Não foi possível carregar o painel. Tente novamente."
+      />
 
       {painel && (
         <div className="flex flex-col gap-6">

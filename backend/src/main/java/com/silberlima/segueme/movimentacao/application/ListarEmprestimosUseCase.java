@@ -31,7 +31,8 @@ public class ListarEmprestimosUseCase {
                 EmprestimoSpecification.comEscopo(escopo),
                 EmprestimoSpecification.comEncontro(encontroId),
                 EmprestimoSpecification.comEquipe(equipeId),
-                EmprestimoSpecification.comStatus(status));
+                EmprestimoSpecification.comStatus(status),
+                EmprestimoSpecification.comAssociacoesCarregadas());
         return emprestimoRepository.findAll(spec);
     }
 }

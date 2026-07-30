@@ -20,7 +20,7 @@ public class AceitarConviteUseCase {
     @Transactional
     public IntegranteEquipe execute(UUID conviteId) {
         IntegranteEquipe convite = integranteEquipeRepository
-                .findById(conviteId)
+                .findWithEquipeAndPessoaById(conviteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Convite não encontrado: " + conviteId));
         convite.aceitar();
         return convite;

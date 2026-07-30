@@ -1,0 +1,42 @@
+# Override de observabilidade (Fase 14): sobe Prometheus e Grafana ao lado do stack normal, já
+# apontados para as métricas que o Actuator expõe desde a Fase 0.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.observabilidade.yml up -d
+#
+# Grafana em http://localhost:3000 (admin/admin), com o dashboard "Segue-me · Backend" e o
+# datasource já provisionados; Prometheus em http://localhost:9090, com as regras de alerta de
+# `observabilidade/alertas.yml` carregadas (rota de notificação fica para o Alertmanager, que
+# depende de canal — e-mail/Slack — ainda não definido com o PO).
+services:
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observabilidade/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observabilidade/alertas.yml:/etc/prometheus/alertas.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - app
+
+  grafana:
+    image: grafana/grafana:11.5.1
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./observabilidade/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observabilidade/grafana/dashboards:/etc/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+  grafana-data:

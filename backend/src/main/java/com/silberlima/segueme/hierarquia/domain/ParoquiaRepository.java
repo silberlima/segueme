@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ParoquiaRepository extends JpaRepository<Paroquia, UUID> {
 
@@ -27,6 +28,11 @@ public interface ParoquiaRepository extends JpaRepository<Paroquia, UUID> {
     List<Paroquia> findBySetor_IdInAndDeletedFalse(List<UUID> setorIds);
 
     boolean existsByIdAndDeletedFalse(UUID id);
+
+    /** Território da paróquia para a checagem de escopo do {@code @PreAuthorize} (RNF-06). */
+    @Query("select new com.silberlima.segueme.hierarquia.domain.Territorio("
+            + "p.id, p.setor.id, p.setor.diocese.id) from Paroquia p where p.id = :id and p.deleted = false")
+    Optional<Territorio> buscarTerritorio(@Param("id") UUID id);
 
     /* KPIs territoriais dos dashboards (Fase 12, RF-053). */
 

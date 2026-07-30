@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { Badge, Button, Skeleton, Stepper } from '../../../shared/ui'
+import { Badge, Button, ListState, Stepper } from '../../../shared/ui'
 import type { StepperStep } from '../../../shared/ui/Stepper/Stepper.types'
 import { usePessoaCompleta } from '../hooks/usePessoaCompleta'
 import { usePreencherFicha } from '../hooks/usePreencherFicha'
@@ -56,13 +56,9 @@ export function EnrollmentFormScreen() {
         Os dados desta ficha integram o cadastro nacional e nunca são apagados.
       </p>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          <Skeleton variant="rect" height="200px" />
-        </div>
-      )}
+      <ListState isLoading={isLoading} skeletonRows={1} skeletonHeight="200px" />
 
-      {!isLoading && pessoa && preInscricao && (
+      {pessoa && preInscricao && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
           <div className="flex flex-col gap-6">
             <section className="rounded-xl border border-slate-200 bg-white p-5">

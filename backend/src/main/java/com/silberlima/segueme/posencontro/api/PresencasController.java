@@ -46,7 +46,7 @@ public class PresencasController {
     }
 
     @GetMapping
-    @PreAuthorize(PERFIS_LEITURA)
+    @PreAuthorize(PERFIS_LEITURA + " and @escopoTerritorial.podeVerEncontroPos(#encontroPosId)")
     @Operation(summary = "Lista de chamada: todos os acompanhados da paróquia e a marcação já registrada de cada um")
     public List<PresencaResponse> listar(@PathVariable UUID encontroPosId) {
         return consultarPresencasUseCase.execute(encontroPosId).stream()
@@ -55,7 +55,7 @@ public class PresencasController {
     }
 
     @PutMapping
-    @PreAuthorize(PERFIS_REGISTRO)
+    @PreAuthorize(PERFIS_REGISTRO + " and @escopoTerritorial.podeVerEncontroPos(#encontroPosId)")
     @Operation(summary = "Registra em lote a presença dos jovens no encontro pós (UC — Registrar presença)")
     public List<PresencaResponse> registrar(
             @PathVariable UUID encontroPosId, @Valid @RequestBody RegistrarPresencasRequest request) {

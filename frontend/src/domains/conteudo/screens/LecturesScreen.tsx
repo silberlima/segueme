@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useProfile } from '../../../app/providers/ProfileProvider'
-import { Badge, Button, Select, Skeleton } from '../../../shared/ui'
+import { Badge, Button, ListState, Select } from '../../../shared/ui'
 import { TIPO_PALESTRANTE_LABEL } from '../domain/conteudo.types'
 import type { PalestraDoEncontro } from '../domain/conteudo.types'
 import { useDesignarPalestrante } from '../hooks/useDesignarPalestrante'
@@ -87,20 +87,18 @@ export function LecturesScreen() {
         </Link>
       </div>
 
-      {isLoading && <Skeleton variant="rect" height="160px" />}
-
-      {isError && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-          <p className="mb-3">Não foi possível carregar as palestras deste encontro.</p>
-          <Button variant="secondary" onClick={() => refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )}
-
-      {palestras && (
+      <ListState
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={palestras?.length === 0}
+        onRetry={() => refetch()}
+        skeletonRows={1}
+        skeletonHeight="160px"
+        errorMessage="Não foi possível carregar as palestras deste encontro."
+        emptyMessage="Nenhuma palestra cadastrada para este encontro."
+      >
         <div className="rounded-xl border border-slate-200 bg-white px-4">
-          {palestras.map((palestra) => (
+          {(palestras ?? []).map((palestra) => (
             <LinhaPalestra
               key={palestra.palestraId}
               palestra={palestra}
@@ -111,7 +109,7 @@ export function LecturesScreen() {
             />
           ))}
         </div>
-      )}
+      </ListState>
     </div>
   )
 }

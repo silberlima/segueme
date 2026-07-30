@@ -1,5 +1,6 @@
 package com.silberlima.segueme.posencontro.domain;
 
+import com.silberlima.segueme.hierarquia.domain.Territorio;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,12 @@ public interface EncontroPosRepository extends JpaRepository<EncontroPos, UUID> 
     Page<EncontroPos> findByParoquia_IdAndDeletedFalseOrderByDataDesc(UUID paroquiaId, Pageable pageable);
 
     boolean existsByParoquia_IdAndDataAndDeletedFalse(UUID paroquiaId, LocalDate data);
+
+    /** Território do encontro pós para a checagem de escopo do {@code @PreAuthorize} (RNF-06). */
+    @Query("select new com.silberlima.segueme.hierarquia.domain.Territorio("
+            + "e.paroquia.id, e.paroquia.setor.id, e.paroquia.setor.diocese.id) "
+            + "from EncontroPos e where e.id = :id and e.deleted = false")
+    Optional<Territorio> buscarTerritorio(@Param("id") UUID id);
 
     /** Cartão "Próximo encontro pós" do Painel Pós-Encontro (`dashboards-por-perfil.md` 3.9). */
     @EntityGraph(attributePaths = {"paroquia"})

@@ -89,7 +89,8 @@ class SolicitacoesControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new SolicitarEmprestimoRequest(encontro.getId(), equipe.getId(), null)))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_EQUIPE_MONTAGEM"))
+                                .jwt(builder -> builder.claim("paroquia_id", origem.getId().toString()))))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/v1/solicitacoes")

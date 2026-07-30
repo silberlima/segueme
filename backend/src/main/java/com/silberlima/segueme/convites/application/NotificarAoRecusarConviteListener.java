@@ -4,6 +4,8 @@ import com.silberlima.segueme.convites.domain.ConviteRecusadoEvent;
 import com.silberlima.segueme.notificacao.application.PublicarNotificacaoUseCase;
 import com.silberlima.segueme.notificacao.domain.TipoNotificacao;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -24,7 +26,13 @@ public class NotificarAoRecusarConviteListener {
         this.publicarNotificacaoUseCase = publicarNotificacaoUseCase;
     }
 
+    /**
+     * {@code REQUIRES_NEW} é obrigatório aqui: no callback de after-commit a transação original
+     * ainda está associada à thread, mas já encerrada — um {@code save} que a reaproveitasse
+     * seria descartado em silêncio, e a notificação nunca chegaria ao banco (corrigido na Fase 14).
+     */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void aoRecusarConvite(ConviteRecusadoEvent evento) {
         publicarNotificacaoUseCase.execute(
                 evento.destinatarioId(),

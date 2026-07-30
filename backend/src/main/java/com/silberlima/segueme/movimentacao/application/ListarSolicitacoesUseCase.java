@@ -40,11 +40,13 @@ public class ListarSolicitacoesUseCase {
         Specification<Transferencia> specTransferencia = Specification.allOf(
                 TransferenciaSpecification.naoDeletada(),
                 TransferenciaSpecification.comEscopo(escopo),
-                TransferenciaSpecification.comStatus(StatusTransferencia.PENDENTE));
+                TransferenciaSpecification.comStatus(StatusTransferencia.PENDENTE),
+                TransferenciaSpecification.comAssociacoesCarregadas());
         Specification<Emprestimo> specEmprestimo = Specification.allOf(
                 EmprestimoSpecification.naoDeletado(),
                 EmprestimoSpecification.comEscopo(escopo),
-                EmprestimoSpecification.comStatus(StatusEmprestimo.SOLICITADO));
+                EmprestimoSpecification.comStatus(StatusEmprestimo.SOLICITADO),
+                EmprestimoSpecification.comAssociacoesCarregadas());
 
         Stream<SolicitacaoItem> transferencias =
                 transferenciaRepository.findAll(specTransferencia).stream().map(SolicitacaoItem::de);

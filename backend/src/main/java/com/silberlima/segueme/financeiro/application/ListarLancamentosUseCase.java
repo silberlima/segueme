@@ -31,7 +31,8 @@ public class ListarLancamentosUseCase {
                 LancamentoFinanceiroSpecification.comEscopo(escopo),
                 LancamentoFinanceiroSpecification.comEncontro(encontroId),
                 LancamentoFinanceiroSpecification.comTipo(tipo),
-                LancamentoFinanceiroSpecification.comSituacao(situacao));
+                LancamentoFinanceiroSpecification.comSituacao(situacao),
+                LancamentoFinanceiroSpecification.comEncontroCarregado());
         return lancamentoFinanceiroRepository.findAll(spec, pageable);
     }
 }
