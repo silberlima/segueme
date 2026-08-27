@@ -16,7 +16,9 @@ export function useProfileProvider(): ProfileContextValue {
     if (override && perfis.includes(override)) return override
     const armazenado = window.localStorage.getItem(STORAGE_KEY) as Perfil | null
     if (armazenado && perfis.includes(armazenado)) return armazenado
-    return perfis[0]
+    // Todo usuário é também Seguidor, então ele quase nunca é o perfil com que se entra: quem tem
+    // um perfil de trabalho cai nele, e o Seguidor só vira padrão para quem não tem outro.
+    return perfis.find((perfil) => perfil !== 'SEGUIDOR') ?? perfis[0]
   }, [perfis, override])
 
   const setPerfilAtivo = useCallback((perfil: Perfil) => {

@@ -35,9 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Casais", description = "Vínculos de casal entre pessoas do cadastro nacional (RF-012)")
 public class CasaisController {
 
-    private static final String PERFIS_ESCRITA = "hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA','EQUIPE_FICHAS')";
-    private static final String PERFIS_LEITURA = "hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA',"
-            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO','SEGUIDOR')";
+    private static final String PERFIS_ESCRITA = "hasAnyRole('DIOCESE','SETORIAL','PAROQUIA','EQUIPE_FICHAS')";
+    private static final String PERFIS_LEITURA = "hasAnyRole('DIOCESE','SETORIAL','PAROQUIA',"
+            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO')";
 
     private final ListarCasaisUseCase listarCasaisUseCase;
     private final VincularCasalUseCase vincularCasalUseCase;

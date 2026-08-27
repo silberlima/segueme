@@ -77,6 +77,14 @@ public class Pessoa extends AbstractAuditableEntity {
             inverseJoinColumns = @JoinColumn(name = "competencia_id"))
     private Set<Competencia> competencias = new HashSet<>();
 
+    /**
+     * Usuário do Keycloak que é esta pessoa (o {@code sub} do token). Nulo na maioria dos
+     * registros: quase ninguém do cadastro nacional acessa o sistema. É por aqui que o perfil
+     * Seguidor encontra os próprios dados.
+     */
+    @Column(name = "usuario_id", length = 100)
+    private String usuarioId;
+
     protected Pessoa() {
     }
 
@@ -109,6 +117,38 @@ public class Pessoa extends AbstractAuditableEntity {
 
     public void adicionarCompetencias(Set<Competencia> novasCompetencias) {
         this.competencias.addAll(novasCompetencias);
+    }
+
+    /**
+     * Atualização que a própria pessoa faz dos seus dados, pelo perfil Seguidor. O conjunto de
+     * campos é deliberadamente estreito — é o que alguém corrige sobre si mesmo sem passar pela
+     * equipe:
+     *
+     * <ul>
+     *   <li><b>nome e data de nascimento</b> ficam de fora por serem identidade: corrigi-los é
+     *       trabalho de quem administra o cadastro, não autoatendimento;
+     *   <li><b>paróquia</b> só muda por Transferência aprovada pelo Setorial (RN-MOVIMENTO-01) —
+     *       deixar a pessoa trocar aqui contornaria toda a mediação;
+     *   <li><b>situação</b> é consequência do fluxo de inscrição, nunca uma escolha;
+     *   <li><b>competências</b> alimentam as Sugestões Inteligentes da Montagem (RN-08); permitir
+     *       autoatribuição deixaria o ranqueamento à mercê de quem quer ser escalado.
+     * </ul>
+     */
+    public void atualizarDadosPessoais(
+            String telefone,
+            String alergias,
+            String restricaoAlimentar,
+            String medicacaoUsoContinuo,
+            String contatoEmergenciaNome,
+            String contatoEmergenciaTelefone,
+            String contatoEmergenciaParentesco) {
+        this.telefone = telefone;
+        this.alergias = alergias;
+        this.restricaoAlimentar = restricaoAlimentar;
+        this.medicacaoUsoContinuo = medicacaoUsoContinuo;
+        this.contatoEmergenciaNome = contatoEmergenciaNome;
+        this.contatoEmergenciaTelefone = contatoEmergenciaTelefone;
+        this.contatoEmergenciaParentesco = contatoEmergenciaParentesco;
     }
 
     /**
@@ -189,5 +229,9 @@ public class Pessoa extends AbstractAuditableEntity {
 
     public Set<Competencia> getCompetencias() {
         return Collections.unmodifiableSet(competencias);
+    }
+
+    public String getUsuarioId() {
+        return usuarioId;
     }
 }

@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Competências", description = "Catálogo nacional de dons/habilidades (RF-013)")
 public class CompetenciasController {
 
-    private static final String PERFIS_LEITURA = "hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA',"
-            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO','SEGUIDOR')";
+    private static final String PERFIS_LEITURA = "hasAnyRole('DIOCESE','SETORIAL','PAROQUIA',"
+            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO')";
 
     private final ListarCompetenciasUseCase listarCompetenciasUseCase;
     private final ListarPessoasPorCompetenciaUseCase listarPessoasPorCompetenciaUseCase;

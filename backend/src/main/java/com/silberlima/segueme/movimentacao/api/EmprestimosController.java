@@ -50,7 +50,7 @@ public class EmprestimosController {
     private static final String PERFIS_MONTAGEM = "hasAnyRole('EQUIPE_MONTAGEM')";
     private static final String PERFIS_SETORIAL = "hasAnyRole('SETORIAL')";
     private static final String PERFIS_LEITURA = "hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA',"
-            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO','SEGUIDOR')";
+            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO')";
 
     private final SolicitarEmprestimoUseCase solicitarEmprestimoUseCase;
     private final ListarEmprestimosUseCase listarEmprestimosUseCase;

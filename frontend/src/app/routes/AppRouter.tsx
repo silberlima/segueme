@@ -25,6 +25,8 @@ import { PersonProfileScreen } from '../../domains/pessoas/screens/PersonProfile
 import { PersonHistoryScreen } from '../../domains/pessoas/screens/PersonHistoryScreen'
 import { CouplesScreen } from '../../domains/pessoas/screens/CouplesScreen'
 import { CompetenciesScreen } from '../../domains/pessoas/screens/CompetenciesScreen'
+import { MeusDadosScreen } from '../../domains/pessoas/screens/MeusDadosScreen'
+import { MeuHistoricoScreen } from '../../domains/pessoas/screens/MeuHistoricoScreen'
 import { EncounterListScreen } from '../../domains/encontros/screens/EncounterListScreen'
 import { CreateEncounterScreen } from '../../domains/encontros/screens/CreateEncounterScreen'
 import { EncounterDetailScreen } from '../../domains/encontros/screens/EncounterDetailScreen'
@@ -90,6 +92,10 @@ export function AppRouter() {
           <Route path="pessoas/competencias" element={<CompetenciesScreen />} />
           <Route path="pessoas/:id" element={<PersonProfileScreen />} />
           <Route path="pessoas/:id/historico" element={<PersonHistoryScreen />} />
+
+          {/* As telas do próprio usuário (perfil Seguidor): resolvidas pelo token, sem id na URL. */}
+          <Route path="meus-dados" element={<MeusDadosScreen />} />
+          <Route path="meus-dados/historico" element={<MeuHistoricoScreen />} />
           <Route path="encontros" element={<EncounterListScreen />} />
           <Route path="encontros/novo" element={<CreateEncounterScreen />} />
           <Route path="encontros/:id" element={<EncounterDetailScreen />} />

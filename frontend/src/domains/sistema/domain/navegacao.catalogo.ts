@@ -1,4 +1,28 @@
 import type { ItemNavegacao } from './navegacao.types'
+import type { Perfil } from './perfil.types'
+
+/**
+ * Os nove perfis operacionais — todos menos o Seguidor. Todo usuário do sistema também é um
+ * seguidor, mas o perfil Seguidor não é um posto de trabalho: quem está nele enxerga apenas os
+ * próprios dados (ver `PERFIS_SEGUIDOR` abaixo).
+ */
+const OPERACIONAIS: Perfil[] = [
+  'NACIONAL',
+  'DIOCESE',
+  'SETORIAL',
+  'PAROQUIA',
+  'EQUIPE_FICHAS',
+  'EQUIPE_MONTAGEM',
+  'EQUIPE_COMANDO',
+  'EQUIPE_FINANCAS',
+  'POS_ENCONTRO',
+]
+
+/**
+ * Quem cuida do cadastro de pessoas. O Nacional fica de fora por decisão do PO: no nível nacional
+ * se cuida de dioceses, setores e paróquias — gente é assunto de quem convive com ela.
+ */
+const CUIDAM_DE_PESSOAS: Perfil[] = OPERACIONAIS.filter((perfil) => perfil !== 'NACIONAL')
 
 /**
  * Catálogo de telas do sistema (autenticacao-acesso.md 2.3 — Mapa de Navegação).
@@ -65,7 +89,16 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
     path: '/painel/pos-encontro',
     perfis: ['POS_ENCONTRO'],
   },
-  { titulo: 'Meu Perfil', modulo: 'Dashboards', status: 'previsto', path: null, perfis: ['SEGUIDOR'] },
+  // As duas telas do Seguidor. Visíveis só a ele: quem está num perfil operacional chega aos
+  // próprios dados pelo mesmo caminho, trocando o perfil ativo para Seguidor.
+  { titulo: 'Meus Dados', modulo: 'Dashboards', status: 'pronto', path: '/meus-dados', perfis: ['SEGUIDOR'] },
+  {
+    titulo: 'Meu Histórico',
+    modulo: 'Dashboards',
+    status: 'pronto',
+    path: '/meus-dados/historico',
+    perfis: ['SEGUIDOR'],
+  },
 
   {
     titulo: 'Dioceses e Setores',
@@ -82,12 +115,12 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
     perfis: ['NACIONAL', 'DIOCESE', 'SETORIAL'],
   },
 
-  { titulo: 'Lista de Pessoas', modulo: 'Pessoas', status: 'pronto', path: '/pessoas', perfis: 'todos' },
-  { titulo: 'Cadastrar Pessoa', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/novo', perfis: 'todos' },
-  { titulo: 'Perfil da Pessoa', modulo: 'Pessoas', status: 'pronto', path: null, perfis: 'todos' },
-  { titulo: 'Histórico da Pessoa', modulo: 'Pessoas', status: 'pronto', path: null, perfis: 'todos' },
-  { titulo: 'Casais', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/casais', perfis: 'todos' },
-  { titulo: 'Competências', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/competencias', perfis: 'todos' },
+  { titulo: 'Lista de Pessoas', modulo: 'Pessoas', status: 'pronto', path: '/pessoas', perfis: CUIDAM_DE_PESSOAS },
+  { titulo: 'Cadastrar Pessoa', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/novo', perfis: CUIDAM_DE_PESSOAS },
+  { titulo: 'Perfil da Pessoa', modulo: 'Pessoas', status: 'pronto', path: null, perfis: CUIDAM_DE_PESSOAS },
+  { titulo: 'Histórico da Pessoa', modulo: 'Pessoas', status: 'pronto', path: null, perfis: CUIDAM_DE_PESSOAS },
+  { titulo: 'Casais', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/casais', perfis: CUIDAM_DE_PESSOAS },
+  { titulo: 'Competências', modulo: 'Pessoas', status: 'pronto', path: '/pessoas/competencias', perfis: CUIDAM_DE_PESSOAS },
 
   {
     titulo: 'Lista de Encontros',
@@ -119,7 +152,7 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
     perfis: ['NACIONAL', 'DIOCESE', 'SETORIAL', 'PAROQUIA'],
   },
 
-  { titulo: 'Equipes do Encontro', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: 'todos' },
+  { titulo: 'Equipes do Encontro', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: OPERACIONAIS },
   {
     titulo: 'Sugestões Inteligentes',
     modulo: 'Equipes & Convites',
@@ -128,10 +161,10 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
     perfis: ['EQUIPE_MONTAGEM'],
   },
   { titulo: 'Substituições', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: ['EQUIPE_MONTAGEM'] },
-  { titulo: 'Convites', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: 'todos' },
-  { titulo: 'Aceites', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: 'todos' },
-  { titulo: 'Recusas', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: 'todos' },
-  { titulo: 'Painel do Coordenador', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: 'todos' },
+  { titulo: 'Convites', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: OPERACIONAIS },
+  { titulo: 'Aceites', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: OPERACIONAIS },
+  { titulo: 'Recusas', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: OPERACIONAIS },
+  { titulo: 'Painel do Coordenador', modulo: 'Equipes & Convites', status: 'pronto', path: null, perfis: OPERACIONAIS },
   {
     titulo: 'Transferências',
     modulo: 'Equipes & Convites',
@@ -159,11 +192,11 @@ export const CATALOGO_NAVEGACAO: ItemNavegacao[] = [
 
   { titulo: 'Pré-inscrições', modulo: 'Inscrições', status: 'pronto', path: null, perfis: ['EQUIPE_FICHAS'] },
   { titulo: 'Ficha de Inscrição', modulo: 'Inscrições', status: 'pronto', path: null, perfis: ['EQUIPE_FICHAS'] },
-  { titulo: 'Lista de Espera', modulo: 'Inscrições', status: 'pronto', path: null, perfis: 'todos' },
-  { titulo: 'Participantes', modulo: 'Inscrições', status: 'pronto', path: null, perfis: 'todos' },
+  { titulo: 'Lista de Espera', modulo: 'Inscrições', status: 'pronto', path: null, perfis: OPERACIONAIS },
+  { titulo: 'Participantes', modulo: 'Inscrições', status: 'pronto', path: null, perfis: OPERACIONAIS },
 
-  { titulo: 'Palestras', modulo: 'Conteúdo', status: 'pronto', path: null, perfis: 'todos' },
-  { titulo: 'Palestrantes', modulo: 'Conteúdo', status: 'pronto', path: null, perfis: 'todos' },
+  { titulo: 'Palestras', modulo: 'Conteúdo', status: 'pronto', path: null, perfis: OPERACIONAIS },
+  { titulo: 'Palestrantes', modulo: 'Conteúdo', status: 'pronto', path: null, perfis: OPERACIONAIS },
 
   {
     titulo: 'Visão Geral Financeira',

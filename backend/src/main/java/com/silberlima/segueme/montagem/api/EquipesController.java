@@ -36,7 +36,7 @@ public class EquipesController {
 
     private static final String PERFIS_ESCRITA = "hasAnyRole('EQUIPE_MONTAGEM')";
     private static final String PERFIS_LEITURA = "hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA',"
-            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO','SEGUIDOR')";
+            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO')";
 
     private final ListarEquipesUseCase listarEquipesUseCase;
     private final ConsultarEquipeUseCase consultarEquipeUseCase;

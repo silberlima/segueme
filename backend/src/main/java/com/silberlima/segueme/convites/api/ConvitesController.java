@@ -42,7 +42,7 @@ public class ConvitesController {
 
     private static final String PERFIS_ESCRITA = "hasAnyRole('EQUIPE_COMANDO')";
     private static final String PERFIS_LEITURA = "hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA',"
-            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO','SEGUIDOR')";
+            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO')";
 
     private final ListarConvitesUseCase listarConvitesUseCase;
     private final EmitirConviteUseCase emitirConviteUseCase;

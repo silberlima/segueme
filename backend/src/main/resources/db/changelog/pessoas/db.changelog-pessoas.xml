@@ -417,4 +417,22 @@
         </insert>
     </changeSet>
 
+    <!--
+        Vínculo entre a Pessoa e o usuário que a representa no Keycloak (o `sub` do token). É o que
+        permite ao perfil Seguidor ver e alterar os *próprios* dados: sem esta coluna não há como
+        responder "quem sou eu" a partir do token.
+
+        Nulo é o normal: a maioria das pessoas do cadastro nunca acessa o sistema. A unicidade
+        impede que dois registros de Pessoa apontem para o mesmo usuário, o que tornaria "meus
+        dados" ambíguo. Quem preenche a coluna ainda é decisão em aberto (pendência #3) — hoje é
+        administrativo, fora do produto.
+    -->
+    <changeSet id="pessoas-0004-vinculo-usuario" author="segueme">
+        <addColumn tableName="pessoa">
+            <column name="usuario_id" type="varchar(100)"/>
+        </addColumn>
+        <addUniqueConstraint tableName="pessoa" columnNames="usuario_id"
+                             constraintName="uk_pessoa_usuario_id"/>
+    </changeSet>
+
 </databaseChangeLog>

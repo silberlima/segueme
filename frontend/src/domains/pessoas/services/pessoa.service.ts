@@ -4,6 +4,7 @@ import type {
   Casal,
   Competencia,
   HistoricoEvento,
+  MeusDadosPayload,
   NovaPessoaPayload,
   NovoCasalPayload,
   Pessoa,
@@ -29,6 +30,25 @@ export async function fetchPessoas(
 
 export async function fetchPessoa(id: string): Promise<Pessoa> {
   const { data } = await httpClient.get<Pessoa>(`/pessoas/${id}`)
+  return data
+}
+
+/**
+ * "Meus dados" não recebe id: o backend resolve a pessoa pelo `sub` do token. Mandar um id daqui
+ * transformaria o endpoint em "editar qualquer pessoa".
+ */
+export async function fetchMeusDados(): Promise<Pessoa> {
+  const { data } = await httpClient.get<Pessoa>('/pessoas/me')
+  return data
+}
+
+export async function updateMeusDados(payload: MeusDadosPayload): Promise<Pessoa> {
+  const { data } = await httpClient.put<Pessoa>('/pessoas/me', payload)
+  return data
+}
+
+export async function fetchMeuHistorico(): Promise<HistoricoEvento[]> {
+  const { data } = await httpClient.get<HistoricoEvento[]>('/pessoas/me/historico')
   return data
 }
 

@@ -49,6 +49,17 @@ export interface Pessoa {
   createdAt: string
 }
 
+/** O que a própria pessoa altera sobre si (perfil Seguidor). O resto do cadastro é da equipe. */
+export interface MeusDadosPayload {
+  telefone: string
+  alergias: string | null
+  restricaoAlimentar: string | null
+  medicacaoUsoContinuo: string | null
+  contatoEmergenciaNome: string | null
+  contatoEmergenciaTelefone: string | null
+  contatoEmergenciaParentesco: string | null
+}
+
 export interface PessoaResumo {
   id: string
   nomeCompleto: string

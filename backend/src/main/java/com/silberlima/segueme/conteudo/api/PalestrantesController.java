@@ -29,7 +29,7 @@ public class PalestrantesController {
 
     private static final String PERFIS_CADASTRO = "hasAnyRole('PAROQUIA','EQUIPE_COMANDO')";
     private static final String PERFIS_LEITURA = "hasAnyRole('NACIONAL','DIOCESE','SETORIAL','PAROQUIA',"
-            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO','SEGUIDOR')";
+            + "'EQUIPE_FICHAS','EQUIPE_MONTAGEM','EQUIPE_COMANDO','EQUIPE_FINANCAS','POS_ENCONTRO')";
 
     private final CadastrarPalestranteUseCase cadastrarPalestranteUseCase;
     private final ListarPalestrantesUseCase listarPalestrantesUseCase;

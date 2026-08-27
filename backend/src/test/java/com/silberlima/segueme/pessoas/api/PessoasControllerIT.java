@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -100,15 +101,105 @@ class PessoasControllerIT extends AbstractIntegrationTest {
         Pessoa pessoa = pessoaRepository.save(umaPessoa("Pessoa Perfil Completo", paroquia));
 
         mockMvc.perform(get("/api/v1/pessoas/" + pessoa.getId())
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
                                 .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nomeCompleto").value("Pessoa Perfil Completo"));
 
         mockMvc.perform(get("/api/v1/pessoas/" + pessoa.getId() + "/historico")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
                                 .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
                 .andExpect(status().isOk());
+    }
+
+    /* Quem cuida de gente: Nacional fora, Seguidor só sobre si (decisão do PO — ver o Javadoc do controller). */
+
+    @Test
+    void shouldReturn403WhenNacionalListsPessoas() throws Exception {
+        mockMvc.perform(get("/api/v1/pessoas")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_NACIONAL"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldReturn403WhenNacionalCreatesPessoa() throws Exception {
+        Paroquia paroquia = criarParoquia("Paróquia Nacional Barrado");
+
+        mockMvc.perform(post("/api/v1/pessoas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(umaRequestValida(paroquia.getId())))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_NACIONAL"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldReturn403WhenSeguidorListsPessoas() throws Exception {
+        mockMvc.perform(get("/api/v1/pessoas")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldReturn403WhenSeguidorReadsSomeoneElsesProfile() throws Exception {
+        Paroquia paroquia = criarParoquia("Paróquia Alheia");
+        Pessoa outra = pessoaRepository.save(umaPessoa("Pessoa Alheia", paroquia));
+
+        mockMvc.perform(get("/api/v1/pessoas/" + outra.getId())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                .andExpect(status().isForbidden());
+    }
+
+    /* "Meus dados": o alvo vem do token, nunca da requisição. */
+
+    @Test
+    void shouldReadAndUpdateOwnDataResolvedFromToken() throws Exception {
+        Paroquia paroquia = criarParoquia("Paróquia Meus Dados");
+        Pessoa eu = pessoaRepository.save(umaPessoaDoUsuario("Eu Mesmo", paroquia, "sub-meus-dados"));
+        pessoaRepository.save(umaPessoa("Outra Pessoa", paroquia));
+
+        mockMvc.perform(get("/api/v1/pessoas/me")
+                        .with(jwt().jwt(builder -> builder.subject("sub-meus-dados"))
+                                .authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(eu.getId().toString()))
+                .andExpect(jsonPath("$.nomeCompleto").value("Eu Mesmo"));
+
+        mockMvc.perform(put("/api/v1/pessoas/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"telefone\":\"(11) 98888-8888\",\"alergias\":\"Amendoim\"}")
+                        .with(jwt().jwt(builder -> builder.subject("sub-meus-dados"))
+                                .authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.telefone").value("(11) 98888-8888"))
+                .andExpect(jsonPath("$.alergias").value("Amendoim"))
+                // O que não é autoeditável continua como estava.
+                .andExpect(jsonPath("$.nomeCompleto").value("Eu Mesmo"));
+
+        mockMvc.perform(get("/api/v1/pessoas/me/historico")
+                        .with(jwt().jwt(builder -> builder.subject("sub-meus-dados"))
+                                .authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturn404WhenUserHasNoPessoaLinked() throws Exception {
+        mockMvc.perform(get("/api/v1/pessoas/me")
+                        .with(jwt().jwt(builder -> builder.subject("sub-sem-vinculo"))
+                                .authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                .andExpect(status().isNotFound());
+    }
+
+    /** Todo usuário é seguidor: "meus dados" vale para qualquer perfil, não só para o Seguidor. */
+    @Test
+    void shouldAllowAnyProfileToReadOwnData() throws Exception {
+        Paroquia paroquia = criarParoquia("Paróquia Nacional Tem Dados");
+        pessoaRepository.save(umaPessoaDoUsuario("Nacional Pessoa", paroquia, "sub-nacional"));
+
+        mockMvc.perform(get("/api/v1/pessoas/me")
+                        .with(jwt().jwt(builder -> builder.subject("sub-nacional"))
+                                .authorities(new SimpleGrantedAuthority("ROLE_NACIONAL"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nomeCompleto").value("Nacional Pessoa"));
     }
 
     private Paroquia criarParoquia(String nome) {
@@ -131,6 +222,12 @@ class PessoasControllerIT extends AbstractIntegrationTest {
                 null,
                 null,
                 null);
+    }
+
+    private Pessoa umaPessoaDoUsuario(String nome, Paroquia paroquia, String usuarioId) {
+        Pessoa pessoa = umaPessoa(nome, paroquia);
+        org.springframework.test.util.ReflectionTestUtils.setField(pessoa, "usuarioId", usuarioId);
+        return pessoa;
     }
 
     private CriarPessoaRequest umaRequestValida(java.util.UUID paroquiaId) {

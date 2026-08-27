@@ -7,7 +7,7 @@ Manter o cadastro nacional único de pessoas do movimento, com seu histórico co
 
 ### 2.1 Lista de Pessoas (`screen_pessoas`)
 - **Objetivo:** localizar, listar e iniciar o cadastro de pessoas.
-- **Quem acessa:** todos os perfis (item "Pessoas"/"Seguidores" aparece no menu de quase todos os perfis).
+- **Quem acessa:** os perfis de gestão, exceto o Nacional e o Seguidor — ver seção 7. (No protótipo o item aparecia "no menu de quase todos os perfis", sem granularidade definida.)
 - **Componentes:** busca por nome/paróquia/competência, botão de filtros, tabela paginada (Pessoa com avatar/idade/estado civil, Paróquia atual, Situação — badge Seguimista/Seguidor/Inscrito, Competências — chips, Encontros — contagem), paginação.
 - **Estados de tela (modelados explicitamente via abas de demonstração):** Dados (carregado com sucesso), Carregando (skeleton shimmer por linha), Vazio (nenhum resultado — com CTA "Limpar filtros"/"Nova pessoa"), Erro (falha de conexão — CTA "Tentar novamente").
 - **Ações:** "Nova pessoa" (vai para Cadastro de Pessoa), clique na linha (vai para Perfil Completo).
@@ -15,7 +15,7 @@ Manter o cadastro nacional único de pessoas do movimento, com seu histórico co
 
 ### 2.2 Cadastro de Pessoa (`screen_cadastro`)
 - **Objetivo:** registrar uma nova pessoa no cadastro nacional.
-- **Quem acessa:** perfis com permissão de gestão de pessoas (observado a partir da Lista de Pessoas, acessível a partir de qualquer perfil que tenha o item "Pessoas" no menu — permissão granular por perfil não detalhada no protótipo).
+- **Quem acessa:** os mesmos perfis da Lista de Pessoas — ver seção 7.
 - **Descrição funcional:** formulário em 4 seções + painel lateral, seguindo o mesmo padrão de campos da Ficha de Inscrição (dados pessoais, saúde/restrições, contato de emergência, competências).
 - **Campos obrigatórios (inferidos do padrão da Ficha):** nome completo, data de nascimento, telefone, paróquia.
 - **Campos opcionais:** alergias, restrição alimentar, medicação, competências.
@@ -73,3 +73,43 @@ Manter o cadastro nacional único de pessoas do movimento, com seu histórico co
 - Regra de deduplicação de cadastro (evitar pessoa duplicada) não especificada.
 - Lista exata e definitiva das 8 competências do catálogo nacional precisa ser confirmada com o Product Owner.
 - Comportamento de edição de pessoa existente (tela de edição vs. reaproveitar tela de cadastro) não está modelado — apenas criação nova.
+
+---
+
+## 7. Quem cuida de pessoas (decisão do PO, posterior ao protótipo)
+
+O protótipo dizia "todos os perfis" e registrava que a permissão granular **não estava detalhada**.
+Definido depois:
+
+| Perfil | Cadastro de pessoas |
+| --- | --- |
+| Nacional | **Não acessa.** No nível nacional se cuida de dioceses, setores e paróquias; gente é assunto de quem convive com ela |
+| Diocese, Setorial, Paróquia, Equipe Fichas | Listam, cadastram e vinculam casais |
+| Equipes Montagem/Comando/Finanças, Pós-Encontro | Só leitura — precisam consultar quem está no cadastro para o próprio trabalho |
+| Seguidor | **Só os próprios dados** (seção 7.1) |
+
+### 7.1 Meus Dados — o perfil Seguidor
+
+Todo usuário do sistema é também um seguidor: o perfil Seguidor não é um posto de trabalho, é a
+visão que a pessoa tem de si mesma. Quem está nele **não enxerga o cadastro dos outros** — vê e
+altera o próprio, e apenas lê o próprio histórico.
+
+O que a pessoa altera sobre si é deliberadamente estreito — telefone, alergias, restrição
+alimentar, medicação de uso contínuo e contato de emergência. Ficam de fora:
+
+- **nome e data de nascimento**, que são identidade: corrigir é trabalho de quem administra o cadastro;
+- **paróquia**, que só muda por Transferência aprovada pelo Setorial (RN-MOVIMENTO-01) — deixar a
+  pessoa trocar aqui contornaria toda a mediação;
+- **situação**, consequência do fluxo de inscrição, nunca uma escolha;
+- **competências**, que alimentam as Sugestões Inteligentes da Montagem (RN-08): autoatribuição
+  deixaria o ranqueamento à mercê de quem quer ser escalado.
+
+### 7.2 O vínculo usuário ↔ pessoa (parte da pendência #3)
+
+"Os próprios dados" exige saber qual registro de Pessoa é o usuário logado. A coluna
+`pessoa.usuario_id` guarda o `sub` do token; é nula na maioria dos registros, porque quase ninguém
+do cadastro nacional acessa o sistema.
+
+**Quem preenche essa coluna ainda não está decidido** — hoje é administrativo, fora do produto. Um
+usuário sem Pessoa vinculada recebe 404 em "Meus Dados", e não uma tela em branco: é um vínculo
+faltando, não um perfil vazio.

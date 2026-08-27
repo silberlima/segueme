@@ -16,6 +16,10 @@ public interface PessoaRepository extends JpaRepository<Pessoa, UUID>, JpaSpecif
     @EntityGraph(attributePaths = {"paroquia", "indicadoPor", "competencias"})
     Optional<Pessoa> findByIdAndDeletedFalse(UUID id);
 
+    /** A Pessoa que o usuário autenticado é — base de "meus dados" do perfil Seguidor. */
+    @EntityGraph(attributePaths = {"paroquia", "indicadoPor", "competencias"})
+    Optional<Pessoa> findByUsuarioIdAndDeletedFalse(String usuarioId);
+
     boolean existsByIdAndDeletedFalse(UUID id);
 
     /**
