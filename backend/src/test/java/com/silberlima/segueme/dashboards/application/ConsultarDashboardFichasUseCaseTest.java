@@ -22,6 +22,7 @@ import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.pessoas.domain.SituacaoPessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -150,10 +151,13 @@ class ConsultarDashboardFichasUseCaseTest {
     private Pessoa umaPessoa(String nome) {
         return new Pessoa(
                 nome,
+                PessoasDeTeste.cpf(),
                 LocalDate.of(2005, 1, 1),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

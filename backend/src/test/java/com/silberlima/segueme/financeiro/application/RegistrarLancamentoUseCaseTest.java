@@ -16,6 +16,7 @@ import com.silberlima.segueme.hierarquia.domain.Paroquia;
 import com.silberlima.segueme.hierarquia.domain.Setor;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -39,8 +40,21 @@ class RegistrarLancamentoUseCaseTest {
         UUID encontroId = UUID.randomUUID();
         Paroquia paroquia = new Paroquia("Paróquia", new Setor("Setor", new Diocese("Diocese")));
         Pessoa diretor = new Pessoa(
-                "Diretor", LocalDate.of(1980, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, paroquia,
-                null, null, null, null, null, null, null);
+                "Diretor",
+                PessoasDeTeste.cpf(),
+                LocalDate.of(1980, 1, 1),
+                "(11) 90000-0000",
+                null,
+                EstadoCivil.SOLTEIRO,
+                paroquia,
+                PessoasDeTeste.endereco(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         Encontro encontro = new Encontro(1, "São José", diretor, "Local", LocalDate.now(), LocalDate.now(), 40, paroquia);
         when(encontroRepository.findByIdAndDeletedFalse(encontroId)).thenReturn(Optional.of(encontro));
         when(lancamentoFinanceiroRepository.save(any(LancamentoFinanceiro.class)))

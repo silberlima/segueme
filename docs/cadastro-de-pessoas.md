@@ -16,9 +16,9 @@ Manter o cadastro nacional único de pessoas do movimento, com seu histórico co
 ### 2.2 Cadastro de Pessoa (`screen_cadastro`)
 - **Objetivo:** registrar uma nova pessoa no cadastro nacional.
 - **Quem acessa:** os mesmos perfis da Lista de Pessoas — ver seção 7.
-- **Descrição funcional:** formulário em 4 seções + painel lateral, seguindo o mesmo padrão de campos da Ficha de Inscrição (dados pessoais, saúde/restrições, contato de emergência, competências).
-- **Campos obrigatórios (inferidos do padrão da Ficha):** nome completo, data de nascimento, telefone, paróquia.
-- **Campos opcionais:** alergias, restrição alimentar, medicação, competências.
+- **Descrição funcional:** formulário em 5 seções + painel lateral, seguindo o mesmo padrão de campos da Ficha de Inscrição (dados pessoais, endereço, saúde/restrições, contato de emergência, competências).
+- **Campos obrigatórios:** nome completo, CPF, data de nascimento, telefone, paróquia e endereço (CEP, logradouro, número, bairro, cidade, UF) — os quatro primeiros e a paróquia inferidos do padrão da Ficha; CPF e endereço definidos depois pelo PO (ver seção 8).
+- **Campos opcionais:** Instagram, complemento do endereço, alergias, restrição alimentar, medicação, competências.
 - **Valor padrão / regra de negócio:** uma pessoa recém-cadastrada nasce com situação **"Pré-inscrito"**.
 - **Ações:** salvar cadastro, cancelar.
 
@@ -57,7 +57,7 @@ Manter o cadastro nacional único de pessoas do movimento, com seu histórico co
 - **Cenário principal:** usuário busca/seleciona pessoa na Lista → abre Perfil Completo → abre Histórico → visualiza linha do tempo de eventos.
 
 ## 4. Regras de negócio
-- **RN-PESSOA-01:** o cadastro de pessoa é único e nacional; nunca duplicado por paróquia.
+- **RN-PESSOA-01:** o cadastro de pessoa é único e nacional; nunca duplicado por paróquia. O **CPF** é o que garante essa unicidade — ver seção 8.1.
 - **RN-PESSOA-02:** o histórico de uma pessoa nunca é apagado ou sobrescrito.
 - **RN-PESSOA-03:** casal = 2 cadastros vinculados.
 - **RN-PESSOA-04:** uma nova pessoa nasce com situação "Pré-inscrito".
@@ -94,15 +94,19 @@ Todo usuário do sistema é também um seguidor: o perfil Seguidor não é um po
 visão que a pessoa tem de si mesma. Quem está nele **não enxerga o cadastro dos outros** — vê e
 altera o próprio, e apenas lê o próprio histórico.
 
-O que a pessoa altera sobre si é deliberadamente estreito — telefone, alergias, restrição
-alimentar, medicação de uso contínuo e contato de emergência. Ficam de fora:
+A pessoa altera sobre si aquilo de que ela é a fonte mais confiável: **CPF, data de nascimento,
+telefone, Instagram, endereço, saúde e contato de emergência**. Ficam de fora:
 
-- **nome e data de nascimento**, que são identidade: corrigir é trabalho de quem administra o cadastro;
+- **nome**, que é como o movimento a identifica em fichas, equipes e histórico: corrigir é trabalho
+  de quem administra o cadastro;
 - **paróquia**, que só muda por Transferência aprovada pelo Setorial (RN-MOVIMENTO-01) — deixar a
   pessoa trocar aqui contornaria toda a mediação;
 - **situação**, consequência do fluxo de inscrição, nunca uma escolha;
 - **competências**, que alimentam as Sugestões Inteligentes da Montagem (RN-08): autoatribuição
   deixaria o ranqueamento à mercê de quem quer ser escalado.
+
+O CPF é editável, mas continua único no cadastro: `PUT /pessoas/me` responde **409** quando o CPF
+informado já pertence a outra pessoa. Corrigir o próprio não é porta para assumir o de outra.
 
 ### 7.2 O vínculo usuário ↔ pessoa (parte da pendência #3)
 
@@ -113,3 +117,49 @@ do cadastro nacional acessa o sistema.
 **Quem preenche essa coluna ainda não está decidido** — hoje é administrativo, fora do produto. Um
 usuário sem Pessoa vinculada recebe 404 em "Meus Dados", e não uma tela em branco: é um vínculo
 faltando, não um perfil vazio.
+
+## 8. CPF, Instagram e endereço
+
+Decisão do PO posterior ao protótipo, que não previa nenhum dos três.
+
+### 8.1 CPF — a chave natural que faltava
+
+O cadastro sempre se disse "nacional único, nunca duplicado por paróquia" (RN-PESSOA-01), mas não
+tinha campo capaz de sustentar a afirmação: nome e data de nascimento coincidem. O CPF passa a ser
+essa chave — **obrigatório, único e validado pelos dígitos verificadores**, com as sequências de
+dígito repetido rejeitadas por serem exatamente o que se digita para escapar de um campo
+obrigatório.
+
+Guardado **só com os 11 dígitos**. Aceitar `529.982.247-25` e `52998224725` como valores distintos
+deixaria a unicidade valer nada; a pontuação é assunto de exibição.
+
+Cadastrar CPF já existente responde **409**, não erro de integridade: é uma regra de negócio que a
+equipe precisa entender, não uma falha técnica.
+
+### 8.2 Endereço em campos separados
+
+Obrigatório: CEP, logradouro, número, bairro, cidade e UF. Só **complemento** é opcional —
+apartamento, bloco e ponto de referência não existem em todo endereço, e exigir um deles obrigaria
+a inventar valor.
+
+Não é um `varchar` de texto livre porque **cidade e UF são consultáveis**: é o que permite cruzar o
+cadastro com a hierarquia territorial e agrupar pessoas por região nos relatórios. Um campo único
+preenchido à mão não sustenta essa consulta.
+
+### 8.3 Instagram
+
+Opcional, guardado como handle sem o `@`. Nem todo mundo tem perfil ou quer informar, e um campo
+obrigatório aqui só produziria valor inventado.
+
+### 8.4 Data de nascimento passa a ser autoeditável
+
+Até aqui a data de nascimento era tratada como identidade, ao lado do nome (seção 7.1). O PO
+decidiu o contrário: quem corrige a própria data de nascimento é a pessoa, não a equipe. **Nome
+continua fora** — é por ele que o movimento a identifica em fichas, equipes e histórico.
+
+### 8.5 Registros anteriores
+
+CPF e endereço entraram no banco como colunas nulas, foram preenchidos para as pessoas do seed de
+demonstração e só então receberam `NOT NULL` (changeset `pessoas-0005`). O backfill vive no
+changeset novo, e não no seed original: um changeset que já rodou não roda de novo, e editá-lo
+quebraria o checksum do Liquibase.

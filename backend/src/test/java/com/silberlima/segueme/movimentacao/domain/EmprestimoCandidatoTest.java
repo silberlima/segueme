@@ -13,6 +13,7 @@ import com.silberlima.segueme.montagem.domain.IntegranteEquipe;
 import com.silberlima.segueme.montagem.domain.PapelIntegrante;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
@@ -21,15 +22,41 @@ class EmprestimoCandidatoTest {
 
     private final Paroquia paroquia = new Paroquia("Paróquia", new Setor("Setor", new Diocese("Diocese")));
     private final Pessoa diretor = new Pessoa(
-            "Diretor", LocalDate.of(1980, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, paroquia,
-            null, null, null, null, null, null, null);
+            "Diretor",
+            PessoasDeTeste.cpf(),
+            LocalDate.of(1980, 1, 1),
+            "(11) 90000-0000",
+            null,
+            EstadoCivil.SOLTEIRO,
+            paroquia,
+            PessoasDeTeste.endereco(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     private final Encontro encontro =
             new Encontro(1, "São José", diretor, "Local", LocalDate.now(), LocalDate.now(), 40, paroquia);
     private final Equipe equipe = new Equipe("Cozinha", 2, 4, null);
     private final Emprestimo emprestimo = new Emprestimo(encontro, equipe, null);
     private final Pessoa candidato = new Pessoa(
-            "Candidato", LocalDate.of(2000, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, paroquia,
-            null, null, null, null, null, null, null);
+            "Candidato",
+            PessoasDeTeste.cpf(),
+            LocalDate.of(2000, 1, 1),
+            "(11) 90000-0000",
+            null,
+            EstadoCivil.SOLTEIRO,
+            paroquia,
+            PessoasDeTeste.endereco(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
 
     @Test
     void shouldStartSugerido() {

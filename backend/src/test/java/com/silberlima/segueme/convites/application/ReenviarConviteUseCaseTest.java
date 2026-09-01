@@ -16,6 +16,7 @@ import com.silberlima.segueme.montagem.domain.IntegranteEquipeRepository;
 import com.silberlima.segueme.montagem.domain.PapelIntegrante;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -71,6 +72,20 @@ class ReenviarConviteUseCaseTest {
 
     private Pessoa umaPessoa(String nome, Paroquia paroquia) {
         return new Pessoa(
-                nome, LocalDate.of(2000, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, paroquia, null, null, null, null, null, null, null);
+                nome,
+                PessoasDeTeste.cpf(),
+                LocalDate.of(2000, 1, 1),
+                "(11) 90000-0000",
+                null,
+                EstadoCivil.SOLTEIRO,
+                paroquia,
+                PessoasDeTeste.endereco(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

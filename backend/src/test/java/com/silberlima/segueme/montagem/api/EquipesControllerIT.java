@@ -24,6 +24,7 @@ import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.pessoas.domain.SituacaoPessoa;
 import com.silberlima.segueme.support.AbstractIntegrationTest;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -156,6 +157,20 @@ class EquipesControllerIT extends AbstractIntegrationTest {
 
     private Pessoa umaPessoa(String nome, Paroquia paroquia) {
         return new Pessoa(
-                nome, LocalDate.of(2000, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, paroquia, null, null, null, null, null, null, null);
+                nome,
+                PessoasDeTeste.cpf(),
+                LocalDate.of(2000, 1, 1),
+                "(11) 90000-0000",
+                null,
+                EstadoCivil.SOLTEIRO,
+                paroquia,
+                PessoasDeTeste.endereco(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

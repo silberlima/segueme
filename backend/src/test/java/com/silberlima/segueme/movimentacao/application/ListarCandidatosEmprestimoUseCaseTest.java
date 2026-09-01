@@ -18,6 +18,7 @@ import com.silberlima.segueme.movimentacao.domain.EmprestimoRepository;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -97,8 +98,21 @@ class ListarCandidatosEmprestimoUseCaseTest {
 
     private Pessoa umaPessoa(String nome, Paroquia paroquia) {
         Pessoa pessoa = new Pessoa(
-                nome, LocalDate.of(2000, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, paroquia,
-                null, null, null, null, null, null, null);
+                nome,
+                PessoasDeTeste.cpf(),
+                LocalDate.of(2000, 1, 1),
+                "(11) 90000-0000",
+                null,
+                EstadoCivil.SOLTEIRO,
+                paroquia,
+                PessoasDeTeste.endereco(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         ReflectionTestUtils.setField(pessoa, "id", UUID.randomUUID());
         return pessoa;
     }

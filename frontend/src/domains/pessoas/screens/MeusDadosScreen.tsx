@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Badge, Button, Input, ListState, PageHeader, PanelCard } from '../../../shared/ui'
-import { calcularIdade } from '../domain/pessoa.entity'
+import { calcularIdade, formatarCpf, formatarEndereco } from '../domain/pessoa.entity'
 import { ESTADO_CIVIL_LABEL, SITUACAO_LABEL } from '../domain/pessoa.types'
 import { PersonAvatar } from '../components/PersonAvatar'
 import { useMeusDados } from '../hooks/useMeusDados'
@@ -16,10 +16,10 @@ function Campo({ label, valor }: { label: string; valor: string | null }) {
 }
 
 /**
- * Meus Dados: a tela do perfil Seguidor. Ele não enxerga o cadastro dos outros — só o próprio, e
- * altera apenas contato e saúde. Nome, data de nascimento, paróquia e situação aparecem como
- * leitura: mudam por fluxos com mediação (correção de cadastro, Transferência, Inscrição), nunca
- * por autoatendimento.
+ * Meus Dados: a tela do perfil Seguidor. Ele não enxerga o cadastro dos outros — só o próprio.
+ * Altera o que é fonte sobre si mesmo: CPF, data de nascimento, contato, endereço e saúde. Nome,
+ * paróquia e situação aparecem como leitura: mudam por fluxos com mediação (correção de cadastro,
+ * Transferência, Inscrição), nunca por autoatendimento.
  */
 export function MeusDadosScreen() {
   const { data: pessoa, isLoading, isError, refetch } = useMeusDados()
@@ -65,68 +65,142 @@ export function MeusDadosScreen() {
                   <Badge tone="info">{SITUACAO_LABEL[pessoa.situacao]}</Badge>
                 </div>
               </div>
-              <p className="text-xs text-slate-500">
-                Nome, data de nascimento, paróquia e situação são mantidos pela equipe do movimento. Para corrigir
-                algum deles, fale com a sua paróquia.
+
+              {form.editando ? (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    label="CPF"
+                    value={form.campos.cpf}
+                    placeholder="000.000.000-00"
+                    onChange={(event) => form.alterar('cpf', event.target.value)}
+                  />
+                  <Input
+                    label="Data de nascimento"
+                    type="date"
+                    value={form.campos.dataNascimento}
+                    onChange={(event) => form.alterar('dataNascimento', event.target.value)}
+                  />
+                </div>
+              ) : (
+                <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <Campo label="CPF" valor={formatarCpf(pessoa.cpf)} />
+                  <Campo label="Data de nascimento" valor={pessoa.dataNascimento} />
+                </div>
+              )}
+
+              <p className="mt-3 text-xs text-slate-500">
+                Nome, paróquia e situação são mantidos pela equipe do movimento. Para corrigir algum deles, fale
+                com a sua paróquia.
               </p>
             </PanelCard>
 
-            <PanelCard titulo="Contato e saúde">
+            <PanelCard titulo="Contato">
               {form.editando ? (
-                <div className="flex flex-col gap-4">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <Input
-                      label="Telefone"
-                      value={form.campos.telefone}
-                      placeholder="(11) 90000-0000"
-                      onChange={(event) => form.alterar('telefone', event.target.value)}
-                    />
-                    <Input
-                      label="Alergias"
-                      value={form.campos.alergias ?? ''}
-                      onChange={(event) => form.alterar('alergias', event.target.value)}
-                    />
-                    <Input
-                      label="Restrição alimentar"
-                      value={form.campos.restricaoAlimentar ?? ''}
-                      onChange={(event) => form.alterar('restricaoAlimentar', event.target.value)}
-                    />
-                    <Input
-                      label="Medicação de uso contínuo"
-                      value={form.campos.medicacaoUsoContinuo ?? ''}
-                      onChange={(event) => form.alterar('medicacaoUsoContinuo', event.target.value)}
-                    />
-                    <Input
-                      label="Contato de emergência"
-                      value={form.campos.contatoEmergenciaNome ?? ''}
-                      onChange={(event) => form.alterar('contatoEmergenciaNome', event.target.value)}
-                    />
-                    <Input
-                      label="Telefone de emergência"
-                      value={form.campos.contatoEmergenciaTelefone ?? ''}
-                      onChange={(event) => form.alterar('contatoEmergenciaTelefone', event.target.value)}
-                    />
-                    <Input
-                      label="Parentesco"
-                      value={form.campos.contatoEmergenciaParentesco ?? ''}
-                      onChange={(event) => form.alterar('contatoEmergenciaParentesco', event.target.value)}
-                    />
-                  </div>
-
-                  {form.erro && <p className="text-sm text-rose-600">{form.erro}</p>}
-
-                  <div className="flex justify-end gap-2">
-                    <Button variant="secondary" disabled={form.isSalvando} onClick={form.cancelar}>
-                      Cancelar
-                    </Button>
-                    <Button disabled={form.isSalvando} onClick={form.salvar}>
-                      {form.isSalvando ? 'Salvando…' : 'Salvar'}
-                    </Button>
-                  </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    label="Telefone"
+                    value={form.campos.telefone}
+                    placeholder="(11) 90000-0000"
+                    onChange={(event) => form.alterar('telefone', event.target.value)}
+                  />
+                  <Input
+                    label="Instagram (opcional)"
+                    value={form.campos.instagram}
+                    placeholder="@seu.perfil"
+                    onChange={(event) => form.alterar('instagram', event.target.value)}
+                  />
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <Campo label="Telefone" valor={pessoa.telefone} />
+                  <Campo label="Instagram" valor={pessoa.instagram && `@${pessoa.instagram}`} />
+                </div>
+              )}
+            </PanelCard>
+
+            <PanelCard titulo="Endereço">
+              {form.editando ? (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    label="CEP"
+                    value={form.campos.cep}
+                    placeholder="00000-000"
+                    onChange={(event) => form.alterar('cep', event.target.value)}
+                  />
+                  <Input
+                    label="Logradouro"
+                    value={form.campos.logradouro}
+                    onChange={(event) => form.alterar('logradouro', event.target.value)}
+                  />
+                  <Input
+                    label="Número"
+                    value={form.campos.numero}
+                    onChange={(event) => form.alterar('numero', event.target.value)}
+                  />
+                  <Input
+                    label="Complemento (opcional)"
+                    value={form.campos.complemento}
+                    onChange={(event) => form.alterar('complemento', event.target.value)}
+                  />
+                  <Input
+                    label="Bairro"
+                    value={form.campos.bairro}
+                    onChange={(event) => form.alterar('bairro', event.target.value)}
+                  />
+                  <Input
+                    label="Cidade"
+                    value={form.campos.cidade}
+                    onChange={(event) => form.alterar('cidade', event.target.value)}
+                  />
+                  <Input
+                    label="UF"
+                    value={form.campos.uf}
+                    maxLength={2}
+                    placeholder="SP"
+                    onChange={(event) => form.alterar('uf', event.target.value)}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-slate-900">{formatarEndereco(pessoa.endereco)}</p>
+              )}
+            </PanelCard>
+
+            <PanelCard titulo="Saúde e emergência">
+              {form.editando ? (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    label="Alergias"
+                    value={form.campos.alergias}
+                    onChange={(event) => form.alterar('alergias', event.target.value)}
+                  />
+                  <Input
+                    label="Restrição alimentar"
+                    value={form.campos.restricaoAlimentar}
+                    onChange={(event) => form.alterar('restricaoAlimentar', event.target.value)}
+                  />
+                  <Input
+                    label="Medicação de uso contínuo"
+                    value={form.campos.medicacaoUsoContinuo}
+                    onChange={(event) => form.alterar('medicacaoUsoContinuo', event.target.value)}
+                  />
+                  <Input
+                    label="Contato de emergência"
+                    value={form.campos.contatoEmergenciaNome}
+                    onChange={(event) => form.alterar('contatoEmergenciaNome', event.target.value)}
+                  />
+                  <Input
+                    label="Telefone de emergência"
+                    value={form.campos.contatoEmergenciaTelefone}
+                    onChange={(event) => form.alterar('contatoEmergenciaTelefone', event.target.value)}
+                  />
+                  <Input
+                    label="Parentesco"
+                    value={form.campos.contatoEmergenciaParentesco}
+                    onChange={(event) => form.alterar('contatoEmergenciaParentesco', event.target.value)}
+                  />
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <Campo label="Alergias" valor={pessoa.alergias} />
                   <Campo label="Restrição alimentar" valor={pessoa.restricaoAlimentar} />
                   <Campo label="Medicação de uso contínuo" valor={pessoa.medicacaoUsoContinuo} />
@@ -136,6 +210,18 @@ export function MeusDadosScreen() {
                 </div>
               )}
             </PanelCard>
+
+            {form.editando && (
+              <div className="flex items-center justify-end gap-3">
+                {form.erro && <span className="mr-auto text-sm text-rose-600">{form.erro}</span>}
+                <Button variant="secondary" disabled={form.isSalvando} onClick={form.cancelar}>
+                  Cancelar
+                </Button>
+                <Button disabled={form.isSalvando} onClick={form.salvar}>
+                  {form.isSalvando ? 'Salvando…' : 'Salvar'}
+                </Button>
+              </div>
+            )}
 
             <PanelCard titulo="Competências">
               <div className="flex flex-wrap gap-1">

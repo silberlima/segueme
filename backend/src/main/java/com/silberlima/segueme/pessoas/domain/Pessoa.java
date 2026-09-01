@@ -4,6 +4,7 @@ import com.silberlima.segueme.domain.exception.BusinessRuleViolationException;
 import com.silberlima.segueme.domain.model.AbstractAuditableEntity;
 import com.silberlima.segueme.hierarquia.domain.Paroquia;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -30,15 +31,30 @@ public class Pessoa extends AbstractAuditableEntity {
     @Column(name = "nome_completo", nullable = false)
     private String nomeCompleto;
 
+    /**
+     * Chave natural do cadastro nacional (RN-PESSOA-01): é o CPF que impede que a mesma pessoa
+     * apareça duas vezes, coisa que a combinação nome + data de nascimento nunca garantiu.
+     * Guardado só com os dígitos — ver {@link #normalizarCpf(String)}.
+     */
+    @Column(name = "cpf", nullable = false, length = 11, unique = true)
+    private String cpf;
+
     @Column(name = "data_nascimento", nullable = false)
     private LocalDate dataNascimento;
 
     @Column(name = "telefone", nullable = false)
     private String telefone;
 
+    /** Perfil do Instagram, sem o {@code @} — opcional: nem todo mundo tem ou quer informar. */
+    @Column(name = "instagram", length = 30)
+    private String instagram;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_civil", nullable = false, length = 20)
     private EstadoCivil estadoCivil;
+
+    @Embedded
+    private Endereco endereco;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paroquia_id", nullable = false)
@@ -90,10 +106,13 @@ public class Pessoa extends AbstractAuditableEntity {
 
     public Pessoa(
             String nomeCompleto,
+            String cpf,
             LocalDate dataNascimento,
             String telefone,
+            String instagram,
             EstadoCivil estadoCivil,
             Paroquia paroquia,
+            Endereco endereco,
             String alergias,
             String restricaoAlimentar,
             String medicacaoUsoContinuo,
@@ -102,10 +121,13 @@ public class Pessoa extends AbstractAuditableEntity {
             String contatoEmergenciaParentesco,
             Pessoa indicadoPor) {
         this.nomeCompleto = nomeCompleto;
+        this.cpf = normalizarCpf(cpf);
         this.dataNascimento = dataNascimento;
         this.telefone = telefone;
+        this.instagram = normalizarInstagram(instagram);
         this.estadoCivil = estadoCivil;
         this.paroquia = paroquia;
+        this.endereco = endereco;
         this.alergias = alergias;
         this.restricaoAlimentar = restricaoAlimentar;
         this.medicacaoUsoContinuo = medicacaoUsoContinuo;
@@ -120,29 +142,59 @@ public class Pessoa extends AbstractAuditableEntity {
     }
 
     /**
-     * Atualização que a própria pessoa faz dos seus dados, pelo perfil Seguidor. O conjunto de
-     * campos é deliberadamente estreito — é o que alguém corrige sobre si mesmo sem passar pela
-     * equipe:
+     * Forma canônica do CPF: só os 11 dígitos. Guardar o que veio digitado deixaria
+     * {@code 529.982.247-25} e {@code 52998224725} conviverem como pessoas diferentes, e a
+     * unicidade — que é a razão de o campo existir — não valeria nada.
+     */
+    public static String normalizarCpf(String cpf) {
+        return cpf == null ? null : cpf.replaceAll("\\D", "");
+    }
+
+    /** O handle sem {@code @} e sem espaços; em branco vira nulo, porque o campo é opcional. */
+    private static String normalizarInstagram(String instagram) {
+        if (instagram == null || instagram.isBlank()) {
+            return null;
+        }
+        return instagram.trim().replaceFirst("^@", "");
+    }
+
+    /**
+     * Atualização que a própria pessoa faz dos seus dados, pelo perfil Seguidor: os dados que ela
+     * é a fonte mais confiável sobre si mesma — CPF, data de nascimento, telefone, Instagram,
+     * endereço, saúde e contato de emergência.
+     *
+     * <p>O que continua fora, e por quê:
      *
      * <ul>
-     *   <li><b>nome e data de nascimento</b> ficam de fora por serem identidade: corrigi-los é
-     *       trabalho de quem administra o cadastro, não autoatendimento;
+     *   <li><b>nome</b> é como o movimento a identifica em fichas, equipes e histórico; corrigi-lo
+     *       é trabalho de quem administra o cadastro, não autoatendimento;
      *   <li><b>paróquia</b> só muda por Transferência aprovada pelo Setorial (RN-MOVIMENTO-01) —
      *       deixar a pessoa trocar aqui contornaria toda a mediação;
      *   <li><b>situação</b> é consequência do fluxo de inscrição, nunca uma escolha;
      *   <li><b>competências</b> alimentam as Sugestões Inteligentes da Montagem (RN-08); permitir
      *       autoatribuição deixaria o ranqueamento à mercê de quem quer ser escalado.
      * </ul>
+     *
+     * <p>O CPF é editável mas continua único no cadastro: quem garante que a troca não colide com
+     * outra pessoa é {@code AtualizarMeusDadosUseCase}, antes de chegar aqui.
      */
     public void atualizarDadosPessoais(
+            String cpf,
+            LocalDate dataNascimento,
             String telefone,
+            String instagram,
+            Endereco endereco,
             String alergias,
             String restricaoAlimentar,
             String medicacaoUsoContinuo,
             String contatoEmergenciaNome,
             String contatoEmergenciaTelefone,
             String contatoEmergenciaParentesco) {
+        this.cpf = normalizarCpf(cpf);
+        this.dataNascimento = dataNascimento;
         this.telefone = telefone;
+        this.instagram = normalizarInstagram(instagram);
+        this.endereco = endereco;
         this.alergias = alergias;
         this.restricaoAlimentar = restricaoAlimentar;
         this.medicacaoUsoContinuo = medicacaoUsoContinuo;
@@ -179,6 +231,10 @@ public class Pessoa extends AbstractAuditableEntity {
         return nomeCompleto;
     }
 
+    public String getCpf() {
+        return cpf;
+    }
+
     public LocalDate getDataNascimento() {
         return dataNascimento;
     }
@@ -187,8 +243,16 @@ public class Pessoa extends AbstractAuditableEntity {
         return telefone;
     }
 
+    public String getInstagram() {
+        return instagram;
+    }
+
     public EstadoCivil getEstadoCivil() {
         return estadoCivil;
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
     }
 
     public Paroquia getParoquia() {

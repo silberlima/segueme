@@ -16,6 +16,7 @@ import com.silberlima.segueme.hierarquia.domain.Setor;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,8 +36,21 @@ class CadastrarPalestranteUseCaseTest {
 
     private final Paroquia paroquia = new Paroquia("Paróquia", new Setor("Setor", new Diocese("Diocese")));
     private final Pessoa pessoa = new Pessoa(
-            "Seguidor", LocalDate.of(1990, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, paroquia,
-            null, null, null, null, null, null, null);
+            "Seguidor",
+            PessoasDeTeste.cpf(),
+            LocalDate.of(1990, 1, 1),
+            "(11) 90000-0000",
+            null,
+            EstadoCivil.SOLTEIRO,
+            paroquia,
+            PessoasDeTeste.endereco(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
 
     private CadastrarPalestranteUseCase useCase() {
         return new CadastrarPalestranteUseCase(pessoaRepository, palestranteRepository);

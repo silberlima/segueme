@@ -20,6 +20,7 @@ import com.silberlima.segueme.posencontro.domain.EncontroPosRepository;
 import com.silberlima.segueme.posencontro.domain.FaixaPrioridade;
 import com.silberlima.segueme.posencontro.domain.FrequenciaPosEncontroRepository;
 import com.silberlima.segueme.posencontro.domain.ReguaPrioridade;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -149,10 +150,13 @@ class ConsultarDashboardPosEncontroUseCaseTest {
     private Pessoa umaPessoa(String nome) {
         return new Pessoa(
                 nome,
+                PessoasDeTeste.cpf(),
                 LocalDate.of(2005, 1, 1),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

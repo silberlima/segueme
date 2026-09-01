@@ -17,6 +17,7 @@ import com.silberlima.segueme.hierarquia.domain.Setor;
 import com.silberlima.segueme.pessoas.domain.Casal;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -94,10 +95,13 @@ class ConsultarEncontroUseCaseTest {
     private Pessoa umaPessoa() {
         return new Pessoa(
                 "Pessoa Teste",
+                PessoasDeTeste.cpf(),
                 LocalDate.of(1999, 5, 20),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 umaParoquia(),
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

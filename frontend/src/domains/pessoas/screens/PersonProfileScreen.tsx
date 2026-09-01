@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { Badge, ListState } from '../../../shared/ui'
-import { calcularIdade } from '../domain/pessoa.entity'
+import { calcularIdade, formatarCpf, formatarEndereco } from '../domain/pessoa.entity'
 import { ESTADO_CIVIL_LABEL, SITUACAO_LABEL } from '../domain/pessoa.types'
 import type { SituacaoPessoa } from '../domain/pessoa.types'
 import { PersonAvatar } from '../components/PersonAvatar'
@@ -58,7 +58,9 @@ export function PersonProfileScreen() {
           </div>
 
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <Campo label="CPF" valor={formatarCpf(pessoa.cpf)} />
             <Campo label="Telefone" valor={pessoa.telefone} />
+            <Campo label="Instagram" valor={pessoa.instagram && `@${pessoa.instagram}`} />
             <Campo label="Alergias" valor={pessoa.alergias} />
             <Campo label="Restrição alimentar" valor={pessoa.restricaoAlimentar} />
             <Campo label="Medicação de uso contínuo" valor={pessoa.medicacaoUsoContinuo} />
@@ -69,6 +71,10 @@ export function PersonProfileScreen() {
             />
             <Campo label="Parentesco" valor={pessoa.contatoEmergenciaParentesco} />
             <Campo label="Indicado por" valor={pessoa.indicadoPorNome} />
+          </div>
+
+          <div className="mb-6">
+            <Campo label="Endereço" valor={formatarEndereco(pessoa.endereco)} />
           </div>
 
           <div className="mb-6">

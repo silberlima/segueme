@@ -435,4 +435,107 @@
                              constraintName="uk_pessoa_usuario_id"/>
     </changeSet>
 
+    <!--
+        CPF, Instagram e endereço residencial (decisão do PO). CPF e endereço são obrigatórios;
+        Instagram não.
+
+        As colunas entram nulas, são preenchidas e só então recebem NOT NULL: as pessoas semeadas
+        em `pessoas-0003` já existem nos bancos de desenvolvimento, e um changeset que já rodou não
+        roda de novo — editá-lo quebraria o checksum do Liquibase. Por isso o backfill vive aqui, e
+        não lá.
+
+        O CPF é a chave natural que faltava ao "cadastro nacional único, nunca duplicado por
+        paróquia" (RN-PESSOA-01): guardado só com os 11 dígitos, para que a unicidade não seja
+        contornada pela pontuação.
+    -->
+    <changeSet id="pessoas-0005-cpf-instagram-endereco" author="segueme">
+        <addColumn tableName="pessoa">
+            <column name="cpf" type="varchar(11)"/>
+            <column name="instagram" type="varchar(30)"/>
+            <column name="endereco_cep" type="varchar(9)"/>
+            <column name="endereco_logradouro" type="varchar(255)"/>
+            <column name="endereco_numero" type="varchar(20)"/>
+            <column name="endereco_complemento" type="varchar(255)"/>
+            <column name="endereco_bairro" type="varchar(255)"/>
+            <column name="endereco_cidade" type="varchar(255)"/>
+            <column name="endereco_uf" type="varchar(2)"/>
+        </addColumn>
+
+        <!-- Backfill das pessoas de demonstração de `pessoas-0003`. CPFs válidos e fictícios. -->
+        <update tableName="pessoa">
+            <column name="cpf" value="52998224725"/>
+            <column name="instagram" value="ana.beatriz"/>
+            <column name="endereco_cep" value="01310-100"/>
+            <column name="endereco_logradouro" value="Avenida Paulista"/>
+            <column name="endereco_numero" value="1000"/>
+            <column name="endereco_bairro" value="Bela Vista"/>
+            <column name="endereco_cidade" value="São Paulo"/>
+            <column name="endereco_uf" value="SP"/>
+            <where>id = '00000000-0000-4000-8000-000000000301'</where>
+        </update>
+        <update tableName="pessoa">
+            <column name="cpf" value="11144477735"/>
+            <column name="endereco_cep" value="01001-000"/>
+            <column name="endereco_logradouro" value="Praça da Sé"/>
+            <column name="endereco_numero" value="55"/>
+            <column name="endereco_bairro" value="Sé"/>
+            <column name="endereco_cidade" value="São Paulo"/>
+            <column name="endereco_uf" value="SP"/>
+            <where>id = '00000000-0000-4000-8000-000000000302'</where>
+        </update>
+        <update tableName="pessoa">
+            <column name="cpf" value="39053344705"/>
+            <column name="endereco_cep" value="04538-133"/>
+            <column name="endereco_logradouro" value="Avenida Brigadeiro Faria Lima"/>
+            <column name="endereco_numero" value="3477"/>
+            <column name="endereco_complemento" value="Apto 92"/>
+            <column name="endereco_bairro" value="Itaim Bibi"/>
+            <column name="endereco_cidade" value="São Paulo"/>
+            <column name="endereco_uf" value="SP"/>
+            <where>id = '00000000-0000-4000-8000-000000000303'</where>
+        </update>
+        <update tableName="pessoa">
+            <column name="cpf" value="16899556944"/>
+            <column name="endereco_cep" value="04538-133"/>
+            <column name="endereco_logradouro" value="Avenida Brigadeiro Faria Lima"/>
+            <column name="endereco_numero" value="3477"/>
+            <column name="endereco_complemento" value="Apto 92"/>
+            <column name="endereco_bairro" value="Itaim Bibi"/>
+            <column name="endereco_cidade" value="São Paulo"/>
+            <column name="endereco_uf" value="SP"/>
+            <where>id = '00000000-0000-4000-8000-000000000304'</where>
+        </update>
+        <update tableName="pessoa">
+            <column name="cpf" value="23344556606"/>
+            <column name="instagram" value="ju.pereira"/>
+            <column name="endereco_cep" value="20040-020"/>
+            <column name="endereco_logradouro" value="Avenida Rio Branco"/>
+            <column name="endereco_numero" value="156"/>
+            <column name="endereco_bairro" value="Centro"/>
+            <column name="endereco_cidade" value="Rio de Janeiro"/>
+            <column name="endereco_uf" value="RJ"/>
+            <where>id = '00000000-0000-4000-8000-000000000305'</where>
+        </update>
+        <update tableName="pessoa">
+            <column name="cpf" value="87231654053"/>
+            <column name="endereco_cep" value="22071-900"/>
+            <column name="endereco_logradouro" value="Avenida Atlântica"/>
+            <column name="endereco_numero" value="1702"/>
+            <column name="endereco_bairro" value="Copacabana"/>
+            <column name="endereco_cidade" value="Rio de Janeiro"/>
+            <column name="endereco_uf" value="RJ"/>
+            <where>id = '00000000-0000-4000-8000-000000000306'</where>
+        </update>
+
+        <addNotNullConstraint tableName="pessoa" columnName="cpf" columnDataType="varchar(11)"/>
+        <addNotNullConstraint tableName="pessoa" columnName="endereco_cep" columnDataType="varchar(9)"/>
+        <addNotNullConstraint tableName="pessoa" columnName="endereco_logradouro" columnDataType="varchar(255)"/>
+        <addNotNullConstraint tableName="pessoa" columnName="endereco_numero" columnDataType="varchar(20)"/>
+        <addNotNullConstraint tableName="pessoa" columnName="endereco_bairro" columnDataType="varchar(255)"/>
+        <addNotNullConstraint tableName="pessoa" columnName="endereco_cidade" columnDataType="varchar(255)"/>
+        <addNotNullConstraint tableName="pessoa" columnName="endereco_uf" columnDataType="varchar(2)"/>
+
+        <addUniqueConstraint tableName="pessoa" columnNames="cpf" constraintName="uk_pessoa_cpf"/>
+    </changeSet>
+
 </databaseChangeLog>

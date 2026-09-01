@@ -11,6 +11,7 @@ import com.silberlima.segueme.hierarquia.domain.Setor;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,10 +52,13 @@ class ConsultarPessoaUseCaseTest {
         Paroquia paroquia = new Paroquia("Paróquia Teste", setor);
         return new Pessoa(
                 "João Teste",
+                PessoasDeTeste.cpf(),
                 LocalDate.of(1999, 5, 20),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

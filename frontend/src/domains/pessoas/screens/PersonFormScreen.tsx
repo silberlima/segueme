@@ -10,6 +10,7 @@ import { usePersonForm } from '../hooks/usePersonForm'
 
 const SECOES: TabItem[] = [
   { id: 'dados', label: 'Dados pessoais' },
+  { id: 'endereco', label: 'Endereço' },
   { id: 'saude', label: 'Saúde/restrições' },
   { id: 'emergencia', label: 'Contato de emergência' },
   { id: 'competencias', label: 'Competências' },
@@ -46,6 +47,13 @@ export function PersonFormScreen() {
                   onChange={(event) => setField('nomeCompleto', event.target.value)}
                 />
                 <Input
+                  label="CPF"
+                  placeholder="000.000.000-00"
+                  value={form.cpf}
+                  error={errors.cpf}
+                  onChange={(event) => setField('cpf', event.target.value)}
+                />
+                <Input
                   label="Data de nascimento"
                   type="date"
                   value={form.dataNascimento}
@@ -59,6 +67,12 @@ export function PersonFormScreen() {
                   value={form.telefone}
                   error={errors.telefone}
                   onChange={(event) => setField('telefone', event.target.value)}
+                />
+                <Input
+                  label="Instagram (opcional)"
+                  placeholder="@perfil"
+                  value={form.instagram}
+                  onChange={(event) => setField('instagram', event.target.value)}
                 />
                 <Select
                   label="Estado civil"
@@ -75,6 +89,55 @@ export function PersonFormScreen() {
                   options={(paroquias ?? []).map((paroquia) => ({ value: paroquia.id, label: paroquia.nome }))}
                   placeholder="Selecione"
                   onChange={(event) => setField('paroquiaId', event.target.value)}
+                />
+              </div>
+            )}
+
+            {secaoAtiva === 'endereco' && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Input
+                  label="CEP"
+                  placeholder="00000-000"
+                  value={form.cep}
+                  error={errors.cep}
+                  onChange={(event) => setField('cep', event.target.value)}
+                />
+                <Input
+                  label="Logradouro"
+                  value={form.logradouro}
+                  error={errors.logradouro}
+                  onChange={(event) => setField('logradouro', event.target.value)}
+                />
+                <Input
+                  label="Número"
+                  value={form.numero}
+                  error={errors.numero}
+                  onChange={(event) => setField('numero', event.target.value)}
+                />
+                <Input
+                  label="Complemento (opcional)"
+                  value={form.complemento}
+                  onChange={(event) => setField('complemento', event.target.value)}
+                />
+                <Input
+                  label="Bairro"
+                  value={form.bairro}
+                  error={errors.bairro}
+                  onChange={(event) => setField('bairro', event.target.value)}
+                />
+                <Input
+                  label="Cidade"
+                  value={form.cidade}
+                  error={errors.cidade}
+                  onChange={(event) => setField('cidade', event.target.value)}
+                />
+                <Input
+                  label="UF"
+                  placeholder="SP"
+                  maxLength={2}
+                  value={form.uf}
+                  error={errors.uf}
+                  onChange={(event) => setField('uf', event.target.value)}
                 />
               </div>
             )}

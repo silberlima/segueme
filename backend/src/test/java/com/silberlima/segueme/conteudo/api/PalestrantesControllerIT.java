@@ -19,6 +19,7 @@ import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.support.AbstractIntegrationTest;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -80,8 +81,21 @@ class PalestrantesControllerIT extends AbstractIntegrationTest {
         Setor setor = setorRepository.save(new Setor("Setor Palestrante " + UUID.randomUUID(), diocese));
         Paroquia paroquia = paroquiaRepository.save(new Paroquia("Paróquia Palestrante " + UUID.randomUUID(), setor));
         Pessoa pessoa = pessoaRepository.save(new Pessoa(
-                "Seguidor Palestrante " + UUID.randomUUID(), LocalDate.of(1990, 1, 1), "(11) 90000-0000",
-                EstadoCivil.SOLTEIRO, paroquia, null, null, null, null, null, null, null));
+                "Seguidor Palestrante " + UUID.randomUUID(),
+                PessoasDeTeste.cpf(),
+                LocalDate.of(1990, 1, 1),
+                "(11) 90000-0000",
+                null,
+                EstadoCivil.SOLTEIRO,
+                paroquia,
+                PessoasDeTeste.endereco(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null));
 
         mockMvc.perform(post("/api/v1/palestrantes")
                         .contentType(MediaType.APPLICATION_JSON)

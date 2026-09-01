@@ -9,6 +9,7 @@ import com.silberlima.segueme.hierarquia.domain.Paroquia;
 import com.silberlima.segueme.hierarquia.domain.Setor;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
@@ -17,8 +18,21 @@ class PalestranteTest {
 
     private final Paroquia paroquia = new Paroquia("Paróquia", new Setor("Setor", new Diocese("Diocese")));
     private final Pessoa pessoa = new Pessoa(
-            "Seguidor Palestrante", LocalDate.of(1990, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, paroquia,
-            null, null, null, null, null, null, null);
+            "Seguidor Palestrante",
+            PessoasDeTeste.cpf(),
+            LocalDate.of(1990, 1, 1),
+            "(11) 90000-0000",
+            null,
+            EstadoCivil.SOLTEIRO,
+            paroquia,
+            PessoasDeTeste.endereco(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
 
     @Test
     void shouldCreateSeguidorLinkedToPessoa() {

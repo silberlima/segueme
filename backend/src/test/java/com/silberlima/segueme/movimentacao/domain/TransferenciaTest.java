@@ -9,6 +9,7 @@ import com.silberlima.segueme.hierarquia.domain.Paroquia;
 import com.silberlima.segueme.hierarquia.domain.Setor;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
@@ -18,8 +19,21 @@ class TransferenciaTest {
     private final Paroquia origem = new Paroquia("Origem", new Setor("Setor", new Diocese("Diocese")));
     private final Paroquia destino = new Paroquia("Destino", new Setor("Setor", new Diocese("Diocese")));
     private final Pessoa pessoa = new Pessoa(
-            "Candidato", LocalDate.of(2000, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, origem,
-            null, null, null, null, null, null, null);
+            "Candidato",
+            PessoasDeTeste.cpf(),
+            LocalDate.of(2000, 1, 1),
+            "(11) 90000-0000",
+            null,
+            EstadoCivil.SOLTEIRO,
+            origem,
+            PessoasDeTeste.endereco(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
 
     @Test
     void shouldStartPendente() {

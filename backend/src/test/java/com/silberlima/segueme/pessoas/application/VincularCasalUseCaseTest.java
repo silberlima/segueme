@@ -18,6 +18,7 @@ import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.HistoricoEventoRepository;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -97,10 +98,13 @@ class VincularCasalUseCaseTest {
         Paroquia paroquia = new Paroquia("Paróquia Teste", setor);
         return new Pessoa(
                 nome,
+                PessoasDeTeste.cpf(),
                 LocalDate.of(1995, 1, 1),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.CASADO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

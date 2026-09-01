@@ -19,6 +19,7 @@ import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.support.AbstractIntegrationTest;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,10 +88,13 @@ class CasaisControllerIT extends AbstractIntegrationTest {
     private Pessoa umaPessoa(String nome, Paroquia paroquia) {
         return new Pessoa(
                 nome,
+                PessoasDeTeste.cpf(),
                 LocalDate.of(1998, 1, 1),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

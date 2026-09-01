@@ -1,5 +1,6 @@
 package com.silberlima.segueme.pessoas.application;
 
+import com.silberlima.segueme.domain.exception.BusinessRuleViolationException;
 import com.silberlima.segueme.domain.exception.ResourceNotFoundException;
 import com.silberlima.segueme.hierarquia.domain.Paroquia;
 import com.silberlima.segueme.hierarquia.domain.ParoquiaRepository;
@@ -43,6 +44,12 @@ public class CriarPessoaUseCase {
 
     @Transactional
     public Pessoa execute(DadosNovaPessoa dados) {
+        String cpf = Pessoa.normalizarCpf(dados.cpf());
+        if (pessoaRepository.existsByCpfAndDeletedFalse(cpf)) {
+            throw new BusinessRuleViolationException(
+                    "Já existe uma pessoa no cadastro nacional com o CPF informado (RN-PESSOA-01).");
+        }
+
         Paroquia paroquia = paroquiaRepository
                 .findByIdAndDeletedFalse(dados.paroquiaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Paróquia não encontrada: " + dados.paroquiaId()));
@@ -57,10 +64,13 @@ public class CriarPessoaUseCase {
 
         Pessoa pessoa = new Pessoa(
                 dados.nomeCompleto(),
+                cpf,
                 dados.dataNascimento(),
                 dados.telefone(),
+                dados.instagram(),
                 dados.estadoCivil(),
                 paroquia,
+                dados.endereco(),
                 dados.alergias(),
                 dados.restricaoAlimentar(),
                 dados.medicacaoUsoContinuo(),

@@ -56,8 +56,9 @@ export const MASSA = {
   /** Destino das transferências da Fase 14 — no mesmo setor, para o Setorial de E2E decidir. */
   paroquiaDestinoId: '11111111-1111-4111-8111-000000000004',
   paroquiaDestinoNome: 'Paróquia E2E Destino',
+  /** CPFs válidos e fictícios: o cadastro exige CPF único por pessoa (RN-PESSOA-01). */
   jovens: [
-    { id: '11111111-1111-4111-8111-000000000101', nome: 'Ana Assídua E2E' },
-    { id: '11111111-1111-4111-8111-000000000102', nome: 'Bruno Faltante E2E' },
+    { id: '11111111-1111-4111-8111-000000000101', nome: 'Ana Assídua E2E', cpf: '45317828791' },
+    { id: '11111111-1111-4111-8111-000000000102', nome: 'Bruno Faltante E2E', cpf: '61184562750' },
   ],
 }

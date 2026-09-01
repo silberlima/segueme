@@ -21,6 +21,7 @@ import com.silberlima.segueme.posencontro.api.dto.RegistrarPresencasRequest;
 import com.silberlima.segueme.posencontro.domain.EncontroPos;
 import com.silberlima.segueme.posencontro.domain.EncontroPosRepository;
 import com.silberlima.segueme.support.AbstractIntegrationTest;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -142,10 +143,13 @@ class PresencasControllerIT extends AbstractIntegrationTest {
     private Pessoa criarPessoa(String nome, Paroquia paroquia, SituacaoPessoa situacao) {
         Pessoa pessoa = new Pessoa(
                 nome + " " + UUID.randomUUID(),
+                PessoasDeTeste.cpf(),
                 LocalDate.of(2005, 1, 1),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

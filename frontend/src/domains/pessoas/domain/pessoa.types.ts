@@ -28,15 +28,29 @@ export const TIPO_EVENTO_LABEL: Record<string, string> = {
   PAPEL_COORDENADOR: 'Papel de coordenador',
 }
 
+/** Endereço residencial. Só `complemento` é opcional. */
+export interface Endereco {
+  cep: string
+  logradouro: string
+  numero: string
+  complemento: string | null
+  bairro: string
+  cidade: string
+  uf: string
+}
+
 export interface Pessoa {
   id: string
   nomeCompleto: string
+  cpf: string
   dataNascimento: string
   telefone: string
+  instagram: string | null
   estadoCivil: EstadoCivil
   situacao: SituacaoPessoa
   paroquiaId: string
   paroquiaNome: string
+  endereco: Endereco
   alergias: string | null
   restricaoAlimentar: string | null
   medicacaoUsoContinuo: string | null
@@ -49,9 +63,16 @@ export interface Pessoa {
   createdAt: string
 }
 
-/** O que a própria pessoa altera sobre si (perfil Seguidor). O resto do cadastro é da equipe. */
+/**
+ * O que a própria pessoa altera sobre si (perfil Seguidor): identificação, contato, endereço e
+ * saúde. Nome, paróquia, situação e competências são da equipe do movimento.
+ */
 export interface MeusDadosPayload {
+  cpf: string
+  dataNascimento: string
   telefone: string
+  instagram: string | null
+  endereco: Endereco
   alergias: string | null
   restricaoAlimentar: string | null
   medicacaoUsoContinuo: string | null
@@ -94,10 +115,13 @@ export interface HistoricoEvento {
 
 export interface NovaPessoaPayload {
   nomeCompleto: string
+  cpf: string
   dataNascimento: string
   telefone: string
+  instagram?: string
   estadoCivil: EstadoCivil
   paroquiaId: string
+  endereco: Endereco
   alergias?: string
   restricaoAlimentar?: string
   medicacaoUsoContinuo?: string

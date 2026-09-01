@@ -1,5 +1,6 @@
 package com.silberlima.segueme.pessoas.application;
 
+import com.silberlima.segueme.domain.exception.BusinessRuleViolationException;
 import com.silberlima.segueme.domain.exception.ResourceNotFoundException;
 import com.silberlima.segueme.pessoas.application.dto.DadosPessoaisEditaveis;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
@@ -8,7 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * A própria pessoa corrige os seus dados de contato e saúde (perfil Seguidor).
+ * A própria pessoa corrige os seus dados de identificação, contato, endereço e saúde (perfil
+ * Seguidor).
  *
  * <p>O alvo nunca vem da requisição: é resolvido pelo {@code sub} do token. Aceitar um id do
  * cliente transformaria este endpoint em "editar qualquer pessoa" para quem trocasse o parâmetro.
@@ -29,8 +31,18 @@ public class AtualizarMeusDadosUseCase {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Nenhuma pessoa do cadastro está vinculada a este usuário."));
 
+        String cpf = Pessoa.normalizarCpf(dados.cpf());
+        if (pessoaRepository.existsByCpfAndIdNotAndDeletedFalse(cpf, pessoa.getId())) {
+            throw new BusinessRuleViolationException(
+                    "Já existe outra pessoa no cadastro nacional com o CPF informado (RN-PESSOA-01).");
+        }
+
         pessoa.atualizarDadosPessoais(
+                cpf,
+                dados.dataNascimento(),
                 dados.telefone(),
+                dados.instagram(),
+                dados.endereco(),
                 dados.alergias(),
                 dados.restricaoAlimentar(),
                 dados.medicacaoUsoContinuo(),

@@ -22,6 +22,7 @@ import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.support.AbstractIntegrationTest;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -122,8 +123,21 @@ class PalestrasControllerIT extends AbstractIntegrationTest {
         Setor setor = setorRepository.save(new Setor("Setor Palestra " + UUID.randomUUID(), diocese));
         Paroquia paroquia = paroquiaRepository.save(new Paroquia("Paróquia Palestra " + UUID.randomUUID(), setor));
         Pessoa diretorEspiritual = pessoaRepository.save(new Pessoa(
-                "Diretor " + UUID.randomUUID(), LocalDate.of(1980, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO,
-                paroquia, null, null, null, null, null, null, null));
+                "Diretor " + UUID.randomUUID(),
+                PessoasDeTeste.cpf(),
+                LocalDate.of(1980, 1, 1),
+                "(11) 90000-0000",
+                null,
+                EstadoCivil.SOLTEIRO,
+                paroquia,
+                PessoasDeTeste.endereco(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null));
         return encontroRepository.save(new Encontro(
                 1, "São José", diretorEspiritual, "Sítio Teste", LocalDate.now().plusDays(30), LocalDate.now().plusDays(32), 40, paroquia));
     }

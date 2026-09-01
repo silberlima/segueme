@@ -17,6 +17,7 @@ import com.silberlima.segueme.movimentacao.domain.TransferenciaRepository;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,8 +48,21 @@ class SolicitarTransferenciaUseCaseTest {
         Paroquia destino = new Paroquia("Destino", new Setor("Setor", new Diocese("Diocese")));
         ReflectionTestUtils.setField(destino, "id", paroquiaDestinoId);
         Pessoa pessoa = new Pessoa(
-                "Candidato", LocalDate.of(2000, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, origem,
-                null, null, null, null, null, null, null);
+                "Candidato",
+                PessoasDeTeste.cpf(),
+                LocalDate.of(2000, 1, 1),
+                "(11) 90000-0000",
+                null,
+                EstadoCivil.SOLTEIRO,
+                origem,
+                PessoasDeTeste.endereco(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         when(pessoaRepository.findByIdAndDeletedFalse(pessoaId)).thenReturn(Optional.of(pessoa));
         when(paroquiaRepository.findByIdAndDeletedFalse(paroquiaDestinoId)).thenReturn(Optional.of(destino));
         when(transferenciaRepository.save(any(Transferencia.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -69,8 +83,21 @@ class SolicitarTransferenciaUseCaseTest {
         Paroquia paroquia = new Paroquia("Paróquia", new Setor("Setor", new Diocese("Diocese")));
         ReflectionTestUtils.setField(paroquia, "id", paroquiaId);
         Pessoa pessoa = new Pessoa(
-                "Candidato", LocalDate.of(2000, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, paroquia,
-                null, null, null, null, null, null, null);
+                "Candidato",
+                PessoasDeTeste.cpf(),
+                LocalDate.of(2000, 1, 1),
+                "(11) 90000-0000",
+                null,
+                EstadoCivil.SOLTEIRO,
+                paroquia,
+                PessoasDeTeste.endereco(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         when(pessoaRepository.findByIdAndDeletedFalse(pessoaId)).thenReturn(Optional.of(pessoa));
         when(paroquiaRepository.findByIdAndDeletedFalse(paroquiaId)).thenReturn(Optional.of(paroquia));
 

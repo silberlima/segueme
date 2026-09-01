@@ -21,6 +21,7 @@ import com.silberlima.segueme.inscricoes.domain.PreInscricaoRepository;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -122,10 +123,13 @@ class PreInscreverUseCaseTest {
     private Pessoa umaPessoa() {
         return new Pessoa(
                 "Candidato Teste",
+                PessoasDeTeste.cpf(),
                 LocalDate.of(2002, 3, 10),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

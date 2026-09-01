@@ -20,6 +20,7 @@ import com.silberlima.segueme.posencontro.domain.EncontroPos;
 import com.silberlima.segueme.posencontro.domain.EncontroPosRepository;
 import com.silberlima.segueme.posencontro.domain.FrequenciaPosEncontro;
 import com.silberlima.segueme.posencontro.domain.FrequenciaPosEncontroRepository;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -111,10 +112,13 @@ class RegistrarPresencasUseCaseTest {
     private Pessoa umaPessoa(String nome, Paroquia paroquiaDaPessoa) {
         Pessoa pessoa = new Pessoa(
                 nome,
+                PessoasDeTeste.cpf(),
                 LocalDate.of(2005, 1, 1),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquiaDaPessoa,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

@@ -42,11 +42,14 @@ export function semearMassaPosEncontro(): void {
     ${MASSA.jovens
       .map(
         (jovem) => `insert into pessoa (
-        id, nome_completo, data_nascimento, telefone, estado_civil, paroquia_id, situacao,
+        id, nome_completo, cpf, data_nascimento, telefone, estado_civil, paroquia_id, situacao,
+        endereco_cep, endereco_logradouro, endereco_numero, endereco_bairro, endereco_cidade, endereco_uf,
         created_at, updated_at, deleted
       ) values (
-        '${jovem.id}', '${jovem.nome}', '2005-01-01', '(11) 90000-0000', 'SOLTEIRO',
-        '${MASSA.paroquiaId}', 'SEGUIMISTA', now(), now(), false
+        '${jovem.id}', '${jovem.nome}', '${jovem.cpf}', '2005-01-01', '(11) 90000-0000', 'SOLTEIRO',
+        '${MASSA.paroquiaId}', 'SEGUIMISTA',
+        '01310-100', 'Avenida Paulista', '1000', 'Bela Vista', 'São Paulo', 'SP',
+        now(), now(), false
       );`,
       )
       .join('\n    ')}

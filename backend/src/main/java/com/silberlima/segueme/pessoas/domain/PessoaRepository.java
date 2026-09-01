@@ -23,6 +23,16 @@ public interface PessoaRepository extends JpaRepository<Pessoa, UUID>, JpaSpecif
     boolean existsByIdAndDeletedFalse(UUID id);
 
     /**
+     * Guarda da unicidade do CPF (RN-PESSOA-01) no cadastro. A constraint do banco é a rede de
+     * segurança; esta consulta é o que transforma a colisão numa mensagem que a equipe entende, em
+     * vez de um erro de integridade.
+     */
+    boolean existsByCpfAndDeletedFalse(String cpf);
+
+    /** Mesma checagem, ignorando a própria pessoa — usada quando ela corrige o próprio CPF. */
+    boolean existsByCpfAndIdNotAndDeletedFalse(String cpf, UUID id);
+
+    /**
      * Pool de candidatos a integrante de equipe (`montagem-de-equipes.md`, Fase 6): só quem já
      * concluiu um Encontro como participante ({@link SituacaoPessoa#SEGUIDOR}) serve em equipes de
      * serviço — modelagem adotada na ausência de um RN explícito sobre o critério de elegibilidade.

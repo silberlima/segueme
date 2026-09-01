@@ -4,7 +4,7 @@ Modelagem conceitual apenas — não representa modelagem de banco de dados.
 
 ## Pessoa
 **Descrição:** Cadastro nacional único de um indivíduo vinculado ao Movimento Segue-me. **Responsabilidade:** manter identidade, dados de contato, dados de saúde, competências e situação (Inscrito, Pré-inscrito, Seguimista, Seguidor) ao longo de toda a vida no movimento; seu histórico nunca é apagado, mesmo com transferência de paróquia.
-**Atributos conceituais:** nome completo, data de nascimento, telefone, estado civil, paróquia atual, situação/status, alergias, restrição alimentar, medicação de uso contínuo, contato de emergência (nome/telefone/parentesco), competências/dons, contagem de encontros participados, indicado por (pessoa que sugeriu a pré-inscrição).
+**Atributos conceituais:** nome completo, CPF (chave natural do cadastro: obrigatório, único e validado), data de nascimento, telefone, Instagram (opcional), estado civil, paróquia atual, endereço residencial (CEP, logradouro, número, complemento opcional, bairro, cidade, UF), situação/status, alergias, restrição alimentar, medicação de uso contínuo, contato de emergência (nome/telefone/parentesco), competências/dons, contagem de encontros participados, indicado por (pessoa que sugeriu a pré-inscrição).
 **Relacionamentos:** pertence a uma Paróquia; pode compor um Casal; participa de Encontros; ocupa posições em Equipes; gera registros de Histórico; pode estar em Empréstimo ou Transferência.
 
 ## Casal

@@ -17,6 +17,7 @@ import com.silberlima.segueme.pessoas.domain.HistoricoEvento;
 import com.silberlima.segueme.pessoas.domain.HistoricoEventoRepository;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.TipoEventoHistorico;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,8 +46,21 @@ class AprovarTransferenciaUseCaseTest {
         Paroquia origem = new Paroquia("Origem", new Setor("Setor", new Diocese("Diocese")));
         Paroquia destino = new Paroquia("Destino", new Setor("Setor", new Diocese("Diocese")));
         Pessoa pessoa = new Pessoa(
-                "Candidato", LocalDate.of(2000, 1, 1), "(11) 90000-0000", EstadoCivil.SOLTEIRO, origem,
-                null, null, null, null, null, null, null);
+                "Candidato",
+                PessoasDeTeste.cpf(),
+                LocalDate.of(2000, 1, 1),
+                "(11) 90000-0000",
+                null,
+                EstadoCivil.SOLTEIRO,
+                origem,
+                PessoasDeTeste.endereco(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         Transferencia transferencia = new Transferencia(pessoa, origem, destino, null);
         when(transferenciaRepository.findByIdAndDeletedFalse(transferenciaId)).thenReturn(Optional.of(transferencia));
 

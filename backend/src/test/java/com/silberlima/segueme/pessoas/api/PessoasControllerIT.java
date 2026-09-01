@@ -16,11 +16,14 @@ import com.silberlima.segueme.hierarquia.domain.Paroquia;
 import com.silberlima.segueme.hierarquia.domain.ParoquiaRepository;
 import com.silberlima.segueme.hierarquia.domain.Setor;
 import com.silberlima.segueme.hierarquia.domain.SetorRepository;
+import com.silberlima.segueme.pessoas.api.dto.AtualizarMeusDadosRequest;
 import com.silberlima.segueme.pessoas.api.dto.CriarPessoaRequest;
+import com.silberlima.segueme.pessoas.api.dto.EnderecoRequest;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.support.AbstractIntegrationTest;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -164,14 +167,19 @@ class PessoasControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.id").value(eu.getId().toString()))
                 .andExpect(jsonPath("$.nomeCompleto").value("Eu Mesmo"));
 
+        String novoCpf = PessoasDeTeste.cpf();
         mockMvc.perform(put("/api/v1/pessoas/me")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"telefone\":\"(11) 98888-8888\",\"alergias\":\"Amendoim\"}")
+                        .content(objectMapper.writeValueAsString(umaEdicaoValida(novoCpf, LocalDate.of(1999, 5, 20))))
                         .with(jwt().jwt(builder -> builder.subject("sub-meus-dados"))
                                 .authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.telefone").value("(11) 98888-8888"))
                 .andExpect(jsonPath("$.alergias").value("Amendoim"))
+                .andExpect(jsonPath("$.cpf").value(novoCpf))
+                .andExpect(jsonPath("$.dataNascimento").value("1999-05-20"))
+                .andExpect(jsonPath("$.instagram").value("eu.mesmo"))
+                .andExpect(jsonPath("$.endereco.cidade").value("Rio de Janeiro"))
                 // O que não é autoeditável continua como estava.
                 .andExpect(jsonPath("$.nomeCompleto").value("Eu Mesmo"));
 
@@ -187,6 +195,74 @@ class PessoasControllerIT extends AbstractIntegrationTest {
                         .with(jwt().jwt(builder -> builder.subject("sub-sem-vinculo"))
                                 .authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
                 .andExpect(status().isNotFound());
+    }
+
+    /** Corrigir o próprio CPF não pode virar porta para assumir o de outra pessoa (RN-PESSOA-01). */
+    @Test
+    void shouldReturn409WhenOwnDataTakesAnotherPessoasCpf() throws Exception {
+        Paroquia paroquia = criarParoquia("Paróquia CPF Alheio");
+        pessoaRepository.save(umaPessoaDoUsuario("Eu De Novo", paroquia, "sub-cpf-alheio"));
+        Pessoa outra = pessoaRepository.save(umaPessoa("Dona do CPF", paroquia));
+
+        mockMvc.perform(put("/api/v1/pessoas/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                umaEdicaoValida(outra.getCpf(), LocalDate.of(1999, 5, 20))))
+                        .with(jwt().jwt(builder -> builder.subject("sub-cpf-alheio"))
+                                .authorities(new SimpleGrantedAuthority("ROLE_SEGUIDOR"))))
+                .andExpect(status().isConflict());
+    }
+
+    /* CPF: chave natural do cadastro nacional único (RN-PESSOA-01). */
+
+    @Test
+    void shouldReturn409WhenCpfAlreadyExists() throws Exception {
+        Paroquia paroquia = criarParoquia("Paróquia CPF Duplicado");
+        String cpf = PessoasDeTeste.cpf();
+
+        mockMvc.perform(post("/api/v1/pessoas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(umaRequestValida(paroquia.getId(), cpf)))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
+                                .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/v1/pessoas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(umaRequestValida(paroquia.getId(), cpf)))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
+                                .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void shouldReturn400WhenCpfCheckDigitsAreWrong() throws Exception {
+        Paroquia paroquia = criarParoquia("Paróquia CPF Inválido");
+
+        mockMvc.perform(post("/api/v1/pessoas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                umaRequestValida(paroquia.getId(), "529.982.247-00")))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
+                                .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors.cpf").exists());
+    }
+
+    /** Endereço é obrigatório: cadastro sem ele não passa da validação. */
+    @Test
+    void shouldReturn400WhenEnderecoIsMissing() throws Exception {
+        Paroquia paroquia = criarParoquia("Paróquia Sem Endereço");
+        String corpo = objectMapper.writeValueAsString(umaRequestValida(paroquia.getId()))
+                .replaceFirst("\"endereco\":\\{.*?\\}", "\"endereco\":null");
+
+        mockMvc.perform(post("/api/v1/pessoas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpo)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_PAROQUIA"))
+                                .jwt(builder -> builder.claim("paroquia_id", paroquia.getId().toString()))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors.endereco").exists());
     }
 
     /** Todo usuário é seguidor: "meus dados" vale para qualquer perfil, não só para o Seguidor. */
@@ -211,10 +287,13 @@ class PessoasControllerIT extends AbstractIntegrationTest {
     private Pessoa umaPessoa(String nome, Paroquia paroquia) {
         return new Pessoa(
                 nome,
+                PessoasDeTeste.cpf(),
                 LocalDate.of(2000, 1, 1),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,
@@ -231,12 +310,19 @@ class PessoasControllerIT extends AbstractIntegrationTest {
     }
 
     private CriarPessoaRequest umaRequestValida(java.util.UUID paroquiaId) {
+        return umaRequestValida(paroquiaId, PessoasDeTeste.cpf());
+    }
+
+    private CriarPessoaRequest umaRequestValida(java.util.UUID paroquiaId, String cpf) {
         return new CriarPessoaRequest(
                 "Pessoa de Teste",
+                cpf,
                 LocalDate.of(2000, 1, 1),
                 "(11) 91234-5678",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquiaId,
+                umEnderecoRequest(),
                 null,
                 null,
                 null,
@@ -245,5 +331,26 @@ class PessoasControllerIT extends AbstractIntegrationTest {
                 null,
                 null,
                 Set.of());
+    }
+
+    private EnderecoRequest umEnderecoRequest() {
+        return new EnderecoRequest(
+                "01310-100", "Avenida Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+    }
+
+    private AtualizarMeusDadosRequest umaEdicaoValida(String cpf, LocalDate dataNascimento) {
+        return new AtualizarMeusDadosRequest(
+                cpf,
+                dataNascimento,
+                "(11) 98888-8888",
+                "@eu.mesmo",
+                new EnderecoRequest(
+                        "20040-020", "Avenida Rio Branco", "156", "Sala 8", "Centro", "Rio de Janeiro", "RJ"),
+                "Amendoim",
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 }

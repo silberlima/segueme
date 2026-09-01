@@ -22,6 +22,7 @@ import com.silberlima.segueme.montagem.domain.MatchScore;
 import com.silberlima.segueme.montagem.domain.PapelIntegrante;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -136,10 +137,13 @@ class ConsultarDashboardMontagemUseCaseTest {
     private Pessoa umaPessoa(String nome) {
         return new Pessoa(
                 nome,
+                PessoasDeTeste.cpf(),
                 LocalDate.of(2000, 1, 1),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

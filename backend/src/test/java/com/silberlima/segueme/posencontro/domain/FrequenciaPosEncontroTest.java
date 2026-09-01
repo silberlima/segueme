@@ -9,6 +9,7 @@ import com.silberlima.segueme.hierarquia.domain.Paroquia;
 import com.silberlima.segueme.hierarquia.domain.Setor;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
@@ -18,10 +19,13 @@ class FrequenciaPosEncontroTest {
     private final EncontroPos encontroPos = new EncontroPos(paroquia, LocalDate.now(), null);
     private final Pessoa pessoa = new Pessoa(
             "Jovem Acompanhado",
+            PessoasDeTeste.cpf(),
             LocalDate.of(2005, 1, 1),
             "(11) 90000-0000",
+            null,
             EstadoCivil.SOLTEIRO,
             paroquia,
+            PessoasDeTeste.endereco(),
             null,
             null,
             null,

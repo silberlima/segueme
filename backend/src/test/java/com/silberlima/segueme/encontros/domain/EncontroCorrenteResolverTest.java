@@ -12,6 +12,7 @@ import com.silberlima.segueme.hierarquia.domain.Paroquia;
 import com.silberlima.segueme.hierarquia.domain.Setor;
 import com.silberlima.segueme.pessoas.domain.EstadoCivil;
 import com.silberlima.segueme.pessoas.domain.Pessoa;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -85,10 +86,13 @@ class EncontroCorrenteResolverTest {
     private Encontro umEncontro(LocalDate dataInicio) {
         Pessoa diretor = new Pessoa(
                 "Padre Diretor",
+                PessoasDeTeste.cpf(),
                 LocalDate.of(1970, 1, 1),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

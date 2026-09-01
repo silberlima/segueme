@@ -6,6 +6,7 @@ export function Input({
   type = 'text',
   value,
   placeholder,
+  maxLength,
   error,
   disabled,
   onChange,
@@ -18,6 +19,7 @@ export function Input({
         type={type}
         value={value}
         placeholder={placeholder}
+        maxLength={maxLength}
         disabled={disabled}
         onChange={onChange}
         className={`h-10 rounded-lg border px-3 text-sm text-slate-900 outline-none transition-colors focus:border-violet-500 disabled:opacity-50 ${

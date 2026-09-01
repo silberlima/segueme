@@ -20,6 +20,7 @@ import com.silberlima.segueme.pessoas.domain.Pessoa;
 import com.silberlima.segueme.pessoas.domain.PessoaRepository;
 import com.silberlima.segueme.pessoas.domain.SituacaoPessoa;
 import com.silberlima.segueme.support.AbstractIntegrationTest;
+import com.silberlima.segueme.support.PessoasDeTeste;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,10 +219,13 @@ class DashboardsControllerIT extends AbstractIntegrationTest {
     private Pessoa criarPessoa(String nome, Paroquia paroquia, SituacaoPessoa situacao) {
         Pessoa pessoa = new Pessoa(
                 nome,
+                PessoasDeTeste.cpf(),
                 LocalDate.of(2000, 5, 10),
                 "(11) 90000-0000",
+                null,
                 EstadoCivil.SOLTEIRO,
                 paroquia,
+                PessoasDeTeste.endereco(),
                 null,
                 null,
                 null,

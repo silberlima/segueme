@@ -108,10 +108,13 @@ public class PessoasController {
     public ResponseEntity<PessoaResponse> criar(@Valid @RequestBody CriarPessoaRequest request) {
         Pessoa pessoa = criarPessoaUseCase.execute(new DadosNovaPessoa(
                 request.nomeCompleto(),
+                request.cpf(),
                 request.dataNascimento(),
                 request.telefone(),
+                request.instagram(),
                 request.estadoCivil(),
                 request.paroquiaId(),
+                request.endereco().toDomain(),
                 request.alergias(),
                 request.restricaoAlimentar(),
                 request.medicacaoUsoContinuo(),
@@ -155,13 +158,17 @@ public class PessoasController {
 
     @PutMapping("/me")
     @PreAuthorize(QUALQUER_AUTENTICADO)
-    @Operation(summary = "Altera os dados de contato e saúde da própria pessoa")
+    @Operation(summary = "Altera os dados de identificação, contato, endereço e saúde da própria pessoa")
     public ResponseEntity<PessoaResponse> atualizarMeusDados(
             @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AtualizarMeusDadosRequest request) {
         Pessoa pessoa = atualizarMeusDadosUseCase.execute(
                 jwt.getSubject(),
                 new DadosPessoaisEditaveis(
+                        request.cpf(),
+                        request.dataNascimento(),
                         request.telefone(),
+                        request.instagram(),
+                        request.endereco().toDomain(),
                         request.alergias(),
                         request.restricaoAlimentar(),
                         request.medicacaoUsoContinuo(),
