@@ -45,3 +45,7 @@ ios/Pods/
 # Editor swap files
 *.swp
 *.swo
+
+# Configuração local do Claude Code
+.claude/settings.local.json
+.claude/worktrees/
